@@ -1,0 +1,141 @@
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #eee;
+}
+
+/* BANNER */
+.banner {
+    position: relative;
+    height: 350px;
+    background: url("https://i.pinimg.com/1200x/ed/61/39/ed6139d2f7820899389db0cb4381a42b.jpg")
+        center/cover;
+}
+
+/* HEADER nằm đè lên */
+.header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 20px 0px;
+  color: white;
+}
+
+/* MENU */
+.menu {
+  font-size: 24px;
+  cursor: pointer;
+  margin-left: 100px;
+}
+
+/* LOGO giữa */
+.logo {
+  font-size: 22px;
+  font-weight: bold;
+  letter-spacing: 5px;
+  margin-left: 60px;
+}
+
+/* ICONS bên phải */
+.icons {
+  margin-right: 85px;
+}
+
+.icons span {
+  margin-right: 15px;
+  cursor: pointer;
+}
+
+/* CONTENT */
+.content {
+  display: flex;
+  background: white;
+  padding: 30px;
+}
+
+.left img {
+  width: 200px;
+}
+
+.right {
+  margin-left: 30px;
+}
+
+.genre {
+  color: gray;
+}
+
+.info span {
+  margin-right: 15px;
+  font-size: 14px;
+}
+
+.plot {
+  margin: 15px 0;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  background: black;
+  color: white;
+  cursor: pointer;
+}
+
+/* TRAILER */
+.trailer {
+  padding: 30px;
+  background: white;
+}
+
+.video {
+  height: 150px;
+  background: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+}
+
+/* QUOTE */
+.quote {
+  text-align: center;
+  padding: 20px;
+  font-style: italic;
+  background: #f5f5f5;
+}
+
+/* RELATED */
+.related {
+  background: #e53935;
+  color: white;
+  padding: 30px;
+}
+
+.list {
+  display: flex;
+  gap: 20px;
+}
+
+.card {
+  text-align: center;
+}
+
+.poster {
+  width: 120px;
+  height: 160px;
+  background: white;
+}
+
+.footer {
+  text-align: center;
+  padding: 20px;
+  background: #222;
+  color: white;
+}
