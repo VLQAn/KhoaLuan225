@@ -1,5 +1,12 @@
 import "./Home.css";
-import { FaTwitter, FaFacebook, FaInstagram, FaSearch, FaGoogle } from "react-icons/fa";
+import { FaTwitter, FaFacebook, FaInstagram, FaSearch, FaGoogle, FaStar, FaPlay } from "react-icons/fa";
+
+import icon1 from "../../assets/cast_crew.png";
+import icon2 from "../../assets/award.png";
+import icon3 from "../../assets/gallery.png";
+import icon4 from "../../assets/more.png";
+
+const icons = [icon1, icon2, icon3, icon4];
 
 const related = [
   { title: "Totoro", year: 1988 },
@@ -23,52 +30,91 @@ const Home = () => {
             <div className="icons">
                 <span><FaSearch /></span>
                 <span><FaFacebook /></span>
-                <span><FaTwitter /></span>
-                <span><FaInstagram /></span>
                 <span><FaGoogle /></span>
+                <span>Đăng nhập/ Đăng ký</span>
             </div>
         </div>
       </div>
 
       {/* CONTENT */}
-      <div className="content">
+      <div className="container">
+        <div className="card">
 
-        <div className="left">
-          <img
-            src="https://upload.wikimedia.org/wikipedia/en/d/db/Spirited_Away_Japanese_poster.png"
-            alt=""
-          />
-        </div>
+          {/* CONTENT HEADER */}
+          <div className="info-header">
+            <div>
+              <h1>
+                VÙNG ĐẤT LINH HỒN <span>(2001)</span>
+              </h1>
+              <p className="genre">Hoat Hình | Phiêu Lưu | Gia đình</p>
 
-        <div className="right">
-          <h2>SPIRITED AWAY (2001)</h2>
-          <p className="genre">Animation | Adventure | Family</p>
+              <div className="stars">
+                {[...Array(5)].map((_, i) => <FaStar key={i} />)}
+              </div>
+            </div>
 
-          <div className="info">
-            <span>Rating: PG</span>
-            <span>125 mins</span>
-            <span>$15M</span>
-            <span>2003</span>
+            <div className="info">
+              <p><b>GIỚI HẠN:</b> 12+</p>
+              <p><b>THỜI LƯỢNG:</b> 125 phút</p>
+              <p><b>DOANH THU:</b> 415.900.000.000 VNĐ</p>
+              <p><b>NGÀY PHÁT HÀNH:</b> 28/03/2003</p>
+            </div>
           </div>
 
-          <p className="plot">
-            During her family's move, a young girl wanders into a world ruled by
-            gods, witches, and spirits.
-          </p>
+          {/* MAIN CONTENT */}
+          <div className="content">
 
-          <button className="btn">READ MORE</button>
+            {/* LEFT */}
+            <div className="left">
+              <img
+                src="https://animehay.mx/wp-content/uploads/2026/01/vung-dat-linh-hon-animehay.jpg"
+                alt=""
+              />
+
+              <div className="descrip">
+                <div className="meta">
+                  <p><b>DẠO DIỄN</b><br />Hayao Miyazaki</p>
+                  <p><b>TÁC GIẢ</b><br />Hayao Miyazaki</p>
+                  <p><b>DIỄN VIÊN</b><br />Rumi Hiiragi, Miyu Irino</p>
+                </div>
+
+                <p className="plot">
+                  <b>MÔ TẢ</b><br />Vùng đất linh hồn (Spirited Away) là một bộ phim hoạt hình phiêu lưu giả tưởng của Nhật Bản được đạo diễn bởi Hayao Miyazaki và sản xuất bởi Studio Ghibli. Bộ phim kể về câu chuyện của một cô bé tên Chihiro,...
+                </p>
+
+                <button className="btn">ĐẶT VÉ</button>
+
+              </div>
+            </div>
+            {/* RIGHT */}
+            <div className="right">
+
+              <div className="info_menu">
+                {["Đoàn phim", "Giải thưởng", "Trưng bày", "Thêm"].map((item, i) => (
+                  <div key={i} className="menu-item">
+                    <div className="circle">
+                      <img src={icons[i]} alt="" />
+                    </div>
+                    <p>{item}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="trailer">
+                <h3>TRAILER</h3>
+
+                <div className="video">
+                  <img
+                    src="https://media.vov.vn/sites/default/files/styles/large/public/2021-07/c66f29f6e575486aa40db56441fa503d.jpg"
+                    alt=""
+                  />
+                </div>
+              </div>
+
+            </div>
+          </div>
+
         </div>
-      </div>
-
-      {/* TRAILER */}
-      <div className="trailer">
-        <h3>TRAILER</h3>
-        <div className="video">▶</div>
-      </div>
-
-      {/* QUOTE */}
-      <div className="quote">
-        “Once you do something, you never forget.”
       </div>
 
       {/* RELATED */}
