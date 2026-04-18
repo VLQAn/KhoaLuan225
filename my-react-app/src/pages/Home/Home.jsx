@@ -8,12 +8,20 @@ import icon4 from "../../assets/more.png";
 
 const icons = [icon1, icon2, icon3, icon4];
 
+import film1 from "../../assets/f1.jpg";
+import film2 from "../../assets/f2.jpg";
+import film3 from "../../assets/f3.jpg";
+import film4 from "../../assets/f4.jpg";
+import film5 from "../../assets/f5.jpg";
+
+const films = [film1, film2, film3, film4, film5];
+
 const related = [
-  { title: "Totoro", year: 1988 },
-  { title: "Howl", year: 2004 },
-  { title: "Ponyo", year: 2008 },
-  { title: "Mononoke", year: 1997 },
-  { title: "Nausicaa", year: 1984 },
+  { title: "Hàng xóm của tôi là Totoro", year: 1988 },
+  { title: "Lâu đài di động của Howl", year: 2004 },
+  { title: "Cô bé người cá Ponyo", year: 2008 },
+  { title: "Công chúa Mononoke", year: 1997 },
+  { title: "Nausicaa: Nàng công chúa ở thung lũng gió", year: 1984 },
 ];
 
 const Home = () => {
@@ -119,11 +127,18 @@ const Home = () => {
 
       {/* RELATED */}
       <div className="related">
-        <h2>RELATED MOVIES</h2>
+        <div className="re_title">
+          <span className="line"></span>
+          <h2>PHIM ĐANG CHIẾU KHÁC</h2>
+          <span className="line"></span>
+        </div>
+        
         <div className="list">
           {related.map((m, i) => (
-            <div key={i} className="card">
-              <div className="poster"></div>
+            <div key={i} className="re_card">
+              <div className="poster">
+                <img src={films[i]} alt="" />
+              </div>
               <p>{m.title}</p>
               <span>{m.year}</span>
             </div>

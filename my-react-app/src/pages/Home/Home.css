@@ -100,20 +100,22 @@ body {
 
 /* CONTENT */
 .content {
-  display: grid;
-  grid-template-columns: 50% 50%;
-  gap: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
   margin: 60px 0px;
 }
 
 /* LEFT */
 .left {
+  width: 60%;
+  min-width: 300px;
   display: flex;
   gap: 20px;
 }
 
 .left img {
-  width: 50%;
+  width: 60%;
   border-radius: 5px;
 }
 
@@ -147,6 +149,11 @@ body {
 }
 
 /* RIGHT */
+.right {
+  width: 40%;
+  min-width: 300px;
+}
+
 .right .info_menu {
   display: flex;
   gap: 20px;
@@ -193,24 +200,47 @@ body {
 
 /* RELATED */
 .related {
+  height: auto;
   background: #e53935;
   color: white;
   padding: 30px;
 }
 
-.list {
+.re_title {
   display: flex;
-  gap: 20px;
-}
-
-.card {
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 40px;
+  padding: 0px 60px;
+  font-size: 20px;
   text-align: center;
 }
 
-.poster {
-  width: 120px;
-  height: 160px;
+.line {
+  width: 30%;
+  height: 6px;
   background: white;
+}
+
+.list {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+.re_card {
+  width: calc(20% - 45px);
+  min-width: 200px;
+  height: 60%;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.list img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .footer {
