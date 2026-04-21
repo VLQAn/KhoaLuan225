@@ -1,0 +1,47 @@
+/* BANNER */
+.banner {
+    position: relative;
+    height: 450px;
+    background: url("https://i.pinimg.com/1200x/ed/61/39/ed6139d2f7820899389db0cb4381a42b.jpg")
+        center/cover;
+}
+
+/* HEADER nằm đè lên */
+.header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 20px 0px;
+  color: white;
+}
+
+/* MENU */
+.menu {
+  font-size: 24px;
+  cursor: pointer;
+  margin-left: 100px;
+}
+
+/* LOGO giữa */
+.logo {
+  font-size: 22px;
+  font-weight: bold;
+  letter-spacing: 5px;
+  margin-left: 160px;
+}
+
+/* ICONS bên phải */
+.icons {
+  margin-right: 85px;
+}
+
+.icons span {
+  margin-right: 15px;
+  cursor: pointer;
+}
