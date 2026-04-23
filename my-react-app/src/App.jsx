@@ -1,16 +1,21 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home/Home";
 import Register from "./pages/Register/Register";
+import MainLayout from "./layout/MainLayout";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Trang mặc định */}
-        <Route path="/" element={<Home />} />
 
-        {/* Trang register */}
+        {/* Những trang CÓ sidebar */}
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<Home />} />
+        </Route>
+
+        {/* Những trang KHÔNG có sidebar */}
         <Route path="/register" element={<Register />} />
+
       </Routes>
     </BrowserRouter>
   );

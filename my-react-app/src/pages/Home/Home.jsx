@@ -33,7 +33,7 @@ const Home = () => {
       {/* BANNER */}
       <div className={s.banner}>
         <div className={s.header}>
-          <div className={s.menu}>☰</div>
+          <div className={s.menu}></div>
           <div className={s.logo}>RACSO</div>
 
           <div className={s.icons}>
