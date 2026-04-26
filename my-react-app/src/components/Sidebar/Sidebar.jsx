@@ -1,6 +1,6 @@
-import { Scripts } from "react-router-dom";
 import styles from "./Sidebar.module.css";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const s = styles;
 
@@ -39,50 +39,52 @@ const Sidebar = () => {
         <div className={s.menu}>
           <ul className={s.menu_links}>
             <li className={s.nav_link}>
-                <a href="#">
+                <Link to="/" onClick={() => setIsActive(false)}>
                     <i className={`fa-solid fa-house ${s.icon}`}></i>
                     <span className={s.text + " " + s.nav_text}>Trang chủ</span>
-                </a>
+                </Link>
             </li>
             <li className={s.nav_link}>
-                <a href="#">
+                <Link to="/movies" onClick={() => setIsActive(false)}>
                     <i className={`fa-solid fa-film ${s.icon}`}></i>
-                    <span className={s.text + " " + s.nav_text}>Phim đang chiếu</span>
-                </a>
+                    <span className={s.text + " " + s.nav_text}>
+                    Phim đang chiếu
+                    </span>
+                </Link>
             </li>
             <li className={s.nav_link}>
-                <a href="#">
+                <Link to="/upcoming" onClick={() => setIsActive(false)}>
                     <i className={`fa-solid fa-video ${s.icon}`}></i>
                     <span className={s.text + " " + s.nav_text}>Phim sắp chiếu</span>
-                </a>
+                </Link>
             </li>
             <li className={s.nav_link}>
-                <a href="#">
+                <Link to="/theaters" onClick={() => setIsActive(false)}>
                     <i className={`fa-solid fa-masks-theater ${s.icon}`}></i>
                     <span className={s.text + " " + s.nav_text}>Rạp chiếu</span>
-                </a>
+                </Link>
             </li>
             <li className={s.nav_link}>
-                <a href="#">
+                <Link to="/history" onClick={() => setIsActive(false)}>
                     <i className={`fa-solid fa-clock-rotate-left ${s.icon}`}></i>
                     <span className={s.text + " " + s.nav_text}>Lịch sử đặt vé</span>
-                </a>
+                </Link>
             </li>
             <li className={s.nav_link}>
-                <a href="#">
+                <Link to="/deals" onClick={() => setIsActive(false)}>
                     <i className={`fa-solid fa-tags ${s.icon}`}></i>
                     <span className={s.text + " " + s.nav_text}>Khuyến mãi</span>
-                </a>
+                </Link>
             </li>
           </ul>
         </div>
 
         <div className={s.bottom_content}>
             <li className={s.nav_link}>
-                <a href="#">
+                <Link to="/logout" onClick={() => setIsActive(false)}>
                     <i className={`fa-solid fa-arrow-right-from-bracket fa-flip-horizontal ${s.icon}`}></i>
                     <span className={s.text + " " + s.nav_text}>Đăng xuất</span>
-                </a>
+                </Link>
             </li>
         </div>
       </div>

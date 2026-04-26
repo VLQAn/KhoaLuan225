@@ -5,7 +5,16 @@ const MainLayout = () => {
   return (
     <>
       <Sidebar />
-      <div style={{ marginLeft: "120px" }}>
+
+      <div
+        style={{
+          // marginLeft: "calc((100% - 120px) / 2)",
+          marginLeft: "120px",
+          width: "calc(100% - 120px)",
+          // padding: "20px",
+          boxSizing: "border-box",
+        }}
+      >
         <Outlet />
       </div>
     </>
