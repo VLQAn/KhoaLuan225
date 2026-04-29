@@ -7,6 +7,9 @@ import Theater from "./pages/Theater/Theater";
 import History from "./pages/History/History";
 import Upcoming from "./pages/Upcoming/Upcoming";
 import MovieDetail from "./pages/MovieDetail/MovieDetail";
+import Showtime from "./pages/Showtime/Showtime";
+import Seat from "./pages/Seat/Seat";
+import Checkout from "./pages/Checkout/Checkout";
 
 import MainLayout from "./layout/MainLayout";
 
@@ -22,6 +25,9 @@ function App() {
           <Route path="/history" element={<History />} />
           <Route path="/upcoming" element={<Upcoming />} />
           <Route path="/movie/:id" element={<MovieDetail />} />
+          <Route path="/showtime/:id" element={<Showtime />} />
+          <Route path="/seat/:id" element={<Seat />} />
+          <Route path="/checkout" element={<Checkout />} />
         </Route>
 
         {/* Những trang KHÔNG có sidebar */}

@@ -3,17 +3,31 @@ import { FaPlay } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import { MdMovie, MdLocationOn, MdAccessTime, MdDateRange } from "react-icons/md";
 import { useLocation } from "react-router-dom";
+import { useState } from "react";
 
 const s = styles;
 
+const dates = [
+    { label: "Hôm nay", date: "29/04" },
+    { label: "Thứ năm", date: "30/04" },
+    { label: "Thứ sáu", date: "01/05" },
+];
+
 const showtimes = [
     {
+        date: "29/04",
         cinema: "CGV Nha Trang",
         times: ["18:00", "20:30", "22:00"],
     },
     {
-        cinema: "Lotte Cinema",
-        times: ["17:30", "19:45"],
+        date: "30/04",
+        cinema: "CGV Nha Trang",
+        times: ["17:00", "19:30"],
+    },
+    {
+        date: "01/05",
+        cinema: "CGV Nha Trang",
+        times: ["16:00", "21:00"],
     },
 ];
 
@@ -21,6 +35,7 @@ const MovieDetail = () => {
     const navigate = useNavigate();
     const { id } = useParams();
     const { state: Movie } = useLocation();
+    const [selectedDate, setSelectedDate] = useState(dates[0].date);
 
     const movie = {
         title: Movie?.title || "Avengers: Endgame",
@@ -72,36 +87,48 @@ const MovieDetail = () => {
                     </p>
 
                     <p className={s.desc}>{movie.desc}</p>
-
-                    <button
-                        className={s.btn}
-                        onClick={() => navigate(`/showtime/${id}`)}
-                    >
-                        Đặt vé ngay
-                    </button>
                 </div>
             </div>
 
             {/* Showtime */}
             <div className={s.showtime}>
-                <h2>Lịch chiếu</h2>
+                <div className={s.showtime_header}>
+                    <h2>Lịch chiếu</h2>
 
-                {showtimes.map((c, i) => (
-                    <div key={i} className={s.cinema}>
-                        <h3>{c.cinema}</h3>
-
-                        <div className={s.times}>
-                            {c.times.map((t, idx) => (
-                                <button
-                                    key={idx}
-                                    onClick={() => navigate(`/seat/${idx + 1}`)}
-                                >
-                                    {t}
-                                </button>
-                            ))}
-                        </div>
+                    <div className={s.date_list}>
+                        {dates.map((d, i) => (
+                            <div
+                                key={i}
+                                className={`${s.date_item} ${selectedDate === d.date ? s.active : ""
+                                    }`}
+                                onClick={() => setSelectedDate(d.date)}
+                            >
+                                <p>{d.label}</p>
+                                <span>{d.date}</span>
+                            </div>
+                        ))}
                     </div>
-                ))}
+
+                </div>
+
+                {showtimes
+                    .filter((c) => c.date === selectedDate)
+                    .map((c, i) => (
+                        <div key={i} className={s.cinema}>
+                            <h3>{c.cinema}</h3>
+
+                            <div className={s.times}>
+                                {c.times.map((t, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => navigate(`/seat/${idx + 1}`)}
+                                    >
+                                        {t}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
             </div>
         </div>
     );

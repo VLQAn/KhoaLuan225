@@ -103,6 +103,11 @@
 }
 
 /* Showtime */
+.showtime_header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
 .showtime {
     padding: 20px 50px;
 }
@@ -131,4 +136,36 @@
 
 .times button:hover {
     background: #e50914;
+}
+
+.date_list {
+  display: flex;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.date_item {
+  background: #1e293b;
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  transition: 0.3s;
+}
+
+.date_item p {
+  font-size: 13px;
+  margin: 0;
+}
+
+.date_item span {
+  font-weight: bold;
+}
+
+.date_item:hover {
+  background: #334155;
+}
+
+.active {
+  background: #e50914;
 }

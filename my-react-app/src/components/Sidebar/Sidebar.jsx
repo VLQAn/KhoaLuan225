@@ -22,7 +22,7 @@ const Sidebar = () => {
       <header>
         <div className={s.image_text}>
             <span className={s.image}>
-                <img src="icon.jpg" alt="logo" />
+                <img src="/icon.jpg" alt="logo" />
             </span>
 
             <div className={s.text + " " + s.header_text}>
