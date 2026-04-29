@@ -6,19 +6,17 @@ const s = styles;
 const Checkout = () => {
     const { state } = useLocation();
 
-    const total = state.seats.length * 75000;
+    const selected = state?.selected || [];
+    const total = state?.total || 0;
 
-    return (<div className={s.container}> <h1>Thanh toán</h1>
+    return (
+        <div>
+            <h2>Thanh toán</h2>
 
-        <p>🎬 {state.movie.title}</p>
-        <p>🏢 {state.cinema}</p>
-        <p>⏰ {state.time}</p>
-        <p>💺 {state.seats.join(", ")}</p>
-
-        <h2>Tổng tiền: {total.toLocaleString()} VND</h2>
-
-        <button className={s.btn}>Thanh toán</button>
-    </div>
+            <p>Số ghế: {selected.length}</p>
+            <p>Ghế: {selected.join(", ")}</p>
+            <p>Tổng tiền: {total.toLocaleString()} VNĐ</p>
+        </div>
     );
 };
 

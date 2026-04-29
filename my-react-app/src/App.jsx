@@ -10,6 +10,7 @@ import MovieDetail from "./pages/MovieDetail/MovieDetail";
 import Showtime from "./pages/Showtime/Showtime";
 import Seat from "./pages/Seat/Seat";
 import Checkout from "./pages/Checkout/Checkout";
+import Food from "./pages/Food/Food";
 
 import MainLayout from "./layout/MainLayout";
 
@@ -28,6 +29,7 @@ function App() {
           <Route path="/showtime/:id" element={<Showtime />} />
           <Route path="/seat/:id" element={<Seat />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/food" element={<Food />} />
         </Route>
 
         {/* Những trang KHÔNG có sidebar */}

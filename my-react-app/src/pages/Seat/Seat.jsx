@@ -25,6 +25,8 @@ const Seat = () => {
     };
 
     const price = 75000;
+
+    const seatTotal = selected.length * price;
     const total = selected.length * price;
 
     return (<div className={s.container}>
@@ -119,6 +121,10 @@ const Seat = () => {
                     <p>
                         Ghế: <b>{selected.join(", ") || "Chưa chọn"}</b>
                     </p>
+
+                    <p className={s.subPrice + " " + s.total}>
+                        Giá: <b className={s.price}>{seatTotal.toLocaleString()}đ</b>
+                    </p>
                 </div>
 
                 <hr />
@@ -143,7 +149,7 @@ const Seat = () => {
                     <button
                         className={s.next}
                         disabled={selected.length === 0}
-                        onClick={() => navigate("/payment", { state: { selected, total } })}
+                        onClick={() => navigate("/food", { state: { selected, total } })}
                     >
                         Tiếp tục
                     </button>
