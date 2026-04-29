@@ -6,6 +6,7 @@ import Deal from "./pages/Deal/Deal";
 import Theater from "./pages/Theater/Theater";
 import History from "./pages/History/History";
 import Upcoming from "./pages/Upcoming/Upcoming";
+import MovieDetail from "./pages/MovieDetail/MovieDetail";
 
 import MainLayout from "./layout/MainLayout";
 
@@ -13,12 +14,6 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-
-        {/* Những trang CÓ sidebar */}
-        {/* <Route element={<MainLayout />}>
-          <Route path="/" element={<Home />} />
-          
-        </Route> */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/movies" element={<MovieList />} />
@@ -26,6 +21,7 @@ function App() {
           <Route path="/theaters" element={<Theater />} />
           <Route path="/history" element={<History />} />
           <Route path="/upcoming" element={<Upcoming />} />
+          <Route path="/movie/:id" element={<MovieDetail />} />
         </Route>
 
         {/* Những trang KHÔNG có sidebar */}

@@ -1,0 +1,124 @@
+:root{
+  --tran-02: all 0.2s ease;
+  --tran-03: all 0.3s ease;
+  --tran-04: all 0.4s ease;
+}
+
+.container {
+  padding: 40px 60px;
+  background: linear-gradient(90deg, #f5f6f8, #e53935);
+  min-height: 100vh;
+}
+
+/* TITLE */
+.title {
+  font-size: 26px;
+  font-weight: 600;
+  margin-bottom: 30px;
+  color: #222;
+}
+
+.brand_menu {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  border-radius: 20px;
+  border: #fff solid 1px;
+
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.brand_item {
+  padding: 14px 28px;
+  border-radius: 12px;
+  cursor: pointer;
+  border: #fff solid 1px;
+  transition: var(--tran-04);
+}
+
+/* Hover */
+.brand_item:hover {
+  background: var(--primary-color);
+  color: #fff;
+
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+/* Active */
+.active {
+  background: var(--primary-color);
+  color: #fff;
+
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.filter {
+  margin: 20px 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.filter select {
+  width: 20%;
+  padding: 10px 40px 10px 15px;
+  border-radius: 10px;
+  border: 1px solid #333;
+  font-size: 16px;
+  appearance: none;
+  background: white url("data:image/svg+xml;utf8,<svg fill='black' height='20' viewBox='0 0 20 20' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M5 7l5 5 5-5z'/></svg>") no-repeat right 10px center;
+}
+
+.theater_list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.theater_card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  padding: 20px;
+  border-radius: 20px;
+
+  background: #f3f3f3;
+  box-shadow: 5px 8px 20px rgba(0,0,0,0.2);
+
+  transition: all 0.3s ease;
+}
+
+.theater_card:hover {
+  transform: translateY(-5px) scale(1.01);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+}
+
+.theater_card img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+
+  transition: var(--tran-03);
+}
+
+.theater_card:hover img {
+  transform: scale(1.1) rotate(3deg);
+}
+
+.info h3 {
+  margin: 0;
+}
+
+.info p {
+  margin: 5px 0 0;
+  color: gray;
+}
+
+.rating {
+  margin-left: auto;
+  font-weight: bold;
+  font-size: 18px;
+}

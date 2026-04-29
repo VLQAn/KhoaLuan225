@@ -1,4 +1,5 @@
 import styles from "./MovieList.module.css";
+import { useNavigate } from "react-router-dom";
 import { FaPlay } from "react-icons/fa";
 
 const s = styles;
@@ -63,13 +64,23 @@ const movies = [
 ];
 
 const MovieList = () => {
+  const navigate = useNavigate();
+  
   return (
     <div className={s.container}>
       <h1 className={s.title}>Phim đang chiếu</h1>
 
       <div className={s.grid}>
         {movies.map((m, i) => (
-          <div key={i} className={s.card}>
+          <div
+            key={i}
+            className={s.card}
+            onClick={() =>
+              navigate(`/movie/${i}`, {
+                state: m,
+              })
+            }
+          >
             <div className={s.poster}>
               <img src={m.img} alt={m.title} />
 

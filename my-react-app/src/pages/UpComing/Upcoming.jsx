@@ -86,14 +86,3 @@ const Upcoming = () => {
 };
 
 export default Upcoming;
-
-// function Upcoming() {
-//   return (
-//     <div>
-//       <h1>Upcoming Page</h1>
-//       <p>This is the upcoming page.</p>
-//     </div>
-//   );
-// }
-
-// export default Upcoming;
