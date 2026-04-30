@@ -11,6 +11,7 @@ import Showtime from "./pages/Showtime/Showtime";
 import Seat from "./pages/Seat/Seat";
 import Checkout from "./pages/Checkout/Checkout";
 import Food from "./pages/Food/Food";
+import Ad_Home from "./Admin/Home/Home";
 
 import MainLayout from "./layout/MainLayout";
 
@@ -35,6 +36,8 @@ function App() {
         {/* Những trang KHÔNG có sidebar */}
         <Route path="/register" element={<Register />} />
 
+        {/* Admin routes */}
+        <Route path="/admin/home" element={<Ad_Home />} />
       </Routes>
     </BrowserRouter>
   );
