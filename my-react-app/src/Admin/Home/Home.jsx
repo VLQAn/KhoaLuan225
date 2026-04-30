@@ -7,9 +7,9 @@ import {
     MdAnalytics,
     MdMessage,
     MdShoppingCart,
-    MdAssessment,
     MdAddBox,
-    MdLogout
+    MdLogout,
+    MdReport
 } from "react-icons/md";
 
 const s = styles;
@@ -52,7 +52,7 @@ const Home = () => {
                         <h3>Products</h3>
                     </a>
                     <a href="#">
-                        <span><MdAssessment /></span>
+                        <span><MdReport /></span>
                         <h3>Reports</h3>
                     </a>
                     <a href="#">

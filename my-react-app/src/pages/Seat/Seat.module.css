@@ -71,6 +71,10 @@ h2 {
     color: white;
 }
 
+.normal {
+    background: white;
+}
+
 /* screen */
 .screen {
     margin-top: 30px;

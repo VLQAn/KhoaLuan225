@@ -77,7 +77,7 @@ const Seat = () => {
             <div className={s.legend}>
                 <div><span className={`${s.box} ${s.sold}`}></span> Ghế đã bán</div>
                 <div><span className={`${s.box} ${s.active}`}></span> Ghế đang chọn</div>
-                <div><span className={s.box}></span> Ghế thường</div>
+                <div><span className={`${s.box} ${s.normal}`}></span> Ghế thường <b>75.000 VNĐ</b></div>
             </div>
         </div>
 
