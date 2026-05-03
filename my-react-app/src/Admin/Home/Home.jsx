@@ -31,7 +31,7 @@ const Home = () => {
                         <h2>RACSO</h2>
                     </div>
                     <div className={s.close}>
-                        <MdClose />
+                        <span><MdClose /></span>
                     </div>
                 </div>
 
