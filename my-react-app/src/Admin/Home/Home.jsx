@@ -14,6 +14,9 @@ import {
     MdLocalMall,
     MdStackedLineChart,
     MdMenu,
+    MdLightMode,
+    MdDarkMode,
+    MdAdd,
 } from "react-icons/md";
 
 const s = styles;
@@ -204,8 +207,108 @@ const Home = () => {
             <div className={s.right}>
                 <div className={s.top}>
                     <button id={s.menu_bar}>
-                        <span></span>
+                        <span><MdMenu /></span>
                     </button>
+                    <div className={s.theme_toggler}>
+                        <span className={s.active}><MdLightMode /></span>
+                        <span><MdDarkMode /></span>
+                    </div>
+                    <div className={s.profile}>
+                        <div className={s.info}>
+                            <p><b>Babar</b></p>
+                            <p>Admin</p>
+                            <small className={s.text_muted}></small>
+                        </div>
+                        <div className={s.profile_photo}>
+                            <img src="/galaxy.jpg" alt="" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Start recent update */}
+                <div className={s.recent_updates}>
+                    <h2>Recent Update</h2>
+                    <div className={s.updates}>
+                        <div className={s.update}>
+                            <div className={s.profile_photo}>
+                                <img src="/galaxy_2.jpg" alt="" />
+                            </div>
+                            <div className={s.message}>
+                                <p><b>Babar</b> Recived his order</p>
+                            </div>
+                        </div>
+                        <div className={s.update}>
+                            <div className={s.profile_photo}>
+                                <img src="/galaxy_2.jpg" alt="" />
+                            </div>
+                            <div className={s.message}>
+                                <p><b>Babar</b> Recived his order</p>
+                            </div>
+                        </div>
+                        <div className={s.update}>
+                            <div className={s.profile_photo}>
+                                <img src="/galaxy_2.jpg" alt="" />
+                            </div>
+                            <div className={s.message}>
+                                <p><b>Babar</b> Recived his order</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {/* End recent update */}
+
+                {/* Start sale analytic */}
+                <div className={s.sales_analytics}>
+                    <h2>Sales Analytics</h2>
+
+                    <div className={s.item + " " + s.onlion}>
+                        <div className={s.icon}>
+                            <span><MdShoppingCart /></span>
+                        </div>
+                        <div className={s.right_text}>
+                            <div className={s.info}>
+                                <h3>Onlion orders</h3>
+                                <small className={s.text_muted}>Last seen 2 Hours</small>
+                            </div>
+                            <h5 className={s.danger}>-17%</h5>
+                            <h3>3849</h3>
+                        </div>
+                    </div>
+
+                    <div className={s.item + " " + s.onlion}>
+                        <div className={s.icon}>
+                            <span><MdShoppingCart /></span>
+                        </div>
+                        <div className={s.right_text}>
+                            <div className={s.info}>
+                                <h3>Onlion orders</h3>
+                                <small className={s.text_muted}>Last seen 2 Hours</small>
+                            </div>
+                            <h5 className={s.danger}>-17%</h5>
+                            <h3>3849</h3>
+                        </div>
+                    </div>
+
+                    <div className={s.item + " " + s.onlion}>
+                        <div className={s.icon}>
+                            <span><MdShoppingCart /></span>
+                        </div>
+                        <div className={s.right_text}>
+                            <div className={s.info}>
+                                <h3>Onlion orders</h3>
+                                <small className={s.text_muted}>Last seen 2 Hours</small>
+                            </div>
+                            <h5 className={s.danger}>-17%</h5>
+                            <h3>3849</h3>
+                        </div>
+                    </div>
+                </div>
+                {/* End sale analytic */}
+
+                <div className={s.item + " " + s.add_products}>
+                    <div>
+                        <span><MdAdd /></span>
+                    </div>
                 </div>
             </div>
             {/* end right section */}
