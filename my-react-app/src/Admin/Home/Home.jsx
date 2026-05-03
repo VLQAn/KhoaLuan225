@@ -9,13 +9,17 @@ import {
     MdShoppingCart,
     MdAddBox,
     MdLogout,
-    MdReport
+    MdReport,
+    MdTrendingUp,
+    MdLocalMall,
+    MdStackedLineChart,
+    MdMenu,
 } from "react-icons/md";
 
 const s = styles;
 
 const Home = () => {
-    return (    
+    return (
         <div className={s.container}>
             {/*aside section start */}
             <aside>
@@ -70,15 +74,142 @@ const Home = () => {
             {/*aside section end */}
             {/* main section start */}
             <main>
-                <h1>Main</h1>
+                <h1>Dashboard</h1>
+
+                <div className={s.date}>
+                    <input type="date" />
+                </div>
+
+                <div className={s.insights}>
+                    {/* start selling */}
+                    <div className={s.sales}>
+                        <span><MdTrendingUp /></span>
+                        <div className={s.middle}>
+                            <div className={s.left}>
+                                <h3>Total Sales</h3>
+                                <h1>23.565.000 VNĐ</h1>
+                            </div>
+
+                            <div className={s.progress}>
+                                <svg>
+                                    <circle r="30" cy="40" cx="40"></circle>
+                                </svg>
+                                <div className={s.number}>80%</div>
+                            </div>
+                        </div>
+                        <small>Last 24 Hours</small>
+                    </div>
+                    {/* end selling */}
+
+                    {/* start expenses */}
+                    <div className={s.expenses}>
+                        <span><MdLocalMall /></span>
+                        <div className={s.middle}>
+                            <div className={s.left}>
+                                <h3>Expenses</h3>
+                                <h1>13.890.000 VNĐ</h1>
+                            </div>
+
+                            <div className={s.progress}>
+                                <svg>
+                                    <circle r="30" cy="40" cx="40"></circle>
+                                </svg>
+                                <div className={s.number}>80%</div>
+                            </div>
+                        </div>
+                        <small>Last 24 Hours</small>
+                    </div>
+                    {/* end expenses */}
+
+                    {/* start income */}
+                    <div className={s.income}>
+                        <span><MdStackedLineChart /></span>
+                        <div className={s.middle}>
+                            <div className={s.left}>
+                                <h3>Income</h3>
+                                <h1>9.450.000 VNĐ</h1>
+                            </div>
+
+                            <div className={s.progress}>
+                                <svg>
+                                    <circle r="30" cy="40" cx="40"></circle>
+                                </svg>
+                                <div className={s.number}>100%</div>
+                            </div>
+                        </div>
+                        <small>Last 24 Hours</small>
+                    </div>
+                    {/* end income */}
+                </div>
+
+                {/* start recent order */}
+                <div className={s.recent_order}>
+                    <h1>Recent Orders</h1>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Procuct Name</th>
+                                <th>Procuct Number</th>
+                                <th>Payments</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Mini USB</td>
+                                <td>10</td>
+                                <td>Due</td>
+                                <td className={s.warning}>Pending</td>
+                                <td className={s.primary}>Details</td>
+                            </tr>
+
+                            <tr>
+                                <td>Mini USB</td>
+                                <td>10</td>
+                                <td>Due</td>
+                                <td className={s.warning}>Pending</td>
+                                <td className={s.primary}>Details</td>
+                            </tr>
+
+                            <tr>
+                                <td>Mini USB</td>
+                                <td>10</td>
+                                <td>Due</td>
+                                <td className={s.warning}>Pending</td>
+                                <td className={s.primary}>Details</td>
+                            </tr>
+
+                            <tr>
+                                <td>Mini USB</td>
+                                <td>10</td>
+                                <td>Due</td>
+                                <td className={s.warning}>Pending</td>
+                                <td className={s.primary}>Details</td>
+                            </tr>
+
+                            <tr>
+                                <td>Mini USB</td>
+                                <td>10</td>
+                                <td>Due</td>
+                                <td className={s.warning}>Pending</td>
+                                <td className={s.primary}>Details</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                {/* end recent order */}
             </main>
             {/* main section end */}
             {/* right section start */}
             <div className={s.right}>
-                <h1>Right</h1>
+                <div className={s.top}>
+                    <button id={s.menu_bar}>
+                        <span></span>
+                    </button>
+                </div>
             </div>
             {/* end right section */}
-            
+
         </div>
     );
 }
