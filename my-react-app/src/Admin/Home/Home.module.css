@@ -1,27 +1,3 @@
-:root {
-    --clr-primary: #E53935;
-    --clr-danger: #E53935;
-    --clr-success: #41f1b6;
-    --clr-white: #fff;
-    --clr-info-dark: #7d8da1;
-    --clr-info-light: #dce1eb;
-    --clr-dark: #363949;
-    --clr-warning: #ff4edc;
-    --clr-light: rgba(132, 139, 200, 0.18);
-    --clr-primary-variant: #111e88;
-    --clr-dark-variant: #677483;
-    --clr-color-background: #f6f6f9;
-
-    --card-border-radius: 2rem;
-    --border-radius-1: 0.4rem;
-    --border-radius-2: 0.8rem;
-    --border-radius-3: 1.2rem;
-
-    --card-padding: 1.8rem;
-    --padding-1: 1.2rem;
-    --box-shadow: 5px 8px 20px rgba(0, 0, 0, 0.2);
-}
-
 * {
     margin: 0;
     padding: 0;
@@ -30,13 +6,15 @@
     border: 0;
     list-style: none;
     appearance: none;
+    transition: background 0.3s ease, color 0.3s ease;
 }
 
 body {
     font-size: 0.88rem;
     user-select: none;
     overflow-x: hidden;
-    /* background: var(--clr-color-background); */
+    background: var(--clr-color-background);
+    transition: background 0.3s ease, color 0.3s ease;
 }
 
 .container {
@@ -54,6 +32,7 @@ a {
 h2 {
     font-size: 1.4rem;
     margin-bottom: 0;
+    color: var(--clr-primary);
 }
 
 h3 {
@@ -70,6 +49,7 @@ h5 {
 
 small {
     font-size: 0.75rem;
+    color: var(--clr-dark);
 }
 
 .profile_photo img {
@@ -120,6 +100,10 @@ aside .top {
     margin-top: 1.4rem;
 }
 
+aside .top .close span {
+    display: none;
+}
+
 aside .logo {
     display: flex;
     gap: 1rem;
@@ -161,7 +145,6 @@ aside .sidebar a.active {
     background: var(--clr-light);
     color: var(--clr-primary);
     margin-left: 0;
-    /* border-left: 5px solid var(--clr-primary); */
 }
 
 aside .sidebar a.active::before {
@@ -329,6 +312,7 @@ main .insights .progress .number {
     display: flex;
     justify-content: center;
     align-items: center;
+    color: var(--clr-dark);
 }
 
 main .recent_order {
@@ -427,6 +411,7 @@ main .recent_order a {
     justify-content: center;
     align-items: center;
     border-radius: var(--border-radius-1);
+    transition: all 0.3s ease;
 }
 
 .right .theme_toggler span.active {
@@ -473,6 +458,10 @@ main .recent_order a {
     grid-template-columns: 2.6rem auto;
     gap: 1rem;
     margin-bottom: 1rem;
+}
+
+.right .recent_updates .update {
+    color: var(--clr-info-dark);
 }
 
 /* SALE ANALYTIC */
@@ -581,7 +570,22 @@ main .recent_order a {
         width: 18rem;
         z-index: 3;
         background: var(--clr-white);
-        display: none;
+        display: block;
+        left: -100px;
+        animation: menuAni 1s forwards;
+
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+
+    .open {
+        transform: translateX(0);
+    }
+
+    @keyframes menuAni {
+        to{
+            left: 0;
+        }
     }
 
     aside .logo h2 {

@@ -19,18 +19,32 @@ import {
     MdAdd,
 } from "react-icons/md";
 
+import { useState, useEffect } from "react";
+
 const s = styles;
 
 const Home = () => {
+    const [darkMode, setDarkMode] = useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    
+
+    useEffect(() => {
+        if (darkMode) {
+            document.body.classList.add("dark_theme_variables");
+        } else {
+            document.body.classList.remove("dark_theme_variables");
+        }
+    }, [darkMode]);
+
     return (
         <div className={s.container}>
             {/*aside section start */}
-            <aside>
+            <aside className={`${s.aside} ${isSidebarOpen ? s.open : ""}`}>
                 <div className={s.top}>
                     <div className={s.logo}>
                         <h2>RACSO</h2>
                     </div>
-                    <div className={s.close}>
+                    <div className={s.close} onClick={() => setIsSidebarOpen(false)}>
                         <span><MdClose /></span>
                     </div>
                 </div>
@@ -206,12 +220,12 @@ const Home = () => {
             {/* right section start */}
             <div className={s.right}>
                 <div className={s.top}>
-                    <button id={s.menu_bar}>
+                    <button className={s.menu_bar} onClick={() => setIsSidebarOpen(true)}>
                         <span><MdMenu /></span>
                     </button>
-                    <div className={s.theme_toggler}>
-                        <span className={s.active}><MdLightMode /></span>
-                        <span><MdDarkMode /></span>
+                    <div className={s.theme_toggler} onClick={() => setDarkMode(!darkMode)}>
+                        <span className={!darkMode ? s.active : ""}><MdLightMode /></span>
+                        <span className={darkMode ? s.active : ""}><MdDarkMode /></span>
                     </div>
                     <div className={s.profile}>
                         <div className={s.info}>
