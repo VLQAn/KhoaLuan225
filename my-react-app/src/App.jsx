@@ -12,6 +12,9 @@ import Seat from "./pages/Seat/Seat";
 import Checkout from "./pages/Checkout/Checkout";
 import Food from "./pages/Food/Food";
 import Ad_Home from "./Admin/Home/Home";
+import MovieManager from "./Admin/ManagerFilm/MovieManager";
+import TheaterManager from "./Admin/ManagerTheater/TheaterManager";
+import ShowtimeManager from "./Admin/ManagerShowtime/ShowtimeManager";
 
 import MainLayout from "./layout/MainLayout";
 
@@ -38,6 +41,10 @@ function App() {
 
         {/* Admin routes */}
         <Route path="/admin/home" element={<Ad_Home />} />
+        <Route path="/admin/movie-manager" element={<MovieManager />} />
+        <Route path="/admin/theater-manager" element={<TheaterManager />} />
+        <Route path="/admin/showtime-manager" element={<ShowtimeManager />} />
+
       </Routes>
     </BrowserRouter>
   );

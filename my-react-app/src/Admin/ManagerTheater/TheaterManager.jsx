@@ -1,0 +1,394 @@
+import styles from "./TheaterManager.module.css";
+
+import {
+    MdClose,
+    MdDashboard,
+    MdMovie,
+    MdAnalytics,
+    MdMessage,
+    MdShoppingCart,
+    MdAddBox,
+    MdLogout,
+    MdMenu,
+    MdLightMode,
+    MdDarkMode,
+    MdEdit,
+    MdDelete,
+    MdSave,
+    MdAdd,
+    MdChair,
+    MdMeetingRoom,
+    MdPhone,
+    MdLocationOn,
+    MdReport,
+
+} from "react-icons/md";
+
+import { useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
+
+const s = styles;
+
+const TheaterManager = () => {
+    const [darkMode, setDarkMode] = useState(() => {
+        return localStorage.getItem("darkMode") === "true";
+    });
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    const [theaters, setTheaters] = useState([
+        {
+            id: 1,
+            tenRap: "Galaxy Cinema",
+            diaChi: "Quận 1, TP.HCM",
+            soDienThoai: "0909999999",
+            moTa: "Rạp chiếu hiện đại",
+            phongChieu: 5,
+        },
+    ]);
+
+    const [formData, setFormData] = useState({
+        tenRap: "",
+        diaChi: "",
+        soDienThoai: "",
+        moTa: "",
+        phongChieu: "",
+    });
+
+    const [editingId, setEditingId] = useState(null);
+
+    useEffect(() => {
+
+        if (darkMode) {
+            document.body.classList.add("dark_theme_variables");
+        } else {
+            document.body.classList.remove("dark_theme_variables");
+        }
+
+        localStorage.setItem("darkMode", darkMode);
+
+    }, [darkMode]);
+
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value,
+        });
+    };
+
+    const handleSubmit = () => {
+        if (editingId) {
+            setTheaters(
+                theaters.map((theater) =>
+                    theater.id === editingId
+                        ? { ...formData, id: editingId }
+                        : theater
+                )
+            );
+            setEditingId(null);
+        } else {
+            setTheaters([
+                ...theaters,
+                {
+                    ...formData,
+                    id: Date.now(),
+                },
+            ]);
+        }
+
+        resetForm();
+    };
+
+    const handleEdit = (theater) => {
+        setEditingId(theater.id);
+        setFormData(theater);
+    };
+
+    const handleDelete = (id) => {
+        setTheaters(theaters.filter((theater) => theater.id !== id));
+    };
+
+    const resetForm = () => {
+        setFormData({
+            tenRap: "",
+            diaChi: "",
+            soDienThoai: "",
+            moTa: "",
+            phongChieu: "",
+        });
+    };
+
+    return (
+        <div className={s.container}>
+            {/* SIDEBAR */}
+            <aside className={`${s.aside} ${isSidebarOpen ? s.open : ""}`}>
+                <div className={s.top}>
+                    <div className={s.logo}>
+                        <h2>RACSO</h2>
+                    </div>
+                    <div className={s.close} onClick={() => setIsSidebarOpen(false)}>
+                        <span><MdClose /></span>
+                    </div>
+                </div>
+
+                {/* sidebar start */}
+                <div className={s.sidebar}>
+                    <NavLink
+                        to="/admin/home"
+                        className={({ isActive }) => isActive ? s.active : ""}
+                    >
+                        <span><MdDashboard /></span>
+                        <h3>Bảng điều khiển</h3>
+                    </NavLink>
+                    <NavLink
+                        to="/admin/movie-manager"
+                        className={({ isActive }) => isActive ? s.active : ""}
+                    >
+                        <span><MdMovie /></span>
+                        <h3>Cập nhật phim</h3>
+                    </NavLink>
+                    <NavLink
+                        to="/admin/theater-manager"
+                        className={({ isActive }) => isActive ? s.active : ""}
+                    >
+                        <span><MdAnalytics /></span>
+                        <h3>Cập nhật rạp chiếu</h3>
+                    </NavLink>
+                    <a href="#">
+                        <span><MdMessage /></span>
+                        <h3>Đơn đặt vé</h3>
+                        <span className={s.msg_count}>10</span>
+                    </a>
+                    <NavLink
+                        to="/admin/showtime-manager"
+                        className={({ isActive }) => isActive ? s.active : ""}
+                    >
+                        <span><MdShoppingCart /></span>
+                        <h3>Cập nhật xuất chiếu</h3>
+                    </NavLink>
+                    <a href="#">
+                        <span><MdReport /></span>
+                        <h3>Thống kê</h3>
+                    </a>
+                    <a href="#">
+                        <span><MdAddBox /></span>
+                        <h3>Thực đơn</h3>
+                    </a>
+                    <a href="#">
+                        <span><MdLogout /></span>
+                        <h3>Logout</h3>
+                    </a>
+
+                </div>
+                {/* sidebar end */}
+            </aside>
+
+            {/* MAIN */}
+            <main>
+                <div className={s.header}>
+                    <h1>Quản lý rạp chiếu</h1>
+
+                    <button className={s.addBtn}>
+                        <MdAdd />
+                        Thêm rạp
+                    </button>
+                </div>
+
+                {/* FORM */}
+                <div className={s.form_container}>
+                    <div className={s.form_group}>
+                        <label>Tên rạp</label>
+
+                        <div className={s.input_box}>
+                            <span><MdAnalytics /></span>
+                            <input
+                                type="text"
+                                name="tenRap"
+                                value={formData.tenRap}
+                                onChange={handleChange}
+                                placeholder="Nhập tên rạp"
+                            />
+                        </div>
+                    </div>
+
+                    <div className={s.form_group}>
+                        <label>Số điện thoại</label>
+
+                        <div className={s.input_box}>
+                            <span><MdPhone /></span>
+                            <input
+                                type="text"
+                                name="soDienThoai"
+                                value={formData.soDienThoai}
+                                onChange={handleChange}
+                                placeholder="Nhập số điện thoại"
+                            />
+                        </div>
+                    </div>
+
+                    <div className={`${s.form_group} ${s.full}`}>
+                        <label>Địa chỉ</label>
+
+                        <div className={s.input_box}>
+                            <span><MdLocationOn /></span>
+                            <input
+                                type="text"
+                                name="diaChi"
+                                value={formData.diaChi}
+                                onChange={handleChange}
+                                placeholder="Nhập địa chỉ"
+                            />
+                        </div>
+                    </div>
+
+                    <div className={s.form_group}>
+                        <label>Phòng chiếu</label>
+
+                        <div className={s.input_box}>
+                            <span><MdMeetingRoom /></span>
+                            <input
+                                type="number"
+                                name="phongChieu"
+                                value={formData.phongChieu}
+                                onChange={handleChange}
+                                placeholder="Số phòng chiếu"
+                            />
+                        </div>
+                    </div>
+
+                    <div className={s.form_group}>
+                        <label>Sơ đồ ghế</label>
+
+                        <div className={s.input_box}>
+                            <span><MdChair /></span>
+                            <select>
+                                <option>2D Standard</option>
+                                <option>IMAX</option>
+                                <option>VIP</option>
+                                <option>Couple Seat</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className={`${s.form_group} ${s.full}`}>
+                        <label>Mô tả</label>
+
+                        <textarea
+                            rows="4"
+                            name="moTa"
+                            value={formData.moTa}
+                            onChange={handleChange}
+                            placeholder="Mô tả rạp chiếu..."
+                        />
+                    </div>
+
+                    <button className={s.saveBtn} onClick={handleSubmit}>
+                        <MdSave />
+                        {editingId ? "Cập nhật rạp" : "Lưu rạp"}
+                    </button>
+                </div>
+
+                {/* TABLE */}
+                <div className={s.table_container}>
+                    <h2>Danh sách rạp chiếu</h2>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tên rạp</th>
+                                <th>Địa chỉ</th>
+                                <th>SĐT</th>
+                                <th>Phòng chiếu</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {theaters.map((theater) => (
+                                <tr key={theater.id}>
+                                    <td>{theater.tenRap}</td>
+                                    <td>{theater.diaChi}</td>
+                                    <td>{theater.soDienThoai}</td>
+                                    <td>{theater.phongChieu}</td>
+
+                                    <td>
+                                        <div className={s.actions}>
+                                            <button
+                                                className={s.editBtn}
+                                                onClick={() => handleEdit(theater)}
+                                            >
+                                                <MdEdit />
+                                            </button>
+
+                                            <button
+                                                className={s.deleteBtn}
+                                                onClick={() => handleDelete(theater.id)}
+                                            >
+                                                <MdDelete />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+
+            {/* RIGHT */}
+            <div className={s.right}>
+                <div className={s.top}>
+                    <button
+                        className={s.menu_bar}
+                        onClick={() => setIsSidebarOpen(true)}
+                    >
+                        <span><MdMenu /></span>
+                    </button>
+
+                    <div
+                        className={s.theme_toggler}
+                        onClick={() => setDarkMode(!darkMode)}
+                    >
+                        <span className={!darkMode ? s.active : ""}>
+                            <MdLightMode />
+                        </span>
+
+                        <span className={darkMode ? s.active : ""}>
+                            <MdDarkMode />
+                        </span>
+                    </div>
+                    <div className={s.profile}>
+                        <div className={s.info}>
+                            <p><b>Babar</b></p>
+                            <p>Admin</p>
+                            <small className={s.text_muted}></small>
+                        </div>
+                        <div className={s.profile_photo}>
+                            <img src="/galaxy.jpg" alt="" />
+                        </div>
+                    </div>
+                </div>
+
+                <div className={s.right_card}>
+                    <h2>Thông tin rạp</h2>
+
+                    <div className={s.info_item}>
+                        <p>Tổng rạp chiếu</p>
+                        <h3>{theaters.length}</h3>
+                    </div>
+
+                    <div className={s.info_item}>
+                        <p>Phòng chiếu hoạt động</p>
+                        <h3>24</h3>
+                    </div>
+
+                    <div className={s.info_item}>
+                        <p>Số ghế trung bình</p>
+                        <h3>120</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default TheaterManager;

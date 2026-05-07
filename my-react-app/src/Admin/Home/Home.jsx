@@ -3,7 +3,11 @@ import {
     MdClose,
     MdSettings,
     MdDashboard,
-    MdPeople,
+    MdMovie,
+    MdMovieCreation,
+    MdOndemandVideo,
+    MdLiveTv,
+    MdTheaters,
     MdAnalytics,
     MdMessage,
     MdShoppingCart,
@@ -20,20 +24,27 @@ import {
 } from "react-icons/md";
 
 import { useState, useEffect } from "react";
+import { NavLink } from "react-router-dom";
 
 const s = styles;
 
 const Home = () => {
-    const [darkMode, setDarkMode] = useState(false);
+    const [darkMode, setDarkMode] = useState(() => {
+        return localStorage.getItem("darkMode") === "true";
+    });
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    
+
 
     useEffect(() => {
+
         if (darkMode) {
             document.body.classList.add("dark_theme_variables");
         } else {
             document.body.classList.remove("dark_theme_variables");
         }
+
+        localStorage.setItem("darkMode", darkMode);
+
     }, [darkMode]);
 
     return (
@@ -51,34 +62,47 @@ const Home = () => {
 
                 {/* sidebar start */}
                 <div className={s.sidebar}>
-                    <a href="#">
+                    <NavLink
+                        to="/admin/home"
+                        className={({ isActive }) => isActive ? s.active : ""}
+                    >
                         <span><MdDashboard /></span>
-                        <h3>Dashboard</h3>
-                    </a>
-                    <a href="#" className={s.active}>
-                        <span><MdPeople /></span>
-                        <h3>Custumers</h3>
-                    </a>
-                    <a href="#">
+                        <h3>Bảng điều khiển</h3>
+                    </NavLink>
+                    <NavLink
+                        to="/admin/movie-manager"
+                        className={({ isActive }) => isActive ? s.active : ""}
+                    >
+                        <span><MdMovie /></span>
+                        <h3>Cập nhật phim</h3>
+                    </NavLink>
+                    <NavLink
+                        to="/admin/theater-manager"
+                        className={({ isActive }) => isActive ? s.active : ""}
+                    >
                         <span><MdAnalytics /></span>
-                        <h3>Analytics</h3>
-                    </a>
+                        <h3>Cập nhật rạp chiếu</h3>
+                    </NavLink>
                     <a href="#">
                         <span><MdMessage /></span>
-                        <h3>Messages</h3>
+                        <h3>Đơn đặt vé</h3>
                         <span className={s.msg_count}>10</span>
                     </a>
-                    <a href="#">
+                    <NavLink
+                        to="/admin/showtime-manager"
+                        className={({ isActive }) => isActive ? s.active : ""}
+                    >
                         <span><MdShoppingCart /></span>
-                        <h3>Products</h3>
-                    </a>
+                        <h3>Cập nhật xuất chiếu</h3>
+                    </NavLink>
+
                     <a href="#">
                         <span><MdReport /></span>
-                        <h3>Reports</h3>
+                        <h3>Thống kê</h3>
                     </a>
                     <a href="#">
                         <span><MdAddBox /></span>
-                        <h3>Add products</h3>
+                        <h3>Thực đơn</h3>
                     </a>
                     <a href="#">
                         <span><MdLogout /></span>
