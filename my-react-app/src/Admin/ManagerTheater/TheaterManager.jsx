@@ -137,7 +137,7 @@ const TheaterManager = () => {
                         className={({ isActive }) => isActive ? s.active : ""}
                     >
                         <span><MdDashboard /></span>
-                        <h3>Bảng điều khiển</h3>
+                        <h3>Doanh thu</h3>
                     </NavLink>
                     <NavLink
                         to="/admin/movie-manager"
@@ -153,11 +153,14 @@ const TheaterManager = () => {
                         <span><MdAnalytics /></span>
                         <h3>Cập nhật rạp chiếu</h3>
                     </NavLink>
-                    <a href="#">
+                    <NavLink
+                        to="/admin/booking-manager"
+                        className={({ isActive }) => isActive ? s.active : ""}
+                    >
                         <span><MdMessage /></span>
                         <h3>Đơn đặt vé</h3>
                         <span className={s.msg_count}>10</span>
-                    </a>
+                    </NavLink>
                     <NavLink
                         to="/admin/showtime-manager"
                         className={({ isActive }) => isActive ? s.active : ""}
@@ -165,14 +168,13 @@ const TheaterManager = () => {
                         <span><MdShoppingCart /></span>
                         <h3>Cập nhật xuất chiếu</h3>
                     </NavLink>
-                    <a href="#">
-                        <span><MdReport /></span>
-                        <h3>Thống kê</h3>
-                    </a>
-                    <a href="#">
+                    <NavLink
+                        to="/admin/food-manager"
+                        className={({ isActive }) => isActive ? s.active : ""}
+                    >
                         <span><MdAddBox /></span>
-                        <h3>Thực đơn</h3>
-                    </a>
+                        <h3>Bắp nước</h3>
+                    </NavLink>
                     <a href="#">
                         <span><MdLogout /></span>
                         <h3>Logout</h3>

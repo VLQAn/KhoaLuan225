@@ -15,6 +15,8 @@ import Ad_Home from "./Admin/Home/Home";
 import MovieManager from "./Admin/ManagerFilm/MovieManager";
 import TheaterManager from "./Admin/ManagerTheater/TheaterManager";
 import ShowtimeManager from "./Admin/ManagerShowtime/ShowtimeManager";
+import FoodManager from "./Admin/Food/FoodManager";
+import BookingManager from "./Admin/Booking/BookingManager";
 
 import MainLayout from "./layout/MainLayout";
 
@@ -44,6 +46,8 @@ function App() {
         <Route path="/admin/movie-manager" element={<MovieManager />} />
         <Route path="/admin/theater-manager" element={<TheaterManager />} />
         <Route path="/admin/showtime-manager" element={<ShowtimeManager />} />
+        <Route path="/admin/food-manager" element={<FoodManager />} />
+        <Route path="/admin/booking-manager" element={<BookingManager />} />
 
       </Routes>
     </BrowserRouter>

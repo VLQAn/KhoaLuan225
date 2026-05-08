@@ -33,7 +33,37 @@ const Home = () => {
         return localStorage.getItem("darkMode") === "true";
     });
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState("today");
 
+    const revenues = {
+        today: {
+            sales: "256",
+            expenses: "19.080.000 VNĐ",
+            income: "78%",
+            label: "Last 24 Hours",
+        },
+
+        week: {
+            sales: "1.730",
+            expenses: "224.450.000 VNĐ",
+            income: "89%",
+            label: "Last 7 Days",
+        },
+
+        month: {
+            sales: "580.000.000 VNĐ",
+            expenses: "250.000.000 VNĐ",
+            income: "330.000.000 VNĐ",
+            label: "Last 30 Days",
+        },
+
+        year: {
+            sales: "6.200.000.000 VNĐ",
+            expenses: "3.100.000.000 VNĐ",
+            income: "3.100.000.000 VNĐ",
+            label: "Last 12 Months",
+        }
+    };
 
     useEffect(() => {
 
@@ -46,6 +76,8 @@ const Home = () => {
         localStorage.setItem("darkMode", darkMode);
 
     }, [darkMode]);
+
+    const currentRevenue = revenues[activeTab];
 
     return (
         <div className={s.container}>
@@ -67,7 +99,7 @@ const Home = () => {
                         className={({ isActive }) => isActive ? s.active : ""}
                     >
                         <span><MdDashboard /></span>
-                        <h3>Bảng điều khiển</h3>
+                        <h3>Doanh thu</h3>
                     </NavLink>
                     <NavLink
                         to="/admin/movie-manager"
@@ -83,11 +115,14 @@ const Home = () => {
                         <span><MdAnalytics /></span>
                         <h3>Cập nhật rạp chiếu</h3>
                     </NavLink>
-                    <a href="#">
+                    <NavLink
+                        to="/admin/booking-manager"
+                        className={({ isActive }) => isActive ? s.active : ""}
+                    >
                         <span><MdMessage /></span>
                         <h3>Đơn đặt vé</h3>
                         <span className={s.msg_count}>10</span>
-                    </a>
+                    </NavLink>
                     <NavLink
                         to="/admin/showtime-manager"
                         className={({ isActive }) => isActive ? s.active : ""}
@@ -95,15 +130,13 @@ const Home = () => {
                         <span><MdShoppingCart /></span>
                         <h3>Cập nhật xuất chiếu</h3>
                     </NavLink>
-
-                    <a href="#">
-                        <span><MdReport /></span>
-                        <h3>Thống kê</h3>
-                    </a>
-                    <a href="#">
+                    <NavLink
+                        to="/admin/food-manager"
+                        className={({ isActive }) => isActive ? s.active : ""}
+                    >
                         <span><MdAddBox /></span>
-                        <h3>Thực đơn</h3>
-                    </a>
+                        <h3>Bắp nước</h3>
+                    </NavLink>
                     <a href="#">
                         <span><MdLogout /></span>
                         <h3>Logout</h3>
@@ -115,10 +148,58 @@ const Home = () => {
             {/*aside section end */}
             {/* main section start */}
             <main>
-                <h1>Dashboard</h1>
+                <h1>Doanh thu</h1>
 
-                <div className={s.date}>
-                    <input type="date" />
+                {/* SUB NAV */}
+                <div className={s.sub_nav}>
+                    <div className={s.date}>
+                        <input type="date" />
+                    </div>
+
+                    <button
+                        className={
+                            activeTab === "today"
+                                ? s.active
+                                : ""
+                        }
+                        onClick={() => setActiveTab("today")}
+                    >
+                        Hôm nay
+                    </button>
+
+                    <button
+                        className={
+                            activeTab === "week"
+                                ? s.active
+                                : ""
+                        }
+                        onClick={() => setActiveTab("week")}
+                    >
+                        Tuần này
+                    </button>
+
+                    <button
+                        className={
+                            activeTab === "month"
+                                ? s.active
+                                : ""
+                        }
+                        onClick={() => setActiveTab("month")}
+                    >
+                        Tháng này
+                    </button>
+
+                    <button
+                        className={
+                            activeTab === "year"
+                                ? s.active
+                                : ""
+                        }
+                        onClick={() => setActiveTab("year")}
+                    >
+                        Năm này
+                    </button>
+
                 </div>
 
                 <div className={s.insights}>
@@ -127,8 +208,8 @@ const Home = () => {
                         <span><MdTrendingUp /></span>
                         <div className={s.middle}>
                             <div className={s.left}>
-                                <h3>Total Sales</h3>
-                                <h1>23.565.000 VNĐ</h1>
+                                <h3>Tổng vé bán ra</h3>
+                                <h1>{currentRevenue.sales}</h1>
                             </div>
 
                             <div className={s.progress}>
@@ -138,7 +219,7 @@ const Home = () => {
                                 <div className={s.number}>80%</div>
                             </div>
                         </div>
-                        <small>Last 24 Hours</small>
+                        <small>{currentRevenue.label}</small>
                     </div>
                     {/* end selling */}
 
@@ -147,8 +228,8 @@ const Home = () => {
                         <span><MdLocalMall /></span>
                         <div className={s.middle}>
                             <div className={s.left}>
-                                <h3>Expenses</h3>
-                                <h1>13.890.000 VNĐ</h1>
+                                <h3>Tổng doanh thu</h3>
+                                <h1>{currentRevenue.expenses}</h1>
                             </div>
 
                             <div className={s.progress}>
@@ -158,7 +239,7 @@ const Home = () => {
                                 <div className={s.number}>80%</div>
                             </div>
                         </div>
-                        <small>Last 24 Hours</small>
+                        <small>{currentRevenue.label}</small>
                     </div>
                     {/* end expenses */}
 
@@ -167,8 +248,8 @@ const Home = () => {
                         <span><MdStackedLineChart /></span>
                         <div className={s.middle}>
                             <div className={s.left}>
-                                <h3>Income</h3>
-                                <h1>9.450.000 VNĐ</h1>
+                                <h3>Tỉ lệ lắp đầy ghế</h3>
+                                <h1>{currentRevenue.income}</h1>
                             </div>
 
                             <div className={s.progress}>
@@ -178,62 +259,43 @@ const Home = () => {
                                 <div className={s.number}>100%</div>
                             </div>
                         </div>
-                        <small>Last 24 Hours</small>
+                        <small>{currentRevenue.label}</small>
                     </div>
                     {/* end income */}
                 </div>
 
                 {/* start recent order */}
                 <div className={s.recent_order}>
-                    <h1>Recent Orders</h1>
+                    <h1>Cụm rạp/ Chi nhánh</h1>
                     <table>
                         <thead>
                             <tr>
-                                <th>Procuct Name</th>
-                                <th>Procuct Number</th>
-                                <th>Payments</th>
-                                <th>Status</th>
+                                <th>Rạp</th>
+                                <th>Vé bán</th>
+                                <th>Doanh thu</th>
+                                <th>Lấp đầy</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Mini USB</td>
-                                <td>10</td>
-                                <td>Due</td>
-                                <td className={s.warning}>Pending</td>
-                                <td className={s.primary}>Details</td>
+                                <td>Galaxy Vĩnh Trung</td>
+                                <td>430</td>
+                                <td>120Tr</td>
+                                <td className={s.primary}>80%</td>
                             </tr>
 
                             <tr>
-                                <td>Mini USB</td>
-                                <td>10</td>
-                                <td>Due</td>
-                                <td className={s.warning}>Pending</td>
-                                <td className={s.primary}>Details</td>
+                                <td>Galaxy Thanh Khê</td>
+                                <td>310</td>
+                                <td>88Tr</td>
+                                <td className={s.primary}>71%</td>
                             </tr>
 
                             <tr>
-                                <td>Mini USB</td>
-                                <td>10</td>
-                                <td>Due</td>
-                                <td className={s.warning}>Pending</td>
-                                <td className={s.primary}>Details</td>
-                            </tr>
-
-                            <tr>
-                                <td>Mini USB</td>
-                                <td>10</td>
-                                <td>Due</td>
-                                <td className={s.warning}>Pending</td>
-                                <td className={s.primary}>Details</td>
-                            </tr>
-
-                            <tr>
-                                <td>Mini USB</td>
-                                <td>10</td>
-                                <td>Due</td>
-                                <td className={s.warning}>Pending</td>
-                                <td className={s.primary}>Details</td>
+                                <td>Galaxy Hải Châu</td>
+                                <td>510</td>
+                                <td>145Tr</td>
+                                <td className={s.primary}>92%</td>
                             </tr>
                         </tbody>
                     </table>
@@ -265,30 +327,30 @@ const Home = () => {
 
                 {/* Start recent update */}
                 <div className={s.recent_updates}>
-                    <h2>Recent Update</h2>
+                    <h2>Top phim</h2>
                     <div className={s.updates}>
                         <div className={s.update}>
                             <div className={s.profile_photo}>
-                                <img src="/galaxy_2.jpg" alt="" />
+                                <img src="https://i.pinimg.com/1200x/1a/74/70/1a7470b2ef79024725d3319ffc09f2c0.jpg" alt="top1" />
                             </div>
                             <div className={s.message}>
-                                <p><b>Babar</b> Recived his order</p>
+                                <p><b>Avengers Endgame</b>6.589 vé</p>
                             </div>
                         </div>
                         <div className={s.update}>
                             <div className={s.profile_photo}>
-                                <img src="/galaxy_2.jpg" alt="" />
+                                <img src="https://i.pinimg.com/736x/7e/2c/48/7e2c48b7fc699cf06d44fd422534f99f.jpg" alt="top2" />
                             </div>
                             <div className={s.message}>
-                                <p><b>Babar</b> Recived his order</p>
+                                <p><b>Zoo Topia 2</b> 6.235 vé</p>
                             </div>
                         </div>
                         <div className={s.update}>
                             <div className={s.profile_photo}>
-                                <img src="/galaxy_2.jpg" alt="" />
+                                <img src="https://i.pinimg.com/736x/bb/d9/a9/bbd9a910ee5386927c2ee1e8e4ddaa34.jpg" alt="top3" />
                             </div>
                             <div className={s.message}>
-                                <p><b>Babar</b> Recived his order</p>
+                                <p><b>Mưa đỏ</b> 5.626 vé</p>
                             </div>
                         </div>
                     </div>
@@ -297,57 +359,51 @@ const Home = () => {
 
                 {/* Start sale analytic */}
                 <div className={s.sales_analytics}>
-                    <h2>Sales Analytics</h2>
+                    <h2>Xuất chiếu vàng</h2>
 
                     <div className={s.item + " " + s.onlion}>
                         <div className={s.icon}>
-                            <span><MdShoppingCart /></span>
+                            <span><MdDarkMode /></span>
                         </div>
                         <div className={s.right_text}>
                             <div className={s.info}>
-                                <h3>Onlion orders</h3>
-                                <small className={s.text_muted}>Last seen 2 Hours</small>
+                                <h3>Xuất</h3>
+                                <h4 className={s.danger}>19:30</h4>
                             </div>
-                            <h5 className={s.danger}>-17%</h5>
-                            <h3>3849</h3>
+                            <h3>Tỷ lệ kín ghế</h3>
+                            <h4 className={s.danger}>97%</h4>
                         </div>
                     </div>
 
                     <div className={s.item + " " + s.onlion}>
                         <div className={s.icon}>
-                            <span><MdShoppingCart /></span>
+                            <span><MdDarkMode /></span>
                         </div>
                         <div className={s.right_text}>
                             <div className={s.info}>
-                                <h3>Onlion orders</h3>
-                                <small className={s.text_muted}>Last seen 2 Hours</small>
+                                <h3>Xuất</h3>
+                                <h4 className={s.danger}>22:00</h4>
                             </div>
-                            <h5 className={s.danger}>-17%</h5>
-                            <h3>3849</h3>
+                            <h3>Tỷ lệ kín ghế</h3>
+                            <h4 className={s.danger}>70%</h4>
                         </div>
                     </div>
 
                     <div className={s.item + " " + s.onlion}>
                         <div className={s.icon}>
-                            <span><MdShoppingCart /></span>
+                            <span><MdLightMode /></span>
                         </div>
                         <div className={s.right_text}>
                             <div className={s.info}>
-                                <h3>Onlion orders</h3>
-                                <small className={s.text_muted}>Last seen 2 Hours</small>
+                                <h3>Xuất</h3>
+                                <h4 className={s.danger}>9:00</h4>
                             </div>
-                            <h5 className={s.danger}>-17%</h5>
-                            <h3>3849</h3>
+                            <h3>Tỷ lệ kín ghế</h3>
+                            <h4 className={s.danger}>22%</h4>
                         </div>
                     </div>
                 </div>
                 {/* End sale analytic */}
-
-                <div className={s.item + " " + s.add_products}>
-                    <div>
-                        <span><MdAdd /></span>
-                    </div>
-                </div>
             </div>
             {/* end right section */}
 

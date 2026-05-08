@@ -1,29 +1,28 @@
-import styles from "./MovieManager.module.css";
+import styles from "./FoodManager.module.css";
+
 import {
     MdClose,
-    MdSettings,
     MdDashboard,
     MdMovie,
-    MdMovieCreation,
-    MdOndemandVideo,
-    MdLiveTv,
-    MdTheaters,
     MdAnalytics,
-    MdMessage,
-    MdShoppingCart,
-    MdAddBox,
+    MdFastfood,
     MdLogout,
-    MdReport,
-    MdTrendingUp,
-    MdLocalMall,
-    MdStackedLineChart,
     MdMenu,
     MdLightMode,
     MdDarkMode,
-    MdAdd,
-    MdSave,
     MdEdit,
     MdDelete,
+    MdSave,
+    MdAdd,
+    MdRestaurantMenu,
+    MdLocalDrink,
+    MdToggleOn,
+    MdToggleOff,
+    MdMessage,
+    MdShoppingCart,
+    MdReport,
+    MdAddBox,
+
 } from "react-icons/md";
 
 import { useEffect, useState } from "react";
@@ -31,40 +30,47 @@ import { NavLink } from "react-router-dom";
 
 const s = styles;
 
-const MovieManager = () => {
+const FoodManager = () => {
+
     const [darkMode, setDarkMode] = useState(() => {
         return localStorage.getItem("darkMode") === "true";
     });
+
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-    const [movies, setMovies] = useState([
+    const [foods, setFoods] = useState([
         {
-            maPhim: 1,
-            tieuDe: "Avengers Endgame",
-            moTa: "Bom tấn Marvel",
-            thoiLuong: 180,
-            ngayCongChieu: "2026-05-01",
-            anhPoster: "https://i.pinimg.com/1200x/46/5d/73/465d735095596d55ba96c937d4dc1917.jpg",
-            anhBanner: "https://i.pinimg.com/1200x/0b/ac/89/0bac898999f616d08e0208933bfed909.jpg",
-            danhGia: 9.2,
-            dienVien: "Robert Downey Jr",
-            daoDien: "Russo Brothers",
-            theLoai: "Hành động",
+            id: 1,
+            name: "Combo Couple",
+            category: "Combo",
+            price: "199000",
+            image: "/combo1.jpg",
+            status: true,
         },
+        {
+            id: 2,
+            name: "Bắp Caramel",
+            category: "Bắp",
+            price: "79000",
+            image: "/popcorn.jpg",
+            status: true,
+        },
+        {
+            id: 3,
+            name: "Pepsi Large",
+            category: "Nước",
+            price: "49000",
+            image: "/pepsi.jpg",
+            status: false,
+        }
     ]);
 
     const [formData, setFormData] = useState({
-        maPhim: "",
-        tieuDe: "",
-        moTa: "",
-        thoiLuong: "",
-        ngayCongChieu: "",
-        anhPoster: "",
-        anhBanner: "",
-        danhGia: "",
-        dienVien: "",
-        daoDien: "",
-        theLoai: "",
+        name: "",
+        category: "",
+        price: "",
+        image: "",
+        status: true,
     });
 
     const [editingId, setEditingId] = useState(null);
@@ -82,54 +88,89 @@ const MovieManager = () => {
     }, [darkMode]);
 
     const handleChange = (e) => {
+
         setFormData({
             ...formData,
             [e.target.name]: e.target.value,
         });
     };
 
+    const resetForm = () => {
+
+        setFormData({
+            name: "",
+            category: "",
+            price: "",
+            image: "",
+            status: true,
+        });
+
+        setEditingId(null);
+    };
+
     const handleSubmit = () => {
+
+        if (
+            !formData.name ||
+            !formData.category ||
+            !formData.price
+        ) return;
+
         if (editingId) {
-            setMovies(
-                movies.map((movie) =>
-                    movie.maPhim === editingId ? formData : movie
+
+            setFoods(
+                foods.map((food) =>
+                    food.id === editingId
+                        ? { ...formData, id: editingId }
+                        : food
                 )
             );
-            setEditingId(null);
+
         } else {
-            setMovies([...movies, { ...formData, maPhim: Date.now() }]);
+
+            setFoods([
+                ...foods,
+                {
+                    ...formData,
+                    id: Date.now(),
+                }
+            ]);
         }
 
         resetForm();
     };
 
-    const handleEdit = (movie) => {
-        setFormData(movie);
-        setEditingId(movie.maPhim);
+    const handleEdit = (food) => {
+
+        setEditingId(food.id);
+        setFormData(food);
     };
 
     const handleDelete = (id) => {
-        setMovies(movies.filter((movie) => movie.maPhim !== id));
+
+        setFoods(
+            foods.filter((food) => food.id !== id)
+        );
     };
 
-    const resetForm = () => {
-        setFormData({
-            maPhim: "",
-            tieuDe: "",
-            moTa: "",
-            thoiLuong: "",
-            ngayCongChieu: "",
-            anhPoster: "",
-            anhBanner: "",
-            danhGia: "",
-            dienVien: "",
-            daoDien: "",
-            theLoai: "",
-        });
+    const handleToggle = (id) => {
+
+        setFoods(
+            foods.map((food) =>
+                food.id === id
+                    ? {
+                        ...food,
+                        status: !food.status
+                    }
+                    : food
+            )
+        );
     };
 
     return (
+
         <div className={s.container}>
+
             {/* SIDEBAR */}
             <aside className={`${s.aside} ${isSidebarOpen ? s.open : ""}`}>
                 <div className={s.top}>
@@ -197,186 +238,205 @@ const MovieManager = () => {
 
             {/* MAIN */}
             <main>
-                <div className={s.header}>
-                    <h1>Quản lý phim</h1>
 
-                    <button className={s.addBtn}>
+                <div className={s.header}>
+
+                    <h1>Quản lý bắp nước</h1>
+
+                    <button
+                        className={s.addBtn}
+                        onClick={resetForm}
+                    >
                         <MdAdd />
-                        Thêm phim
+                        Thêm món
                     </button>
+
                 </div>
 
                 {/* FORM */}
                 <div className={s.form_container}>
-                    <div className={s.form_group}>
-                        <label>Tiêu đề</label>
-                        <input
-                            type="text"
-                            name="tieuDe"
-                            value={formData.tieuDe}
-                            onChange={handleChange}
-                        />
-                    </div>
 
                     <div className={s.form_group}>
-                        <label>Thể loại</label>
-                        <input
-                            type="text"
-                            name="theLoai"
-                            value={formData.theLoai}
-                            onChange={handleChange}
-                        />
+                        <label>Tên món</label>
+
+                        <div className={s.input_box}>
+                            <span><MdRestaurantMenu /></span>
+
+                            <input
+                                type="text"
+                                name="name"
+                                placeholder="Nhập tên món"
+                                value={formData.name}
+                                onChange={handleChange}
+                            />
+                        </div>
                     </div>
 
                     <div className={s.form_group}>
-                        <label>Thời lượng</label>
-                        <input
-                            type="number"
-                            name="thoiLuong"
-                            value={formData.thoiLuong}
-                            onChange={handleChange}
-                        />
+                        <label>Loại món</label>
+
+                        <div className={s.input_box}>
+                            <span><MdLocalDrink /></span>
+
+                            <select
+                                name="category"
+                                value={formData.category}
+                                onChange={handleChange}
+                            >
+                                <option value="">Chọn loại</option>
+                                <option value="Combo">Combo</option>
+                                <option value="Bắp">Bắp</option>
+                                <option value="Nước">Nước</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div className={s.form_group}>
-                        <label>Ngày công chiếu</label>
-                        <input
-                            type="date"
-                            name="ngayCongChieu"
-                            value={formData.ngayCongChieu}
-                            onChange={handleChange}
-                        />
+                        <label>Giá món</label>
+
+                        <div className={s.input_box}>
+                            <span>VNĐ</span>
+
+                            <input
+                                type="number"
+                                name="price"
+                                placeholder="Nhập giá món"
+                                value={formData.price}
+                                onChange={handleChange}
+                            />
+                        </div>
                     </div>
 
                     <div className={s.form_group}>
-                        <label>Ảnh poster</label>
-                        <input
-                            type="text"
-                            name="anhPoster"
-                            value={formData.anhPoster}
-                            onChange={handleChange}
-                        />
+                        <label>Ảnh món</label>
+
+                        <div className={s.input_box}>
+                            <input
+                                type="text"
+                                name="image"
+                                placeholder="/combo.jpg"
+                                value={formData.image}
+                                onChange={handleChange}
+                            />
+                        </div>
                     </div>
 
-                    <div className={s.form_group}>
-                        <label>Ảnh banner</label>
-                        <input
-                            type="text"
-                            name="anhBanner"
-                            value={formData.anhBanner}
-                            onChange={handleChange}
-                        />
-                    </div>
-
-                    <div className={s.form_group}>
-                        <label>Đánh giá</label>
-                        <input
-                            type="number"
-                            step="0.1"
-                            name="danhGia"
-                            value={formData.danhGia}
-                            onChange={handleChange}
-                        />
-                    </div>
-
-                    <div className={s.form_group}>
-                        <label>Diễn viên</label>
-                        <input
-                            type="text"
-                            name="dienVien"
-                            value={formData.dienVien}
-                            onChange={handleChange}
-                        />
-                    </div>
-
-                    <div className={s.form_group}>
-                        <label>Đạo diễn</label>
-                        <input
-                            type="text"
-                            name="daoDien"
-                            value={formData.daoDien}
-                            onChange={handleChange}
-                        />
-                    </div>
-
-                    <div className={`${s.form_group} ${s.full}`}>
-                        <label>Mô tả</label>
-                        <textarea
-                            rows="4"
-                            name="moTa"
-                            value={formData.moTa}
-                            onChange={handleChange}
-                        />
-                    </div>
-
-                    <button className={s.saveBtn} onClick={handleSubmit}>
+                    <button
+                        className={s.saveBtn}
+                        onClick={handleSubmit}
+                    >
                         <MdSave />
-                        {editingId ? "Cập nhật phim" : "Lưu phim"}
+                        {editingId ? "Cập nhật món" : "Lưu món"}
                     </button>
+
                 </div>
 
                 {/* TABLE */}
                 <div className={s.table_container}>
+
+                    <h2>Danh sách món</h2>
+
                     <table>
+
                         <thead>
+
                             <tr>
-                                <th>Poster</th>
-                                <th>Tên phim</th>
-                                <th>Thể loại</th>
-                                <th>Thời lượng</th>
-                                <th>Đánh giá</th>
+                                <th>Ảnh</th>
+                                <th>Tên món</th>
+                                <th>Loại</th>
+                                <th>Giá</th>
+                                <th>Trạng thái</th>
                                 <th>Hành động</th>
                             </tr>
+
                         </thead>
 
                         <tbody>
-                            {movies.map((movie) => (
-                                <tr key={movie.maPhim}>
+
+                            {foods.map((food) => (
+
+                                <tr key={food.id}>
+
                                     <td>
                                         <img
-                                            src={movie.anhPoster}
+                                            src={food.image}
                                             alt=""
-                                            className={s.poster}
+                                            className={s.food_image}
                                         />
                                     </td>
 
-                                    <td>{movie.tieuDe}</td>
-                                    <td>{movie.theLoai}</td>
-                                    <td>{movie.thoiLuong} phút</td>
-                                    <td>{movie.danhGia}</td>
+                                    <td>{food.name}</td>
+
+                                    <td>{food.category}</td>
 
                                     <td>
+                                        {Number(food.price).toLocaleString()} VNĐ
+                                    </td>
+
+                                    <td>
+
+                                        <button
+                                            className={
+                                                food.status
+                                                    ? s.toggle_on
+                                                    : s.toggle_off
+                                            }
+                                            onClick={() => handleToggle(food.id)}
+                                        >
+
+                                            {
+                                                food.status
+                                                    ? <MdToggleOn />
+                                                    : <MdToggleOff />
+                                            }
+
+                                        </button>
+
+                                    </td>
+
+                                    <td>
+
                                         <div className={s.actions}>
+
                                             <button
                                                 className={s.editBtn}
-                                                onClick={() => handleEdit(movie)}
+                                                onClick={() => handleEdit(food)}
                                             >
                                                 <MdEdit />
                                             </button>
 
                                             <button
                                                 className={s.deleteBtn}
-                                                onClick={() => handleDelete(movie.maPhim)}
+                                                onClick={() => handleDelete(food.id)}
                                             >
                                                 <MdDelete />
                                             </button>
+
                                         </div>
+
                                     </td>
+
                                 </tr>
+
                             ))}
+
                         </tbody>
+
                     </table>
+
                 </div>
+
             </main>
 
             {/* RIGHT */}
             <div className={s.right}>
+
                 <div className={s.top}>
                     <button
                         className={s.menu_bar}
                         onClick={() => setIsSidebarOpen(true)}
                     >
-                        <MdMenu />
+                        <span><MdMenu /></span>
                     </button>
 
                     <div
@@ -404,26 +464,40 @@ const MovieManager = () => {
                 </div>
 
                 <div className={s.right_card}>
-                    <h2>Thông tin</h2>
+
+                    <h2>Thống kê món</h2>
 
                     <div className={s.info_item}>
-                        <p>Tổng số phim</p>
-                        <h3>{movies.length}</h3>
+                        <p>Tổng món</p>
+                        <h3>{foods.length}</h3>
                     </div>
 
                     <div className={s.info_item}>
-                        <p>Phim đang chiếu</p>
-                        <h3>12</h3>
+                        <p>Món đang bán</p>
+
+                        <h3>
+                            {
+                                foods.filter(food => food.status).length
+                            }
+                        </h3>
                     </div>
 
                     <div className={s.info_item}>
-                        <p>Phim sắp chiếu</p>
-                        <h3>5</h3>
+                        <p>Món đã tắt</p>
+
+                        <h3>
+                            {
+                                foods.filter(food => !food.status).length
+                            }
+                        </h3>
                     </div>
+
                 </div>
+
             </div>
+
         </div>
     );
 };
 
-export default MovieManager;
+export default FoodManager;
