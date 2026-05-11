@@ -82,6 +82,28 @@
     color: #ffff;
 }
 
+.extra_info{
+    margin-top: 18px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.extra_info p{
+    color: #ddd;
+
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.extra_info span{
+    color: white;
+    font-weight: bold;
+
+    margin-right: 8px;
+}
+
 .desc {
     margin: 15px 0;
     line-height: 1.6;
@@ -117,6 +139,12 @@
     padding: 15px;
     border-radius: 8px;
     margin-top: 15px;
+}
+
+.cinema_name {
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
 }
 
 .times {

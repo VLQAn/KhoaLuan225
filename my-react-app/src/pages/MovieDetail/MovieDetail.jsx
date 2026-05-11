@@ -44,8 +44,15 @@ const MovieDetail = () => {
         rating: Movie?.rating || 8.8,
         time: Movie?.time || "181 phút",
         date: Movie?.date || "26/04/2019",
-        genre: "Hành động, Viễn tưởng",
-        desc: "Sau Infinity War, các Avengers phải tập hợp để đảo ngược hậu quả do Thanos gây ra.",
+        director: "Anthony Russo, Joe Russo",
+        cast: [
+            "Robert Downey Jr.",
+            "Chris Evans",
+            "Scarlett Johansson",
+            "Tom Holland",
+        ],
+        genre: "Hành động, khoa học Viễn tưởng, chính kịch, siêu anh hùng, phiêu lưu, kỳ ảo",
+        desc: "Avengers: Endgame (Avengers: Hồi Kết) là bom tấn siêu anh hùng năm 2019, đóng vai trò là phần kết của câu chuyện kéo dài 11 năm trong Vũ trụ Điện ảnh Marvel (MCU) tính đến thời điểm đó. Bộ phim là hậu quả trực tiếp của Avengers: Infinity War, khi Thanos đã búng tay xóa sổ một nửa sinh vật sống trong vũ trụ.",
     };
 
     return (
@@ -85,6 +92,19 @@ const MovieDetail = () => {
                         <MdDateRange className={s.icon} />
                         {movie.date}
                     </p>
+                    <div className={s.extra_info}>
+
+                        <p>
+                            <span>Đạo diễn:</span>
+                            {movie.director}
+                        </p>
+
+                        <p>
+                            <span>Diễn viên:</span>
+                            {movie.cast.join(", ")}
+                        </p>
+
+                    </div>
 
                     <p className={s.desc}>{movie.desc}</p>
                 </div>
@@ -115,7 +135,7 @@ const MovieDetail = () => {
                     .filter((c) => c.date === selectedDate)
                     .map((c, i) => (
                         <div key={i} className={s.cinema}>
-                            <h3>{c.cinema}</h3>
+                            <h3 className={s.cinema_name}>{c.cinema}</h3>
 
                             <div className={s.times}>
                                 {c.times.map((t, idx) => (
