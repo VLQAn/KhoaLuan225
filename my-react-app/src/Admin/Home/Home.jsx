@@ -21,9 +21,10 @@ import {
     MdLightMode,
     MdDarkMode,
     MdAdd,
+    MdLocalOffer,
 } from "react-icons/md";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { NavLink } from "react-router-dom";
 
 const s = styles;
@@ -65,6 +66,23 @@ const Home = () => {
         }
     };
 
+    const seatRows = ["J", "I", "H", "G", "F", "E", "D", "C", "B", "A"];
+
+    const hotSeats = [
+        "J3", "J4", "J5", "J6", "J7", "J8",
+        "I3", "I4", "I5", "I6", "I7",
+        "H3", "H4", "H5", "H6", "H7",
+        "G5", "G6",
+    ];
+
+    const mediumSeats = [
+        "H2",
+        "G3", "G4", "G7", "G8",
+        "F4", "F5", "F6",
+        "E5", "E6",
+        "D5",
+    ];
+
     useEffect(() => {
 
         if (darkMode) {
@@ -78,6 +96,8 @@ const Home = () => {
     }, [darkMode]);
 
     const currentRevenue = revenues[activeTab];
+    const revenueDetailRef = useRef(null);
+    const seatAnalyticsRef = useRef(null);
 
     return (
         <div className={s.container}>
@@ -131,6 +151,13 @@ const Home = () => {
                         <h3>Cập nhật xuất chiếu</h3>
                     </NavLink>
                     <NavLink
+                        to="/admin/promotion-manager"
+                        className={({ isActive }) => isActive ? s.active : ""}
+                    >
+                        <span><MdLocalOffer /></span>
+                        <h3>Khuyến mãi</h3>
+                    </NavLink>
+                    <NavLink
                         to="/admin/food-manager"
                         className={({ isActive }) => isActive ? s.active : ""}
                     >
@@ -148,7 +175,7 @@ const Home = () => {
             {/*aside section end */}
             {/* main section start */}
             <main>
-                <h1>Doanh thu</h1>
+                <h1>Bảng điều khiển</h1>
 
                 {/* SUB NAV */}
                 <div className={s.sub_nav}>
@@ -224,7 +251,13 @@ const Home = () => {
                     {/* end selling */}
 
                     {/* start expenses */}
-                    <div className={s.expenses}>
+                    <div className={s.expenses}
+                        onClick={() =>
+                            revenueDetailRef.current?.scrollIntoView({
+                                behavior: "smooth",
+                                block: "start",
+                            })
+                        }>
                         <span><MdLocalMall /></span>
                         <div className={s.middle}>
                             <div className={s.left}>
@@ -244,7 +277,15 @@ const Home = () => {
                     {/* end expenses */}
 
                     {/* start income */}
-                    <div className={s.income}>
+                    <div
+                        className={s.income}
+                        onClick={() =>
+                            seatAnalyticsRef.current?.scrollIntoView({
+                                behavior: "smooth",
+                                block: "start",
+                            })
+                        }
+                    >
                         <span><MdStackedLineChart /></span>
                         <div className={s.middle}>
                             <div className={s.left}>
@@ -301,6 +342,145 @@ const Home = () => {
                     </table>
                 </div>
                 {/* end recent order */}
+
+                {/* START REVENUE DETAIL */}
+                <div className={s.revenue_detail} ref={revenueDetailRef}>
+                    <div className={s.revenue_header}>
+                        <h1>Thống kê doanh thu</h1>
+                    </div>
+
+                    <div className={s.revenue_content}>
+                        {/* LEFT */}
+                        <div className={s.revenue_chart_card}>
+                            <h2>Tỷ lệ doanh thu</h2>
+
+                            <div className={s.pie_chart}></div>
+
+                            <div className={s.chart_legend}>
+                                <div>
+                                    <span className={s.ticket_dot}></span>
+                                    Doanh thu vé - 82%
+                                </div>
+
+                                <div>
+                                    <span className={s.food_dot}></span>
+                                    Bắp nước - 18%
+                                </div>
+                            </div>
+
+                            <div className={s.revenue_numbers}>
+                                <div>
+                                    <h3>Doanh thu vé</h3>
+                                    <h2>475.000.000 VNĐ</h2>
+                                </div>
+
+                                <div>
+                                    <h3>Doanh thu bắp nước</h3>
+                                    <h2>105.000.000 VNĐ</h2>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* RIGHT */}
+                        <div className={s.food_top_card}>
+                            <h2>Top combo bán chạy</h2>
+
+                            <div className={s.combo_item}>
+                                <div>
+                                    <h3>Combo Galaxy XL</h3>
+                                    <small>1.250 combo</small>
+                                </div>
+                                <span className={s.combo_img}>
+                                    <img src="https://i.pinimg.com/736x/99/60/0a/99600a38a884687cab170b068e7794b3.jpg" alt="" />
+                                </span>
+                            </div>
+
+                            <div className={s.combo_item}>
+                                <div>
+                                    <h3>Combo Couple</h3>
+                                    <small>980 combo</small>
+                                </div>
+                                <span className={s.combo_img}>
+                                    <img src="https://i.pinimg.com/736x/99/60/0a/99600a38a884687cab170b068e7794b3.jpg" alt="" />
+                                </span>
+                            </div>
+
+                            <div className={s.combo_item}>
+                                <div>
+                                    <h3>Combo Family</h3>
+                                    <small>745 combo</small>
+                                </div>
+                                <span className={s.combo_img}>
+                                    <img src="https://i.pinimg.com/736x/99/60/0a/99600a38a884687cab170b068e7794b3.jpg" alt="" />
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {/* END REVENUE DETAIL */}
+
+                {/* START SEAT ANALYTICS */}
+
+                <div className={s.seat_analytics} ref={seatAnalyticsRef}>
+                    <div className={s.seat_header}>
+                        <h1>Phân tích tỷ lệ lấp đầy ghế</h1>
+                        <p>Khu vực màu đỏ là vị trí được đặt nhiều nhất</p>
+                    </div>
+
+                    <div className={s.cinema_layout}>
+                        <div className={s.screen}>
+                            SCREEN
+                        </div>
+
+                        <div className={s.seat_map}>
+                            {seatRows.map((row) => (
+                                <div key={row} className={s.seat_row}>
+                                    <span className={s.row_label}>{row}</span>
+
+                                    {[...Array(10)].map((_, index) => {
+                                        const seatId = `${row}${index + 1}`;
+
+                                        let seatClass = s.low;
+
+                                        if (hotSeats.includes(seatId)) {
+                                            seatClass = s.hot;
+                                        } else if (mediumSeats.includes(seatId)) {
+                                            seatClass = s.medium;
+                                        }
+
+                                        return (
+                                            <div
+                                                key={seatId}
+                                                className={`${s.seat_box} ${seatClass}`}
+                                            >
+                                                {index + 1}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className={s.seat_legend}>
+                            <div>
+                                <span className={`${s.legend_box} ${s.hot}`}></span>
+                                Đặt nhiều
+                            </div>
+
+                            <div>
+                                <span className={`${s.legend_box} ${s.medium}`}></span>
+                                Trung bình
+                            </div>
+
+                            <div>
+                                <span className={`${s.legend_box} ${s.low}`}></span>
+                                Ít đặt
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* END SEAT ANALYTICS */}
             </main>
             {/* main section end */}
             {/* right section start */}

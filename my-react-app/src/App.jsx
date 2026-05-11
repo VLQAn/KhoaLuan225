@@ -17,6 +17,7 @@ import TheaterManager from "./Admin/ManagerTheater/TheaterManager";
 import ShowtimeManager from "./Admin/ManagerShowtime/ShowtimeManager";
 import FoodManager from "./Admin/Food/FoodManager";
 import BookingManager from "./Admin/Booking/BookingManager";
+import PromotionManager from "./Admin/Promotion/PromotionManager";
 
 import MainLayout from "./layout/MainLayout";
 
@@ -48,7 +49,7 @@ function App() {
         <Route path="/admin/showtime-manager" element={<ShowtimeManager />} />
         <Route path="/admin/food-manager" element={<FoodManager />} />
         <Route path="/admin/booking-manager" element={<BookingManager />} />
-
+        <Route path="/admin/promotion-manager" element={<PromotionManager />} />
       </Routes>
     </BrowserRouter>
   );

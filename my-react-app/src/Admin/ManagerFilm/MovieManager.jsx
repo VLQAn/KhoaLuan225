@@ -24,6 +24,7 @@ import {
     MdSave,
     MdEdit,
     MdDelete,
+    MdLocalOffer,
 } from "react-icons/md";
 
 import { useEffect, useState } from "react";
@@ -178,6 +179,13 @@ const MovieManager = () => {
                     >
                         <span><MdShoppingCart /></span>
                         <h3>Cập nhật xuất chiếu</h3>
+                    </NavLink>
+                    <NavLink
+                        to="/admin/promotion-manager"
+                        className={({ isActive }) => isActive ? s.active : ""}
+                    >
+                        <span><MdLocalOffer /></span>
+                        <h3>Khuyến mãi</h3>
                     </NavLink>
                     <NavLink
                         to="/admin/food-manager"
