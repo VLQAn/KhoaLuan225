@@ -165,18 +165,18 @@ const BookingManager = () => {
                         <h3>Cập nhật xuất chiếu</h3>
                     </NavLink>
                     <NavLink
-                        to="/admin/promotion-manager"
-                        className={({ isActive }) => isActive ? s.active : ""}
-                    >
-                        <span><MdLocalOffer /></span>
-                        <h3>Khuyến mãi</h3>
-                    </NavLink>
-                    <NavLink
                         to="/admin/food-manager"
                         className={({ isActive }) => isActive ? s.active : ""}
                     >
                         <span><MdAddBox /></span>
                         <h3>Bắp nước</h3>
+                    </NavLink>
+                    <NavLink
+                        to="/admin/promotion-manager"
+                        className={({ isActive }) => isActive ? s.active : ""}
+                    >
+                        <span><MdLocalOffer /></span>
+                        <h3>Khuyến mãi</h3>
                     </NavLink>
                     <a href="#">
                         <span><MdLogout /></span>

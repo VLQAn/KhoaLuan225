@@ -50,6 +50,10 @@ body {
   cursor: pointer;
 }
 
+.icons .login_link a {
+  color: white;
+}
+
 /* CONTENT */
 .content_container {
   background: white;

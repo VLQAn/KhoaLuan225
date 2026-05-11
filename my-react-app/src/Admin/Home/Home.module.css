@@ -538,6 +538,23 @@ main .recent_order a {
     background-color: var(--clr-danger);
 }
 
+/* ASIDE */
+aside {
+    height: 100vh;
+    position: sticky;
+    top: 0;
+}
+
+/* RIGHT PANEL */
+.right {
+    margin-top: 1.4rem;
+
+    position: sticky;
+    top: 1.4rem;
+
+    height: fit-content;
+}
+
 /* ================= REVENUE DETAIL ================= */
 
 .revenue_detail {

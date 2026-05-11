@@ -40,7 +40,7 @@ const Home = () => {
             <span><FaSearch /></span>
             <span><FaFacebook /></span>
             <span><FaGoogle /></span>
-            <span>
+            <span className={s.login_link}>
               <Link to="/register">Đăng nhập / Đăng ký</Link>
             </span>
           </div>
