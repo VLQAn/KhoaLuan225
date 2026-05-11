@@ -15,6 +15,8 @@ import film3 from "../../assets/f3.jpg";
 import film4 from "../../assets/f4.jpg";
 import film5 from "../../assets/f5.jpg";
 
+import { useState } from "react";
+
 const films = [film1, film2, film3, film4, film5];
 
 const related = [
@@ -28,6 +30,9 @@ const related = [
 const s = styles;
 
 const Home = () => {
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchText, setSearchText] = useState("");
+
   return (
     <div className="container">
       {/* BANNER */}
@@ -37,7 +42,9 @@ const Home = () => {
           <div className={s.logo}>RACSO</div>
 
           <div className={s.icons}>
-            <span><FaSearch /></span>
+            <span onClick={() => setShowSearch(true)}>
+              <FaSearch />
+            </span>
             <span><FaFacebook /></span>
             <span><FaGoogle /></span>
             <span className={s.login_link}>
@@ -69,6 +76,60 @@ const Home = () => {
               <p><b>THỜI LƯỢNG:</b> 125 phút</p>
               <p><b>DOANH THU:</b> 415.900.000.000 VNĐ</p>
               <p><b>NGÀY PHÁT HÀNH:</b> 28/03/2003</p>
+            </div>
+          </div>
+
+          {/* SEARCH OVERLAY */}
+          <div
+            className={`${s.search_overlay} ${showSearch ? s.show_search : ""
+              }`}
+          >
+            <div className={s.search_box}>
+
+              <input
+                type="text"
+                placeholder="Tìm kiếm phim..."
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+              />
+
+              <button>
+                <FaSearch />
+              </button>
+
+              <span
+                className={s.close_search}
+                onClick={() => setShowSearch(false)}
+              >
+                ✕
+              </span>
+
+            </div>
+
+            {/* SEARCH RESULT */}
+            <div className={s.search_result}>
+
+              {
+                related
+                  .filter((m) =>
+                    m.title
+                      .toLowerCase()
+                      .includes(searchText.toLowerCase())
+                  )
+                  .map((m, i) => (
+                    <div key={i} className={s.result_item}>
+
+                      <img src={films[i]} alt="" />
+
+                      <div>
+                        <h4>{m.title}</h4>
+                        <p>{m.year}</p>
+                      </div>
+
+                    </div>
+                  ))
+              }
+
             </div>
           </div>
 
@@ -132,10 +193,10 @@ const Home = () => {
       <div className={s.related}>
         <div className={s.re_title}>
           <span className={s.line}></span>
-          <h2>PHIM ĐANG CHIẾU KHÁC</h2>
+          <h2 className={s.re_title_text}>PHIM ĐANG CHIẾU KHÁC</h2>
           <span className={s.line}></span>
         </div>
-        
+
         <div className={s.list}>
           {related.map((m, i) => (
             <div key={i} className={s.re_card}>
