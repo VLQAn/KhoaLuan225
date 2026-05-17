@@ -3,33 +3,57 @@ import { MdMovie, MdLocationOn, MdAccessTime, MdEventSeat } from "react-icons/md
 import { useState } from "react";
 import styles from "./History.module.css";
 
+import { useNavigate } from "react-router-dom";
+
 const s = styles;
 
 const data = [
   {
+    id: 1,
     movie: "Avengers: Endgame",
-    cinema: "CGV Vincom ",
-    add: "Tầng Trệt (tầng 1), Trung tâm thương mại GO! (Big C cũ), Lô số 4, đường 19/5, Khu đô thị Vĩnh Điềm Trung, Xã Vĩnh Hiệp, TP. Nha Trang, Tỉnh Khánh Hòa.",
+    poster: "https://i.pinimg.com/1200x/0d/af/73/0daf73d3471efc7ae0392b9255773ee9.jpg",
+    cinema: "CGV Vincom",
+    add: "Nha Trang",
     time: "19:30 - 25/04/2026",
     seats: ["A1", "A2"],
+    food: ["Bắp", "Pepsi"],
     total: 180000,
-    status: "Đã thanh toán",
+    status: "Đã xem phim",
+    reviewed: false,
   },
 
   {
+    id: 2,
     movie: "Deadpool 2",
     cinema: "Galaxy Nha Trang",
-    add: "Tầng 3, TTTM Nha Trang Center - Số 20 Trần Phú, Phường Nha Trang, Tỉnh Khánh Hòa",
+    add: "Nha Trang",
     time: "19:30 - 21/08/2025",
     seats: ["D10", "D11", "D12"],
+    food: [],
     total: 240000,
     status: "Đã hủy",
+    reviewed: false,
+  },
+
+  {
+    id: 3,
+    movie: "Spider-Man",
+    cinema: "CGV",
+    add: "Đà Nẵng",
+    time: "20:00 - 15/06/2026",
+    seats: ["B5"],
+    food: ["Combo đôi"],
+    total: 150000,
+    status: "Đã thanh toán",
+    reviewed: false,
   },
 ];
 
 const History = () => {
+  const navigate = useNavigate();
+
   return (
-    <div className={s.container}> 
+    <div className={s.container}>
       <h1 className={s.title}>Lịch sử đặt vé</h1>
 
       <div className={s.history_list}>
@@ -60,8 +84,34 @@ const History = () => {
 
             <div className={s.right}>
               <h4>{item.total.toLocaleString()}đ</h4>
-              <span className={s.status}>{item.status}</span>
-              <button>Đánh giá</button>
+              <span
+                className={`${s.status}
+  ${item.status === "Đã thanh toán"
+                    ? s.status_paid
+                    : item.status === "Đã xem phim"
+                      ? s.status_watched
+                      : s.status_cancel
+                  }`}
+              >
+                {item.status}
+              </span>
+              {
+                item.status === "Đã xem phim" ? (
+                  <button
+                    onClick={() =>
+                      navigate(`/review/${item.id}`, {
+                        state: item,
+                      })
+                    }
+                  >
+                    {item.reviewed ? "Đã đánh giá" : "Đánh giá"}
+                  </button>
+                ) : (
+                  <button disabled>
+                    Không khả dụng
+                  </button>
+                )
+              }
             </div>
           </div>
         ))}

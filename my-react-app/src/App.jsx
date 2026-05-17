@@ -18,6 +18,8 @@ import ShowtimeManager from "./Admin/ManagerShowtime/ShowtimeManager";
 import FoodManager from "./Admin/Food/FoodManager";
 import BookingManager from "./Admin/Booking/BookingManager";
 import PromotionManager from "./Admin/Promotion/PromotionManager";
+import Profile from "./pages/Profile/Profile";
+import Review from "./pages/Review/Review";
 
 import MainLayout from "./layout/MainLayout";
 
@@ -37,6 +39,8 @@ function App() {
           <Route path="/seat/:id" element={<Seat />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/food" element={<Food />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/review/:id" element={<Review />} />
         </Route>
 
         {/* Những trang KHÔNG có sidebar */}

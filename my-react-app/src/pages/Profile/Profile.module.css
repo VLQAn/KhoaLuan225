@@ -1,0 +1,263 @@
+.profile_page{
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 40px;
+}
+
+.card{
+    width: 700px;
+
+    background: white;
+
+    border-radius: 30px;
+
+    overflow: hidden;
+
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+}
+
+.header{
+    background:
+    linear-gradient(
+        135deg,
+        #e53935,
+        #ff6b6b
+    );
+
+    color: white;
+
+    padding: 50px;
+
+    text-align: center;
+}
+
+.avatar{
+    width: 110px;
+    height: 110px;
+
+    border-radius: 50%;
+
+    background: white;
+    color: #e53935;
+
+    margin: auto;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 42px;
+    font-weight: bold;
+
+    margin-bottom: 20px;
+}
+
+.header h1{
+    font-size: 36px;
+}
+
+.info_box{
+    padding: 40px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 25px;
+}
+
+.info_item{
+    display: flex;
+    align-items: center;
+
+    gap: 20px;
+
+    background: #f5f5f5;
+
+    padding: 20px;
+
+    border-radius: 18px;
+
+    transition: 0.3s ease;
+}
+
+.info_item:hover{
+    transform: translateX(10px);
+}
+
+.info_item svg{
+    font-size: 35px;
+    color: #e53935;
+}
+
+.info_item span{
+    color: gray;
+    font-size: 14px;
+}
+
+.info_item h3{
+    margin-top: 5px;
+    font-size: 20px;
+}
+
+/* CHANGE PASSWORD */
+.change_password{
+    padding: 0 40px 40px;
+}
+
+.change_password h2{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    margin-bottom: 20px;
+
+    color: #333;
+}
+
+.change_password input{
+    width: 100%;
+
+    height: 55px;
+
+    padding: 0 20px;
+
+    border-radius: 12px;
+
+    border: 1px solid #ddd;
+
+    margin-bottom: 20px;
+
+    font-size: 16px;
+}
+
+.change_password button{
+    width: 100%;
+    height: 55px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    background: #e53935;
+
+    color: white;
+
+    font-size: 17px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    gap: 10px;
+
+    transition: 0.3s ease;
+}
+
+.change_password button:hover{
+    transform: translateY(-5px);
+}
+
+/* CHANGE PASSWORD BUTTON */
+.open_btn{
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: #e53935;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* POPUP */
+.popup_overlay{
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 999;
+}
+
+.popup{
+    width: 420px;
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    animation: popupShow 0.3s ease;
+}
+
+.popup h2{
+    margin: 0 0 10px;
+    text-align: center;
+}
+
+.popup input{
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    font-size: 15px;
+    outline: none;
+}
+
+.popup input:focus{
+    border-color: #e53935;
+}
+
+.popup_actions{
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.popup_actions button{
+    flex: 1;
+    padding: 13px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.popup_actions button:first-child{
+    background: #e53935;
+    color: white;
+}
+
+.cancel_btn{
+    background: #eee;
+}
+
+@keyframes popupShow{
+    from{
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    to{
+        transform: scale(1);
+        opacity: 1;
+    }
+}
