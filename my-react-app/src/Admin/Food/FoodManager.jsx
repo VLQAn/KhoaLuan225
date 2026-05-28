@@ -23,6 +23,7 @@ import {
     MdReport,
     MdAddBox,
     MdLocalOffer,
+    MdDescription,
 } from "react-icons/md";
 
 import { useEffect, useState } from "react";
@@ -167,6 +168,12 @@ const FoodManager = () => {
         );
     };
 
+    const userData = localStorage.getItem("user");
+
+    const user = userData
+        ? JSON.parse(userData)
+        : null;
+
     return (
 
         <div className={s.container}>
@@ -280,21 +287,18 @@ const FoodManager = () => {
                     </div>
 
                     <div className={s.form_group}>
-                        <label>Loại món</label>
+                        <label>Mô tả</label>
 
                         <div className={s.input_box}>
-                            <span><MdLocalDrink /></span>
+                            <span><MdDescription /></span>
 
-                            <select
-                                name="category"
-                                value={formData.category}
+                            <input
+                                type="text"
+                                name="description"
+                                placeholder="Nhập mô tả món"
+                                value={formData.description}
                                 onChange={handleChange}
-                            >
-                                <option value="">Chọn loại</option>
-                                <option value="Combo">Combo</option>
-                                <option value="Bắp">Bắp</option>
-                                <option value="Nước">Nước</option>
-                            </select>
+                            />
                         </div>
                     </div>
 
@@ -460,12 +464,28 @@ const FoodManager = () => {
                     </div>
                     <div className={s.profile}>
                         <div className={s.info}>
-                            <p><b>Babar</b></p>
-                            <p>Admin</p>
+
+                            <p>
+                                <b>
+                                    {user?.tenNguoiDung || "Admin"}
+                                </b>
+                            </p>
+
+                            <p>
+                                {user?.vaiTro?.tenVaiTro || "Admin"}
+                            </p>
+
                             <small className={s.text_muted}></small>
                         </div>
+
                         <div className={s.profile_photo}>
-                            <img src="/galaxy.jpg" alt="" />
+                            <img
+                                src={
+                                    user?.anhDaiDien ||
+                                    "/icon.jpg"
+                                }
+                                alt=""
+                            />
                         </div>
                     </div>
                 </div>

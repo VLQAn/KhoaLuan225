@@ -111,6 +111,12 @@ const BookingManager = () => {
         (booking) => booking.status === activeTab
     );
 
+    const userData = localStorage.getItem("user");
+
+    const user = userData
+        ? JSON.parse(userData)
+        : null;
+
     return (
 
         <div className={s.container}>
@@ -480,12 +486,28 @@ const BookingManager = () => {
                     </div>
                     <div className={s.profile}>
                         <div className={s.info}>
-                            <p><b>Babar</b></p>
-                            <p>Admin</p>
+
+                            <p>
+                                <b>
+                                    {user?.tenNguoiDung || "Admin"}
+                                </b>
+                            </p>
+
+                            <p>
+                                {user?.vaiTro?.tenVaiTro || "Admin"}
+                            </p>
+
                             <small className={s.text_muted}></small>
                         </div>
+
                         <div className={s.profile_photo}>
-                            <img src="/galaxy.jpg" alt="" />
+                            <img
+                                src={
+                                    user?.anhDaiDien ||
+                                    "/icon.jpg"
+                                }
+                                alt=""
+                            />
                         </div>
                     </div>
                 </div>
