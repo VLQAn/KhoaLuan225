@@ -30,6 +30,8 @@ import {
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 
+import movieApi from "../../services/movieApi";
+
 const s = styles;
 
 const MovieManager = () => {
@@ -38,21 +40,7 @@ const MovieManager = () => {
     });
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-    const [movies, setMovies] = useState([
-        {
-            maPhim: 1,
-            tieuDe: "Avengers Endgame",
-            moTa: "Bom tấn Marvel",
-            thoiLuong: 180,
-            ngayCongChieu: "2026-05-01",
-            anhPoster: "https://i.pinimg.com/1200x/46/5d/73/465d735095596d55ba96c937d4dc1917.jpg",
-            anhBanner: "https://i.pinimg.com/1200x/0b/ac/89/0bac898999f616d08e0208933bfed909.jpg",
-            danhGia: 9.2,
-            dienVien: "Robert Downey Jr",
-            daoDien: "Russo Brothers",
-            theLoai: "Hành động",
-        },
-    ]);
+    const [movies, setMovies] = useState([]);
 
     const [formData, setFormData] = useState({
         maPhim: "",
@@ -69,6 +57,25 @@ const MovieManager = () => {
     });
 
     const [editingId, setEditingId] = useState(null);
+
+    useEffect(() => {
+        fetchMovies();
+    }, []);
+
+    const fetchMovies = async () => {
+        try {
+
+            const response =
+                await movieApi.getAllMovies();
+
+            setMovies(response.data.data);
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
+    };
 
     useEffect(() => {
 
@@ -89,19 +96,35 @@ const MovieManager = () => {
         });
     };
 
-    const handleSubmit = () => {
-        if (editingId) {
-            setMovies(
-                movies.map((movie) =>
-                    movie.maPhim === editingId ? formData : movie
-                )
-            );
-            setEditingId(null);
-        } else {
-            setMovies([...movies, { ...formData, maPhim: Date.now() }]);
-        }
+    const handleSubmit = async () => {
 
-        resetForm();
+        try {
+
+            if (editingId) {
+
+                await movieApi.updateMovie(
+                    editingId,
+                    formData
+                );
+
+            } else {
+
+                await movieApi.createMovie(
+                    formData
+                );
+            }
+
+            fetchMovies();
+
+            resetForm();
+
+            setEditingId(null);
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
     };
 
     const handleEdit = (movie) => {
@@ -109,8 +132,47 @@ const MovieManager = () => {
         setEditingId(movie.maPhim);
     };
 
-    const handleDelete = (id) => {
-        setMovies(movies.filter((movie) => movie.maPhim !== id));
+    const handleDelete = async (id) => {
+
+        const confirmDelete =
+            window.confirm(
+                "Bạn có chắc muốn xóa phim?"
+            );
+
+        if (!confirmDelete) return;
+
+        try {
+
+            await movieApi.deleteMovie(id);
+
+            fetchMovies();
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
+    };
+
+    const handleChangeStatus = async (
+        id,
+        trangThai
+    ) => {
+
+        try {
+
+            await movieApi.changeStatus(
+                id,
+                trangThai
+            );
+
+            fetchMovies();
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
     };
 
     const resetForm = () => {
@@ -227,6 +289,32 @@ const MovieManager = () => {
                     </div>
 
                     <div className={s.form_group}>
+                        <label>Trạng thái</label>
+
+                        <select
+                            name="trangThai"
+                            value={formData.trangThai}
+                            onChange={handleChange}
+                        >
+                            <option value="">
+                                Chọn trạng thái
+                            </option>
+
+                            <option value="dang_chieu">
+                                Đang chiếu
+                            </option>
+
+                            <option value="sap_chieu">
+                                Sắp chiếu
+                            </option>
+
+                            <option value="ngung_chieu">
+                                Ngừng chiếu
+                            </option>
+                        </select>
+                    </div>
+
+                    <div className={s.form_group}>
                         <label>Thể loại</label>
                         <input
                             type="text"
@@ -333,6 +421,7 @@ const MovieManager = () => {
                                 <th>Thể loại</th>
                                 <th>Thời lượng</th>
                                 <th>Đánh giá</th>
+                                <th>Trạng thái</th>
                                 <th>Hành động</th>
                             </tr>
                         </thead>
@@ -349,9 +438,32 @@ const MovieManager = () => {
                                     </td>
 
                                     <td>{movie.tieuDe}</td>
-                                    <td>{movie.theLoai}</td>
+                                    <td>
+                                        {
+                                            movie.theLoai
+                                                ?.map(
+                                                    (item) =>
+                                                        item.tenTheLoai
+                                                )
+                                                .join(", ")
+                                        }
+                                    </td>
                                     <td>{movie.thoiLuong} phút</td>
                                     <td>{movie.danhGia}</td>
+                                    <td>{movie.trangThai}
+                                        <button
+                                            onClick={() =>
+                                                handleChangeStatus(
+                                                    movie.maPhim,
+                                                    movie.trangThai === "dang_chieu"
+                                                        ? "ngung_chieu"
+                                                        : "dang_chieu"
+                                                )
+                                            }
+                                        >
+                                            Đổi trạng thái
+                                        </button>
+                                    </td>
 
                                     <td>
                                         <div className={s.actions}>

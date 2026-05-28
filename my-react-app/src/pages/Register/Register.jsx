@@ -1,6 +1,7 @@
 import styles from "./Register.module.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import authApi from "../../services/authApi";
 
 const s = styles;
 
@@ -29,18 +30,40 @@ const Register = () => {
   const [forgotEmail, setForgotEmail] = useState("");
 
   // ================= LOGIN =================
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
 
     e.preventDefault();
 
-    const savedUser = JSON.parse(
-      localStorage.getItem("user")
-    );
+    try {
 
-    if (
-      savedUser?.email === loginData.email &&
-      savedUser?.password === loginData.password
-    ) {
+      const response =
+        await authApi.login({
+
+          email: loginData.email,
+
+          matKhau: loginData.password,
+        });
+
+      console.log(response.data);
+
+      // TOKEN
+      const token =
+        response.data.data.token;
+
+      // USER
+      const user =
+        response.data.data.user;
+
+      // SAVE LOCAL STORAGE
+      localStorage.setItem(
+        "token",
+        token
+      );
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify(user)
+      );
 
       localStorage.setItem(
         "isLogin",
@@ -49,16 +72,30 @@ const Register = () => {
 
       alert("Đăng nhập thành công!");
 
-      navigate("/");
+      // CHECK ROLE
+      if (user.vaiTro.maVaiTro === 1) {
 
-    } else {
+        // ADMIN
+        navigate("/admin/home");
 
-      alert("Sai email hoặc mật khẩu!");
+      } else {
+
+        // CUSTOMER
+        navigate("/");
+      }
+
+    } catch (error) {
+
+      console.log(error.response.data);
+
+      alert(
+        "Sai email hoặc mật khẩu!"
+      );
     }
   };
 
   // ================= REGISTER =================
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
 
     e.preventDefault();
 
@@ -67,25 +104,40 @@ const Register = () => {
       registerData.confirmPassword
     ) {
 
-      alert("Mật khẩu xác nhận không đúng!");
+      alert(
+        "Mật khẩu xác nhận không đúng!"
+      );
+
       return;
     }
 
-    const newUser = {
-      username: registerData.username,
-      email: registerData.email,
-      password: registerData.password,
-      totalSpent: 0,
-    };
+    try {
 
-    localStorage.setItem(
-      "user",
-      JSON.stringify(newUser)
-    );
+      const response =
+        await authApi.register({
 
-    alert("Đăng ký thành công!");
+          hoTen: registerData.username,
 
-    setIsActive(false);
+          email: registerData.email,
+
+          matKhau: registerData.password,
+
+          matKhau_confirmation:
+            registerData.confirmPassword,
+        });
+
+      console.log(response.data);
+
+      alert("Đăng ký thành công!");
+
+      setIsActive(false);
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert("Đăng ký thất bại!");
+    }
   };
 
   // ================= FORGOT =================
