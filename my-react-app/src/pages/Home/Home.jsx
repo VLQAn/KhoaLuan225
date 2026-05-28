@@ -52,7 +52,6 @@ const Home = () => {
             <span><FaFacebook /></span>
             <span><FaGoogle /></span>
             <span className={s.login_link}>
-
               {
                 user ? (
                   <Link to="/profile">

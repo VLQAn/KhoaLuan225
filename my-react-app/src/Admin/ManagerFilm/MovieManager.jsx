@@ -300,6 +300,18 @@ const MovieManager = () => {
         });
     };
 
+    const phimDangChieu = movies.filter(
+        (movie) => movie.trangThai === "dang_chieu"
+    ).length;
+
+    const phimSapChieu = movies.filter(
+        (movie) => movie.trangThai === "sap_chieu"
+    ).length;
+
+    const phimNgungChieu = movies.filter(
+        (movie) => movie.trangThai === "ngung_chieu"
+    ).length;
+
     return (
         <div className={s.container}>
             {/* SIDEBAR */}
@@ -704,12 +716,17 @@ const MovieManager = () => {
 
                     <div className={s.info_item}>
                         <p>Phim đang chiếu</p>
-                        <h3>12</h3>
+                        <h3>{phimDangChieu}</h3>
                     </div>
 
                     <div className={s.info_item}>
                         <p>Phim sắp chiếu</p>
-                        <h3>5</h3>
+                        <h3>{phimSapChieu}</h3>
+                    </div>
+
+                    <div className={s.info_item}>
+                        <p>Phim ngừng chiếu</p>
+                        <h3>{phimNgungChieu}</h3>
                     </div>
                 </div>
             </div>
