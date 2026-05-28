@@ -23,6 +23,38 @@ body {
     margin: 0 auto;
 }
 
+.toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    background: var(--clr-primary);
+    color: white;
+
+    padding: 16px 24px;
+    border-radius: 10px;
+    border: 2px solid white;
+
+    font-size: 16px;
+    font-weight: 500;
+
+    z-index: 9999;
+
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -60%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
 h2 {
     font-size: 1.4rem;
     color: var(--clr-primary);
@@ -253,7 +285,7 @@ thead th {
 }
 
 tbody tr {
-    height: 4rem;
+    height: 6.5rem;
     border-bottom: 1px solid var(--clr-light);
     transition: all 0.3s ease;
 }
@@ -278,11 +310,25 @@ td {
     padding: 1rem;
 }
 
-.poster {
-    width: 55px;
-    height: 75px;
-    border-radius: var(--border-radius-1);
+.food_image {
+    width: 80px;
+    height: 80px;
+
     object-fit: cover;
+
+    border-radius: 16px;
+
+    transition: 0.3s ease;
+
+    border: 2px solid var(--clr-light);
+
+    background: #fff;
+}
+
+.food_image:hover {
+    transform: translateY(-4px) scale(1.05);
+
+    border-color: var(--clr-primary);
 }
 
 .actions {

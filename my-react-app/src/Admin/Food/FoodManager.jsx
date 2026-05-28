@@ -29,6 +29,8 @@ import {
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 
+import bapNuocApi from "../../services/bapNuocApi";
+
 const s = styles;
 
 const FoodManager = () => {
@@ -39,42 +41,19 @@ const FoodManager = () => {
 
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-    const [foods, setFoods] = useState([
-        {
-            id: 1,
-            name: "Combo Couple",
-            category: "Combo",
-            price: "199000",
-            image: "/combo1.jpg",
-            status: true,
-        },
-        {
-            id: 2,
-            name: "Bắp Caramel",
-            category: "Bắp",
-            price: "79000",
-            image: "/popcorn.jpg",
-            status: true,
-        },
-        {
-            id: 3,
-            name: "Pepsi Large",
-            category: "Nước",
-            price: "49000",
-            image: "/pepsi.jpg",
-            status: false,
-        }
-    ]);
+    const [foods, setFoods] = useState([]);
 
     const [formData, setFormData] = useState({
-        name: "",
-        category: "",
-        price: "",
-        image: "",
-        status: true,
+        tenMon: "",
+        gia: "",
+        hinhAnh: "",
+        moTa: "",
+        trangThai: true,
     });
 
     const [editingId, setEditingId] = useState(null);
+
+    const [toast, setToast] = useState("");
 
     useEffect(() => {
 
@@ -88,6 +67,12 @@ const FoodManager = () => {
 
     }, [darkMode]);
 
+    useEffect(() => {
+
+        fetchFoods();
+
+    }, []);
+
     const handleChange = (e) => {
 
         setFormData({
@@ -99,52 +84,90 @@ const FoodManager = () => {
     const resetForm = () => {
 
         setFormData({
-            name: "",
-            category: "",
-            price: "",
-            image: "",
-            status: true,
+
+            tenMon: "",
+
+            moTa: "",
+
+            gia: "",
+
+            hinhAnh: "",
+
+            trangThai: "DANG_BAN",
+
+            maRap: 1,
         });
 
         setEditingId(null);
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
 
-        if (
-            !formData.name ||
-            !formData.category ||
-            !formData.price
-        ) return;
+        try {
 
-        if (editingId) {
+            if (
+                !formData.tenMon ||
+                !formData.gia
+            ) return;
 
-            setFoods(
-                foods.map((food) =>
-                    food.id === editingId
-                        ? { ...formData, id: editingId }
-                        : food
-                )
-            );
+            const payload = {
+                maRap: 1,
+                tenMon: formData.tenMon,
+                gia: Number(formData.gia),
+                hinhAnh: formData.hinhAnh,
+                moTa: formData.moTa,
+                trangThai: formData.trangThai
+                    ? "DANG_BAN"
+                    : "NGUNG_KINH_DOANH"
+            };
 
-        } else {
+            console.log(payload);
 
-            setFoods([
-                ...foods,
-                {
-                    ...formData,
-                    id: Date.now(),
-                }
-            ]);
+            if (editingId) {
+
+                await bapNuocApi.updateFood(
+                    editingId,
+                    payload
+                );
+
+            } else {
+
+                await bapNuocApi.createFood(
+                    payload
+                );
+            }
+
+            fetchFoods();
+
+            resetForm();
+
+        } catch (error) {
+
+            console.log(error.response.data.errors);
+
+            console.error(error);
         }
-
-        resetForm();
     };
 
     const handleEdit = (food) => {
 
-        setEditingId(food.id);
-        setFormData(food);
+        setEditingId(food.maMon);
+
+        setFormData({
+
+            tenMon: food.tenMon || "",
+
+            moTa: food.moTa || "",
+
+            gia: food.gia || "",
+
+            hinhAnh: food.hinhAnh || "",
+
+            trangThai:
+                food.trangThai || "DANG_BAN",
+
+            maRap: food.maRap || 1,
+        });
     };
 
     const handleDelete = (id) => {
@@ -154,18 +177,43 @@ const FoodManager = () => {
         );
     };
 
-    const handleToggle = (id) => {
+    const handleToggle = async (food) => {
+        try {
+            const newStatus =
+                food.trangThai === "DANG_BAN"
+                    ? "NGUNG_KINH_DOANH"
+                    : "DANG_BAN";
 
-        setFoods(
-            foods.map((food) =>
-                food.id === id
-                    ? {
-                        ...food,
-                        status: !food.status
-                    }
-                    : food
-            )
-        );
+            await bapNuocApi.updateStatus(food.maMon, newStatus);
+
+            setToast(
+                newStatus === "DANG_BAN"
+                    ? "Mở bán món thành công"
+                    : "Tắt bán món thành công"
+            );
+
+            fetchFoods();
+
+            setTimeout(() => setToast(""), 2500);
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const fetchFoods = async () => {
+
+        try {
+
+            const response =
+                await bapNuocApi.getAllFoods();
+
+            setFoods(response.data);
+
+        } catch (error) {
+
+            console.error(error);
+        }
     };
 
     const userData = localStorage.getItem("user");
@@ -177,6 +225,12 @@ const FoodManager = () => {
     return (
 
         <div className={s.container}>
+
+            {toast && (
+                <div className={styles.toast}>
+                    {toast}
+                </div>
+            )}
 
             {/* SIDEBAR */}
             <aside className={`${s.aside} ${isSidebarOpen ? s.open : ""}`}>
@@ -278,9 +332,8 @@ const FoodManager = () => {
 
                             <input
                                 type="text"
-                                name="name"
-                                placeholder="Nhập tên món"
-                                value={formData.name}
+                                name="tenMon"
+                                value={formData.tenMon}
                                 onChange={handleChange}
                             />
                         </div>
@@ -294,9 +347,9 @@ const FoodManager = () => {
 
                             <input
                                 type="text"
-                                name="description"
+                                name="moTa"
                                 placeholder="Nhập mô tả món"
-                                value={formData.description}
+                                value={formData.moTa}
                                 onChange={handleChange}
                             />
                         </div>
@@ -310,9 +363,9 @@ const FoodManager = () => {
 
                             <input
                                 type="number"
-                                name="price"
+                                name="gia"
                                 placeholder="Nhập giá món"
-                                value={formData.price}
+                                value={formData.gia}
                                 onChange={handleChange}
                             />
                         </div>
@@ -324,9 +377,9 @@ const FoodManager = () => {
                         <div className={s.input_box}>
                             <input
                                 type="text"
-                                name="image"
+                                name="hinhAnh"
                                 placeholder="/combo.jpg"
-                                value={formData.image}
+                                value={formData.hinhAnh}
                                 onChange={handleChange}
                             />
                         </div>
@@ -354,7 +407,7 @@ const FoodManager = () => {
                             <tr>
                                 <th>Ảnh</th>
                                 <th>Tên món</th>
-                                <th>Loại</th>
+                                <th>Mô tả</th>
                                 <th>Giá</th>
                                 <th>Trạng thái</th>
                                 <th>Hành động</th>
@@ -366,37 +419,37 @@ const FoodManager = () => {
 
                             {foods.map((food) => (
 
-                                <tr key={food.id}>
+                                <tr key={food.maMon}>
 
                                     <td>
                                         <img
-                                            src={food.image}
+                                            src={food.hinhAnh}
                                             alt=""
                                             className={s.food_image}
                                         />
                                     </td>
 
-                                    <td>{food.name}</td>
+                                    <td>{food.tenMon}</td>
 
-                                    <td>{food.category}</td>
+                                    <td>{food.moTa}</td>
 
                                     <td>
-                                        {Number(food.price).toLocaleString()} VNĐ
+                                        {Number(food.gia).toLocaleString()} VNĐ
                                     </td>
 
                                     <td>
 
                                         <button
                                             className={
-                                                food.status
+                                                food.trangThai === "DANG_BAN"
                                                     ? s.toggle_on
                                                     : s.toggle_off
                                             }
-                                            onClick={() => handleToggle(food.id)}
+                                            onClick={() => handleToggle(food)}
                                         >
 
                                             {
-                                                food.status
+                                                food.trangThai === "DANG_BAN"
                                                     ? <MdToggleOn />
                                                     : <MdToggleOff />
                                             }
@@ -418,7 +471,7 @@ const FoodManager = () => {
 
                                             <button
                                                 className={s.deleteBtn}
-                                                onClick={() => handleDelete(food.id)}
+                                                onClick={() => handleDelete(food.maMon)}
                                             >
                                                 <MdDelete />
                                             </button>
@@ -504,7 +557,9 @@ const FoodManager = () => {
 
                         <h3>
                             {
-                                foods.filter(food => food.status).length
+                                foods.filter(
+                                    food => food.trangThai === "DANG_BAN"
+                                ).length
                             }
                         </h3>
                     </div>
@@ -514,7 +569,9 @@ const FoodManager = () => {
 
                         <h3>
                             {
-                                foods.filter(food => !food.status).length
+                                foods.filter(
+                                    food => food.trangThai !== "DANG_BAN"
+                                ).length
                             }
                         </h3>
                     </div>
