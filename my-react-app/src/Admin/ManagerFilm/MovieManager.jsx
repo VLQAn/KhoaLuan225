@@ -31,6 +31,7 @@ import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 
 import movieApi from "../../services/movieApi";
+import theLoaiApi from "../../services/theLoaiApi";
 
 const s = styles;
 
@@ -41,6 +42,8 @@ const MovieManager = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const [movies, setMovies] = useState([]);
+
+    const [theLoai, setTheLoai] = useState([]);
 
     const [formData, setFormData] = useState({
         maPhim: "",
@@ -53,13 +56,19 @@ const MovieManager = () => {
         danhGia: "",
         dienVien: "",
         daoDien: "",
-        theLoai: "",
+        trangThai: "",
+        theLoai: [],
     });
 
     const [editingId, setEditingId] = useState(null);
 
+    const [showGenreDropdown, setShowGenreDropdown]
+        = useState(false);
+
     useEffect(() => {
         fetchMovies();
+
+        fetchTheLoai();
     }, []);
 
     const fetchMovies = async () => {
@@ -74,6 +83,23 @@ const MovieManager = () => {
 
             console.error(error);
 
+        }
+    };
+
+    const fetchTheLoai = async () => {
+
+        try {
+
+            const response =
+                await theLoaiApi.getAllGenres();
+
+            setTheLoai(
+                response.data.data
+            );
+
+        } catch (error) {
+
+            console.error(error);
         }
     };
 
@@ -122,13 +148,59 @@ const MovieManager = () => {
 
         } catch (error) {
 
+            console.log(
+                error.response.data
+            );
+
+            console.log(movie);
+
             console.error(error);
 
         }
     };
 
     const handleEdit = (movie) => {
-        setFormData(movie);
+
+        setFormData({
+
+            maPhim: movie.maPhim || "",
+
+            tieuDe: movie.tieuDe || "",
+
+            moTa: movie.moTa || "",
+
+            thoiLuong: movie.thoiLuong || "",
+
+            ngayCongChieu:
+                movie.ngayCongChieu
+                    ? movie.ngayCongChieu.split("T")[0]
+                    : "",
+
+            anhPoster:
+                movie.anhPoster || "",
+
+            anhBanner:
+                movie.anhBanner || "",
+
+            danhGia:
+                movie.danhGia || "",
+
+            dienVien:
+                movie.dienVien || "",
+
+            daoDien:
+                movie.daoDien || "",
+
+            trangThai:
+                movie.trangThai || "",
+
+            theLoai:
+                movie.theLoai?.map(
+                    (item) =>
+                        item.maTheLoai
+                ) || [],
+        });
+
         setEditingId(movie.maPhim);
     };
 
@@ -175,6 +247,42 @@ const MovieManager = () => {
         }
     };
 
+    const handleTheLoaiChange = (
+        maTheLoai
+    ) => {
+
+        setFormData((prev) => {
+
+            const exists =
+                prev.theLoai.includes(
+                    maTheLoai
+                );
+
+            if (exists) {
+
+                return {
+                    ...prev,
+
+                    theLoai:
+                        prev.theLoai.filter(
+                            (id) =>
+                                id !== maTheLoai
+                        ),
+                };
+            }
+
+            return {
+
+                ...prev,
+
+                theLoai: [
+                    ...prev.theLoai,
+                    maTheLoai,
+                ],
+            };
+        });
+    };
+
     const resetForm = () => {
         setFormData({
             maPhim: "",
@@ -187,7 +295,8 @@ const MovieManager = () => {
             danhGia: "",
             dienVien: "",
             daoDien: "",
-            theLoai: "",
+            trangThai: "",
+            theLoai: [],
         });
     };
 
@@ -316,12 +425,79 @@ const MovieManager = () => {
 
                     <div className={s.form_group}>
                         <label>Thể loại</label>
-                        <input
-                            type="text"
-                            name="theLoai"
-                            value={formData.theLoai}
-                            onChange={handleChange}
-                        />
+
+                        <div className={s.genre_dropdown}>
+
+                            {/* INPUT HIỂN THỊ */}
+                            <div
+                                className={s.genre_select}
+                                onClick={() =>
+                                    setShowGenreDropdown(
+                                        !showGenreDropdown
+                                    )
+                                }
+                            >
+
+                                {
+                                    formData.theLoai.length > 0
+                                        ? theLoai
+                                            .filter((item) =>
+                                                formData.theLoai.includes(
+                                                    item.maTheLoai
+                                                )
+                                            )
+                                            .map(
+                                                (item) =>
+                                                    item.tenTheLoai
+                                            )
+                                            .join(", ")
+
+                                        : "Chọn thể loại"
+                                }
+
+                            </div>
+
+                            {/* DROPDOWN */}
+                            {
+                                showGenreDropdown && (
+
+                                    <div className={s.genre_options}>
+
+                                        {
+                                            theLoai.map((genre) => (
+
+                                                <label
+                                                    key={genre.maTheLoai}
+                                                    className={s.genre_option}
+                                                >
+
+                                                    <input
+                                                        type="checkbox"
+
+                                                        checked={
+                                                            formData.theLoai.includes(
+                                                                genre.maTheLoai
+                                                            )
+                                                        }
+
+                                                        onChange={() =>
+                                                            handleTheLoaiChange(
+                                                                genre.maTheLoai
+                                                            )
+                                                        }
+                                                    />
+
+                                                    {genre.tenTheLoai}
+
+                                                </label>
+                                            ))
+                                        }
+
+                                    </div>
+                                )
+                            }
+
+                        </div>
                     </div>
 
                     <div className={s.form_group}>
@@ -450,19 +626,14 @@ const MovieManager = () => {
                                     </td>
                                     <td>{movie.thoiLuong} phút</td>
                                     <td>{movie.danhGia}</td>
-                                    <td>{movie.trangThai}
-                                        <button
-                                            onClick={() =>
-                                                handleChangeStatus(
-                                                    movie.maPhim,
-                                                    movie.trangThai === "dang_chieu"
-                                                        ? "ngung_chieu"
-                                                        : "dang_chieu"
-                                                )
-                                            }
-                                        >
-                                            Đổi trạng thái
-                                        </button>
+                                    <td>
+                                        {
+                                            movie.trangThai === "dang_chieu"
+                                                ? "Đang chiếu"
+                                                : movie.trangThai === "sap_chieu"
+                                                    ? "Sắp chiếu"
+                                                    : "Ngừng chiếu"
+                                        }
                                     </td>
 
                                     <td>

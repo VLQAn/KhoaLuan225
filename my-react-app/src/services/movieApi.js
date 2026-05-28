@@ -19,9 +19,12 @@ const movieApi = {
 
     updateMovie: async (id, data) => {
 
-        return await axiosClient.put(
+        return await axiosClient.post(
             `/movies/${id}`,
-            data
+            {
+                ...data,
+                _method: "PUT",
+            }
         );
     },
 
