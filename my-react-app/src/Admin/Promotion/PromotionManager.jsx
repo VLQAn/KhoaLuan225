@@ -1,4 +1,5 @@
 import styles from "./PromotionManager.module.css";
+import khuyenMaiApi from "../../services/khuyenMaiApi";
 
 import {
     MdClose,
@@ -35,45 +36,24 @@ const PromotionManager = () => {
         return localStorage.getItem("darkMode") === "true";
     });
 
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [promotions, setPromotions] = useState([]);
 
-    const [promotions, setPromotions] = useState([
-        {
-            id: 1,
-            title: "Giảm giá cuối tuần",
-            code: "WEEKEND50",
-            discount: 50,
-            startDate: "2026-05-10",
-            endDate: "2026-05-30",
-            status: true,
-        },
-        {
-            id: 2,
-            title: "Khuyến mãi sinh viên",
-            code: "STUDENT20",
-            discount: 20,
-            startDate: "2026-05-01",
-            endDate: "2026-06-01",
-            status: true,
-        },
-        {
-            id: 3,
-            title: "Flash Sale",
-            code: "FLASH10",
-            discount: 10,
-            startDate: "2026-05-15",
-            endDate: "2026-05-16",
-            status: false,
+    const fetchPromotions = async () => {
+        try {
+            const res = await khuyenMaiApi.getAll();
+
+            setPromotions(res.data || []);
+        } catch (err) {
+            console.log(err);
         }
-    ]);
+    };
 
     const [formData, setFormData] = useState({
-        title: "",
-        code: "",
-        discount: "",
-        startDate: "",
-        endDate: "",
-        status: true,
+        noiDung: "",
+        maCode: "",
+        giaKhuyenMai: "",
+        ngayBatDau: "",
+        thoiHan: "",
     });
 
     const [editingId, setEditingId] = useState(null);
@@ -90,6 +70,10 @@ const PromotionManager = () => {
 
     }, [darkMode]);
 
+    useEffect(() => {
+        fetchPromotions();
+    }, []);
+
     const handleChange = (e) => {
 
         setFormData({
@@ -101,62 +85,88 @@ const PromotionManager = () => {
     const resetForm = () => {
 
         setFormData({
-            title: "",
-            code: "",
-            discount: "",
-            startDate: "",
-            endDate: "",
+            noiDung: "",
+            maCode: "",
+            giaKhuyenMai: "",
+            ngayBatDau: "",
+            thoiHan: "",
             status: true,
         });
 
         setEditingId(null);
     };
 
-    const handleSubmit = () => {
+    const formatDate = (dateString) => {
+        if (!dateString) return "";
+        return dateString.split(" ")[0].split("T")[0];
+    };
+
+    const toDateTime = (date, isEnd = false) => {
+        if (!date) return null;
+
+        return isEnd
+            ? `${date} 23:59:59`
+            : `${date} 00:00:00`;
+    };
+
+    const handleSubmit = async () => {
 
         if (
-            !formData.title ||
-            !formData.code ||
-            !formData.discount ||
-            !formData.startDate ||
-            !formData.endDate
+            !formData.noiDung ||
+            !formData.maCode ||
+            !formData.giaKhuyenMai ||
+            !formData.ngayBatDau ||
+            !formData.thoiHan
         ) return;
 
-        if (editingId) {
+        const payload = {
+            noiDung: formData.noiDung,
+            maCode: formData.maCode,
+            giaKhuyenMai: Number(formData.giaKhuyenMai),
 
-            setPromotions(
-                promotions.map((promo) =>
-                    promo.id === editingId
-                        ? { ...formData, id: editingId }
-                        : promo
-                )
-            );
+            ngayBatDau: toDateTime(formData.ngayBatDau, false),
+            thoiHan: toDateTime(formData.thoiHan, true),
+        };
 
-        } else {
+        try {
+            if (editingId) {
+                await khuyenMaiApi.update(editingId, payload);
+            } else {
+                await khuyenMaiApi.create(payload);
+            }
 
-            setPromotions([
-                ...promotions,
-                {
-                    ...formData,
-                    id: Date.now(),
-                }
-            ]);
+            fetchPromotions();
+            resetForm();
+
+        } catch (err) {
+            console.log("STATUS:", err.response?.status);
+            console.log("DATA:", err.response?.data);
+            console.log(err);
         }
-
-        resetForm();
     };
 
     const handleEdit = (promo) => {
+        setEditingId(promo.maKhuyenMai);
 
-        setEditingId(promo.id);
-        setFormData(promo);
+        setFormData({
+            noiDung: promo.noiDung || "",
+            maCode: promo.maCode || "",
+            giaKhuyenMai: promo.giaKhuyenMai || "",
+
+            ngayBatDau: formatDate(promo.ngayBatDau),
+            thoiHan: formatDate(promo.thoiHan),
+        });
     };
 
-    const handleDelete = (id) => {
-
-        setPromotions(
-            promotions.filter((promo) => promo.id !== id)
-        );
+    const handleDelete = async (id) => {
+        try {
+            await khuyenMaiApi.delete(id);
+            fetchPromotions();
+        } catch (err) {
+            console.log("STATUS:", err.response?.status);
+            console.log("DATA:", err.response?.data);
+            console.log(err);
+        }
     };
 
     const handleToggle = (id) => {
@@ -178,6 +188,10 @@ const PromotionManager = () => {
     const user = userData
         ? JSON.parse(userData)
         : null;
+
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    const now = new Date();
 
     return (
 
@@ -284,88 +298,80 @@ const PromotionManager = () => {
                 {/* FORM */}
                 <div className={s.form_container}>
 
+                    {/* Nội dung */}
                     <div className={s.form_group}>
-                        <label>Tên khuyến mãi</label>
-
+                        <label>Nội dung khuyến mãi</label>
                         <div className={s.input_box}>
                             <span><MdLocalOffer /></span>
-
                             <input
                                 type="text"
-                                name="title"
-                                placeholder="Nhập tên khuyến mãi"
-                                value={formData.title}
+                                name="noiDung"
+                                placeholder="Nhập nội dung khuyến mãi"
+                                value={formData.noiDung}
                                 onChange={handleChange}
                             />
                         </div>
                     </div>
 
+                    {/* Mã code */}
                     <div className={s.form_group}>
                         <label>Mã giảm giá</label>
-
                         <div className={s.input_box}>
                             <span><MdDiscount /></span>
-
                             <input
                                 type="text"
-                                name="code"
+                                name="maCode"
                                 placeholder="VD: SALE50"
-                                value={formData.code}
+                                value={formData.maCode}
                                 onChange={handleChange}
                             />
                         </div>
                     </div>
 
+                    {/* % giảm */}
                     <div className={s.form_group}>
                         <label>Phần trăm giảm</label>
-
                         <div className={s.input_box}>
                             <span><MdPercent /></span>
-
                             <input
                                 type="number"
-                                name="discount"
+                                name="giaKhuyenMai"
                                 placeholder="Nhập % giảm"
-                                value={formData.discount}
+                                value={formData.giaKhuyenMai}
                                 onChange={handleChange}
                             />
                         </div>
                     </div>
 
+                    {/* ngày bắt đầu */}
                     <div className={s.form_group}>
                         <label>Ngày bắt đầu</label>
-
                         <div className={s.input_box}>
                             <span><MdDateRange /></span>
-
                             <input
                                 type="date"
-                                name="startDate"
-                                value={formData.startDate}
+                                name="ngayBatDau"
+                                value={formData.ngayBatDau || ""}
                                 onChange={handleChange}
                             />
                         </div>
                     </div>
 
+                    {/* ngày kết thúc */}
                     <div className={s.form_group}>
                         <label>Ngày kết thúc</label>
-
                         <div className={s.input_box}>
                             <span><MdDateRange /></span>
-
                             <input
                                 type="date"
-                                name="endDate"
-                                value={formData.endDate}
+                                name="thoiHan"
+                                value={formData.thoiHan || ""}
                                 onChange={handleChange}
                             />
                         </div>
                     </div>
 
-                    <button
-                        className={s.saveBtn}
-                        onClick={handleSubmit}
-                    >
+                    <button className={s.saveBtn} onClick={handleSubmit}>
                         <MdSave />
                         {editingId ? "Cập nhật mã" : "Lưu mã"}
                     </button>
@@ -381,7 +387,7 @@ const PromotionManager = () => {
 
                         <thead>
                             <tr>
-                                <th>Tên</th>
+                                <th>Nội dung</th>
                                 <th>Mã</th>
                                 <th>Giảm giá</th>
                                 <th>Ngày bắt đầu</th>
@@ -392,48 +398,39 @@ const PromotionManager = () => {
                         </thead>
 
                         <tbody>
-
                             {promotions.map((promo) => (
+                                <tr key={promo.maKhuyenMai}>
 
-                                <tr key={promo.id}>
+                                    {/* Nội dung */}
+                                    <td>{promo.noiDung}</td>
 
-                                    <td>{promo.title}</td>
-
+                                    {/* Mã */}
                                     <td>
                                         <span className={s.code}>
-                                            {promo.code}
+                                            {promo.maCode}
                                         </span>
                                     </td>
 
-                                    <td>{promo.discount}%</td>
+                                    {/* % giảm */}
+                                    <td>{parseInt(promo.giaKhuyenMai)}%</td>
 
-                                    <td>{promo.startDate}</td>
+                                    {/* ngày bắt đầu */}
+                                    <td>{promo.ngayBatDau}</td>
 
-                                    <td>{promo.endDate}</td>
+                                    {/* ngày kết thúc */}
+                                    <td>{promo.thoiHan?.split("T")[0]}</td>
 
+                                    {/* trạng thái */}
                                     <td>
-
-                                        <button
-                                            className={
-                                                promo.status
-                                                    ? s.toggle_on
-                                                    : s.toggle_off
-                                            }
-                                            onClick={() => handleToggle(promo.id)}
-                                        >
-
-                                            {
-                                                promo.status
-                                                    ? <MdToggleOn />
-                                                    : <MdToggleOff />
-                                            }
-
-                                        </button>
-
+                                        {
+                                            new Date(promo.thoiHan) < new Date()
+                                                ? "Hết hạn"
+                                                : "Đang hoạt động"
+                                        }
                                     </td>
 
+                                    {/* actions */}
                                     <td>
-
                                         <div className={s.actions}>
 
                                             <button
@@ -445,19 +442,16 @@ const PromotionManager = () => {
 
                                             <button
                                                 className={s.deleteBtn}
-                                                onClick={() => handleDelete(promo.id)}
+                                                onClick={() => handleDelete(promo.maKhuyenMai)}
                                             >
                                                 <MdDelete />
                                             </button>
 
                                         </div>
-
                                     </td>
 
                                 </tr>
-
                             ))}
-
                         </tbody>
 
                     </table>
@@ -530,24 +524,22 @@ const PromotionManager = () => {
                     </div>
 
                     <div className={s.info_item}>
-                        <p>Đang hoạt động</p>
-
+                        <p>Còn hiệu lực</p>
                         <h3>
                             {
-                                promotions.filter(
-                                    promo => promo.status
+                                promotions.filter(promo =>
+                                    new Date(promo.thoiHan) >= new Date()
                                 ).length
                             }
                         </h3>
                     </div>
 
                     <div className={s.info_item}>
-                        <p>Đã tắt</p>
-
+                        <p>Hết hạn</p>
                         <h3>
                             {
-                                promotions.filter(
-                                    promo => !promo.status
+                                promotions.filter(promo =>
+                                    new Date(promo.thoiHan) < new Date()
                                 ).length
                             }
                         </h3>

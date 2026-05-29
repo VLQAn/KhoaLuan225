@@ -266,6 +266,11 @@ tbody tr:hover td {
     color: white;
 }
 
+tbody tr:hover span {
+    color: white;
+    border: #fff solid 1px;
+}
+
 tbody tr:hover .toggle_on {
     border: #fff solid 1px;
 }
