@@ -44,7 +44,14 @@ const TheaterManager = () => {
         diaChi: "",
         soDienThoai: "",
         moTa: "",
-        phongChieu: "",
+
+        phongChieus: [
+            {
+                tenPhong: "",
+                soHang: 5,
+                soCot: 5,
+            },
+        ],
     });
 
     const [editingId, setEditingId] = useState(null);
@@ -90,35 +97,64 @@ const TheaterManager = () => {
         });
     };
 
+    const handleRoomChange = (
+        index,
+        field,
+        value
+    ) => {
+
+        const updatedRooms =
+            [...formData.phongChieus];
+
+        updatedRooms[index][field] = value;
+
+        setFormData({
+            ...formData,
+            phongChieus: updatedRooms,
+        });
+    };
+
+    const addRoom = () => {
+
+        setFormData({
+            ...formData,
+
+            phongChieus: [
+                ...formData.phongChieus,
+
+                {
+                    tenPhong: "",
+                    soHang: 5,
+                    soCot: 5,
+                },
+            ],
+        });
+    };
+
+    const removeRoom = (index) => {
+
+        const updatedRooms =
+            formData.phongChieus.filter(
+                (_, i) => i !== index
+            );
+
+        setFormData({
+            ...formData,
+            phongChieus: updatedRooms,
+        });
+    };
+
     const handleSubmit = async () => {
 
         try {
 
-            if (
-                !formData.tenRap ||
-                !formData.diaChi ||
-                !formData.soDienThoai
-            ) return;
-
-            if (editingId) {
-
-                await rapChieuApi.updateRapChieu(
-                    editingId,
-                    formData
-                );
-
-            } else {
-
-                await rapChieuApi.createRapChieu(
-                    formData
-                );
-            }
+            await rapChieuApi.createRapChieu(
+                formData
+            );
 
             await fetchTheaters();
 
             resetForm();
-
-            setEditingId(null);
 
         } catch (error) {
 
@@ -162,12 +198,20 @@ const TheaterManager = () => {
     };
 
     const resetForm = () => {
+
         setFormData({
             tenRap: "",
             diaChi: "",
             soDienThoai: "",
             moTa: "",
-            phongChieu: "",
+
+            phongChieus: [
+                {
+                    tenPhong: "",
+                    soHang: 5,
+                    soCot: 5,
+                },
+            ],
         });
     };
 
@@ -264,95 +308,193 @@ const TheaterManager = () => {
 
                 {/* FORM */}
                 <div className={s.form_container}>
-                    <div className={s.form_group}>
-                        <label>Tên rạp</label>
 
-                        <div className={s.input_box}>
-                            <span><MdAnalytics /></span>
-                            <input
-                                type="text"
-                                name="tenRap"
-                                value={formData.tenRap}
+                    <div className={s.section_title}>
+                        <h2>Thông tin rạp</h2>
+                    </div>
+
+                    <div className={s.form_grid}>
+
+                        <div className={s.form_group}>
+                            <label>Tên rạp</label>
+
+                            <div className={s.input_box}>
+                                <span><MdAnalytics /></span>
+
+                                <input
+                                    type="text"
+                                    name="tenRap"
+                                    value={formData.tenRap}
+                                    onChange={handleChange}
+                                    placeholder="Nhập tên rạp"
+                                />
+                            </div>
+                        </div>
+
+                        <div className={s.form_group}>
+                            <label>Số điện thoại</label>
+
+                            <div className={s.input_box}>
+                                <span><MdPhone /></span>
+
+                                <input
+                                    type="text"
+                                    name="soDienThoai"
+                                    value={formData.soDienThoai}
+                                    onChange={handleChange}
+                                    placeholder="Nhập số điện thoại"
+                                />
+                            </div>
+                        </div>
+
+                        <div className={`${s.form_group} ${s.full}`}>
+                            <label>Địa chỉ</label>
+
+                            <div className={s.input_box}>
+                                <span><MdLocationOn /></span>
+
+                                <input
+                                    type="text"
+                                    name="diaChi"
+                                    value={formData.diaChi}
+                                    onChange={handleChange}
+                                    placeholder="Nhập địa chỉ"
+                                />
+                            </div>
+                        </div>
+
+                        <div className={`${s.form_group} ${s.full}`}>
+                            <label>Mô tả</label>
+
+                            <textarea
+                                rows="4"
+                                name="moTa"
+                                value={formData.moTa}
                                 onChange={handleChange}
-                                placeholder="Nhập tên rạp"
+                                placeholder="Mô tả rạp..."
                             />
                         </div>
                     </div>
 
-                    <div className={s.form_group}>
-                        <label>Số điện thoại</label>
+                    {/* ROOM SECTION */}
 
-                        <div className={s.input_box}>
-                            <span><MdPhone /></span>
-                            <input
-                                type="text"
-                                name="soDienThoai"
-                                value={formData.soDienThoai}
-                                onChange={handleChange}
-                                placeholder="Nhập số điện thoại"
-                            />
-                        </div>
+                    <div className={s.room_header}>
+
+                        <h2>Danh sách phòng chiếu</h2>
+
+                        <button
+                            className={s.addRoomBtn}
+                            onClick={addRoom}
+                        >
+                            <MdAdd />
+                            Thêm phòng
+                        </button>
                     </div>
 
-                    <div className={`${s.form_group} ${s.full}`}>
-                        <label>Địa chỉ</label>
+                    <div className={s.room_list}>
 
-                        <div className={s.input_box}>
-                            <span><MdLocationOn /></span>
-                            <input
-                                type="text"
-                                name="diaChi"
-                                value={formData.diaChi}
-                                onChange={handleChange}
-                                placeholder="Nhập địa chỉ"
-                            />
-                        </div>
+                        {formData.phongChieus.map(
+                            (room, index) => (
+
+                                <div
+                                    key={index}
+                                    className={s.room_card}
+                                >
+
+                                    <div className={s.room_top}>
+
+                                        <h3>
+                                            <MdMeetingRoom />
+                                            Phòng {index + 1}
+                                        </h3>
+
+                                        {formData.phongChieus.length > 1 && (
+                                            <button
+                                                className={s.deleteRoomBtn}
+                                                onClick={() => removeRoom(index)}
+                                            >
+                                                <MdDelete />
+                                            </button>
+                                        )}
+                                    </div>
+
+                                    <div className={s.room_grid}>
+
+                                        <div className={s.form_group}>
+                                            <label>Tên phòng</label>
+
+                                            <input
+                                                type="text"
+                                                value={room.tenPhong}
+                                                onChange={(e) =>
+                                                    handleRoomChange(
+                                                        index,
+                                                        "tenPhong",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                placeholder="Phòng VIP 1"
+                                            />
+                                        </div>
+
+                                        <div className={s.form_group}>
+                                            <label>Số hàng</label>
+
+                                            <input
+                                                type="number"
+                                                value={room.soHang}
+                                                onChange={(e) =>
+                                                    handleRoomChange(
+                                                        index,
+                                                        "soHang",
+                                                        e.target.value
+                                                    )
+                                                }
+                                            />
+                                        </div>
+
+                                        <div className={s.form_group}>
+                                            <label>Số cột</label>
+
+                                            <input
+                                                type="number"
+                                                value={room.soCot}
+                                                onChange={(e) =>
+                                                    handleRoomChange(
+                                                        index,
+                                                        "soCot",
+                                                        e.target.value
+                                                    )
+                                                }
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className={s.room_preview}>
+
+                                        <MdChair />
+
+                                        Tổng ghế:
+
+                                        <b>
+                                            {room.soHang * room.soCot}
+                                        </b>
+
+                                    </div>
+                                </div>
+                            )
+                        )}
                     </div>
 
-                    <div className={s.form_group}>
-                        <label>Phòng chiếu</label>
-
-                        <div className={s.input_box}>
-                            <span><MdMeetingRoom /></span>
-                            <input
-                                type="number"
-                                name="phongChieu"
-                                value={formData.phongChieu}
-                                onChange={handleChange}
-                                placeholder="Số phòng chiếu"
-                            />
-                        </div>
-                    </div>
-
-                    <div className={s.form_group}>
-                        <label>Sơ đồ ghế</label>
-
-                        <div className={s.input_box}>
-                            <span><MdChair /></span>
-                            <select>
-                                <option>2D Standard</option>
-                                <option>IMAX</option>
-                                <option>VIP</option>
-                                <option>Couple Seat</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className={`${s.form_group} ${s.full}`}>
-                        <label>Mô tả</label>
-
-                        <textarea
-                            rows="4"
-                            name="moTa"
-                            value={formData.moTa}
-                            onChange={handleChange}
-                            placeholder="Mô tả rạp chiếu..."
-                        />
-                    </div>
-
-                    <button className={s.saveBtn} onClick={handleSubmit}>
+                    <button
+                        className={s.saveBtn}
+                        onClick={handleSubmit}
+                    >
                         <MdSave />
-                        {editingId ? "Cập nhật rạp" : "Lưu rạp"}
+
+                        {editingId
+                            ? "Cập nhật rạp"
+                            : "Tạo rạp chiếu"}
                     </button>
                 </div>
 
