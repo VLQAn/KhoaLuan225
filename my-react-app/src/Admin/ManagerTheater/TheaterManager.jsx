@@ -27,6 +27,7 @@ import {
 
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
+import rapChieuApi from "../../services/rapChieuApi";
 
 const s = styles;
 
@@ -36,16 +37,7 @@ const TheaterManager = () => {
     });
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-    const [theaters, setTheaters] = useState([
-        {
-            id: 1,
-            tenRap: "Galaxy Cinema",
-            diaChi: "Quận 1, TP.HCM",
-            soDienThoai: "0909999999",
-            moTa: "Rạp chiếu hiện đại",
-            phongChieu: 5,
-        },
-    ]);
+    const [theaters, setTheaters] = useState([]);
 
     const [formData, setFormData] = useState({
         tenRap: "",
@@ -69,6 +61,28 @@ const TheaterManager = () => {
 
     }, [darkMode]);
 
+    useEffect(() => {
+
+        fetchTheaters();
+
+    }, []);
+
+    const fetchTheaters = async () => {
+
+        try {
+
+            const response =
+                await rapChieuApi.getAllRapChieu();
+
+            setTheaters(response);
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
+    };
+
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -76,36 +90,75 @@ const TheaterManager = () => {
         });
     };
 
-    const handleSubmit = () => {
-        if (editingId) {
-            setTheaters(
-                theaters.map((theater) =>
-                    theater.id === editingId
-                        ? { ...formData, id: editingId }
-                        : theater
-                )
-            );
-            setEditingId(null);
-        } else {
-            setTheaters([
-                ...theaters,
-                {
-                    ...formData,
-                    id: Date.now(),
-                },
-            ]);
-        }
+    const handleSubmit = async () => {
 
-        resetForm();
+        try {
+
+            if (
+                !formData.tenRap ||
+                !formData.diaChi ||
+                !formData.soDienThoai
+            ) return;
+
+            if (editingId) {
+
+                await rapChieuApi.updateRapChieu(
+                    editingId,
+                    formData
+                );
+
+            } else {
+
+                await rapChieuApi.createRapChieu(
+                    formData
+                );
+            }
+
+            await fetchTheaters();
+
+            resetForm();
+
+            setEditingId(null);
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
     };
 
     const handleEdit = (theater) => {
-        setEditingId(theater.id);
-        setFormData(theater);
+
+        setEditingId(theater.maRap);
+
+        setFormData({
+            tenRap: theater.tenRap || "",
+            diaChi: theater.diaChi || "",
+            soDienThoai: theater.soDienThoai || "",
+            moTa: theater.moTa || "",
+            phongChieu: theater.phongChieu || "",
+        });
     };
 
-    const handleDelete = (id) => {
-        setTheaters(theaters.filter((theater) => theater.id !== id));
+    const handleDelete = async (id) => {
+
+        const confirmDelete = window.confirm(
+            "Bạn có chắc muốn xóa rạp này?"
+        );
+
+        if (!confirmDelete) return;
+
+        try {
+
+            await rapChieuApi.deleteRapChieu(id);
+
+            await fetchTheaters();
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
     };
 
     const resetForm = () => {
@@ -320,7 +373,7 @@ const TheaterManager = () => {
 
                         <tbody>
                             {theaters.map((theater) => (
-                                <tr key={theater.id}>
+                                <tr key={theater.maRap}>
                                     <td>{theater.tenRap}</td>
                                     <td>{theater.diaChi}</td>
                                     <td>{theater.soDienThoai}</td>
@@ -337,7 +390,7 @@ const TheaterManager = () => {
 
                                             <button
                                                 className={s.deleteBtn}
-                                                onClick={() => handleDelete(theater.id)}
+                                                onClick={() => handleDelete(theater.maRap)}
                                             >
                                                 <MdDelete />
                                             </button>
