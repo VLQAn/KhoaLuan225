@@ -1,4 +1,7 @@
 import styles from "./ShowtimeManager.module.css";
+import xuatChieuApi from "../../services/xuatChieuApi";
+import movieApi from "../../services/movieApi";
+import phongChieuApi from "../../services/phongChieuApi";
 
 import {
     MdClose,
@@ -35,25 +38,15 @@ const ShowtimeManager = () => {
     });
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-    const [showtimes, setShowtimes] = useState([
-        {
-            id: 1,
-            movie: "Avengers: Endgame",
-            theater: "Galaxy Nguyễn Du",
-            room: "Phòng 1",
-            startTime: "18:30",
-            date: "2026-05-08",
-            format: "IMAX"
-        }
-    ]);
+    const [showtimes, setShowtimes] = useState([]);
+    const [movies, setMovies] = useState([]);
+    const [rooms, setRooms] = useState([]);
 
     const [formData, setFormData] = useState({
-        movie: "",
-        theater: "",
-        room: "",
-        startTime: "",
-        date: "",
-        format: "",
+        maPhim: "",
+        maPhong: "",
+        ngayChieu: "",
+        gioChieu: "",
     });
 
     const [editingId, setEditingId] = useState(null);
@@ -70,6 +63,14 @@ const ShowtimeManager = () => {
 
     }, [darkMode]);
 
+    useEffect(() => {
+
+        fetchShowtimes();
+        fetchMovies();
+        fetchRooms();
+
+    }, []);
+
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -78,53 +79,160 @@ const ShowtimeManager = () => {
     };
 
     const resetForm = () => {
+
         setFormData({
-            movie: "",
-            theater: "",
-            room: "",
-            startTime: "",
-            date: "",
-            format: "",
+            maPhim: "",
+            maPhong: "",
+            ngayChieu: "",
+            gioChieu: "",
         });
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
 
-        if (editingId) {
+        try {
 
-            setShowtimes(
-                showtimes.map((showtime) =>
-                    showtime.id === editingId
-                        ? { ...formData, id: editingId }
-                        : showtime
-                )
+            if (
+                !formData.maPhim ||
+                !formData.maPhong ||
+                !formData.ngayChieu ||
+                !formData.gioChieu
+            ) {
+                return;
+            }
+
+            const thoiGianBatDau =
+                `${formData.ngayChieu} ${formData.gioChieu}:00`;
+
+            const payload = {
+                maPhim: formData.maPhim,
+                maPhong: formData.maPhong,
+                thoiGianBatDau,
+            };
+
+            if (editingId) {
+
+                await xuatChieuApi.update(
+                    editingId,
+                    payload
+                );
+
+                setEditingId(null);
+
+            } else {
+
+                await xuatChieuApi.create(payload);
+            }
+
+            fetchShowtimes();
+
+            resetForm();
+
+        } catch (error) {
+
+            console.log(error);
+
+            alert(
+                error?.response?.data?.message ||
+                "Có lỗi xảy ra"
             );
-
-            setEditingId(null);
-
-        } else {
-
-            setShowtimes([
-                ...showtimes,
-                {
-                    ...formData,
-                    id: Date.now(),
-                }
-            ]);
         }
-
-        resetForm();
     };
 
     const handleEdit = (showtime) => {
-        setEditingId(showtime.id);
-        setFormData(showtime);
+
+        setEditingId(
+            showtime.maXuatChieu
+        );
+
+        const date =
+            showtime.thoiGianBatDau
+                ?.split("T")[0];
+
+        const time =
+            showtime.thoiGianBatDau
+                ?.split("T")[1]
+                ?.substring(0, 5);
+
+        setFormData({
+            maPhim: showtime.maPhim,
+            maPhong: showtime.maPhong,
+            ngayChieu: date,
+            gioChieu: time,
+        });
     };
 
-    const handleDelete = (id) => {
-        setShowtimes(
-            showtimes.filter((showtime) => showtime.id !== id)
-        );
+    const handleDelete = async (id) => {
+
+        try {
+
+            await xuatChieuApi.delete(id);
+
+            fetchShowtimes();
+
+        } catch (error) {
+
+            console.log(error);
+
+            alert(
+                error?.response?.data?.message ||
+                "Không thể xóa"
+            );
+        }
+    };
+
+    const fetchShowtimes = async () => {
+
+        try {
+
+            const response =
+                await xuatChieuApi.getAll();
+
+            setShowtimes(
+                response.data || []
+            );
+
+        } catch (error) {
+
+            console.log(response.data);
+
+            console.log(error);
+        }
+    };
+
+    const fetchMovies = async () => {
+
+        try {
+
+            const response =
+                await movieApi.getAllMovies();
+
+            setMovies(
+                response.data?.data || []
+            );
+
+        } catch (error) {
+
+            console.log(error);
+        }
+    };
+
+    const fetchRooms = async () => {
+
+        try {
+
+            const response =
+                await phongChieuApi
+                    .getAllPhongChieu();
+
+            setRooms(
+                response.data || []
+            );
+
+        } catch (error) {
+
+            console.log(error);
+        }
     };
 
     const userData = localStorage.getItem("user");
@@ -229,14 +337,25 @@ const ShowtimeManager = () => {
                             <span><MdMovieCreation /></span>
 
                             <select
-                                name="movie"
-                                value={formData.movie}
+                                name="maPhim"
+                                value={formData.maPhim}
                                 onChange={handleChange}
                             >
-                                <option value="">Chọn phim</option>
-                                <option>Avengers: Endgame</option>
-                                <option>Spider Man</option>
-                                <option>Batman</option>
+                                <option value="">
+                                    Chọn phim
+                                </option>
+
+                                {movies.map((movie) => (
+
+                                    <option
+                                        key={movie.maPhim}
+                                        value={movie.maPhim}
+                                    >
+                                        {movie.tieuDe}
+                                    </option>
+
+                                ))}
+
                             </select>
                         </div>
                     </div>
@@ -248,52 +367,26 @@ const ShowtimeManager = () => {
                             <span><MdTheaters /></span>
 
                             <select
-                                name="theater"
-                                value={formData.theater}
+                                name="maPhong"
+                                value={formData.maPhong}
                                 onChange={handleChange}
                             >
-                                <option value="">Chọn rạp</option>
-                                <option>Galaxy Nguyễn Du</option>
-                                <option>Lotte Cinema</option>
-                                <option>CGV Vincom</option>
-                            </select>
-                        </div>
-                    </div>
+                                <option value="">
+                                    Chọn phòng
+                                </option>
 
-                    <div className={s.form_group}>
-                        <label>Phòng chiếu</label>
+                                {rooms.map((room) => (
 
-                        <div className={s.input_box}>
-                            <span><MdEventSeat /></span>
+                                    <option
+                                        key={room.maPhong}
+                                        value={room.maPhong}
+                                    >
+                                        {room.tenPhong} -
+                                        {room.rap_chieu?.tenRap}
+                                    </option>
 
-                            <select
-                                name="room"
-                                value={formData.room}
-                                onChange={handleChange}
-                            >
-                                <option value="">Chọn phòng</option>
-                                <option>Phòng 1</option>
-                                <option>Phòng 2</option>
-                                <option>Phòng VIP</option>
-                            </select>
-                        </div>
-                    </div>
+                                ))}
 
-                    <div className={s.form_group}>
-                        <label>Định dạng</label>
-
-                        <div className={s.input_box}>
-                            <span><MdMovie /></span>
-
-                            <select
-                                name="format"
-                                value={formData.format}
-                                onChange={handleChange}
-                            >
-                                <option value="">Chọn định dạng</option>
-                                <option>2D</option>
-                                <option>3D</option>
-                                <option>IMAX</option>
                             </select>
                         </div>
                     </div>
@@ -304,8 +397,8 @@ const ShowtimeManager = () => {
                         <div className={s.input_box}>
                             <input
                                 type="date"
-                                name="date"
-                                value={formData.date}
+                                name="ngayChieu"
+                                value={formData.ngayChieu}
                                 onChange={handleChange}
                             />
                         </div>
@@ -319,8 +412,8 @@ const ShowtimeManager = () => {
 
                             <input
                                 type="time"
-                                name="startTime"
-                                value={formData.startTime}
+                                name="gioChieu"
+                                value={formData.gioChieu}
                                 onChange={handleChange}
                             />
                         </div>
@@ -350,26 +443,52 @@ const ShowtimeManager = () => {
                                 <th>Phòng</th>
                                 <th>Ngày</th>
                                 <th>Giờ</th>
-                                <th>Định dạng</th>
+                                <th>Trạng thái</th>
                                 <th>Hành động</th>
                             </tr>
                         </thead>
 
                         <tbody>
-
                             {showtimes.map((showtime) => (
-
-                                <tr key={showtime.id}>
-
-                                    <td>{showtime.movie}</td>
-                                    <td>{showtime.theater}</td>
-                                    <td>{showtime.room}</td>
-                                    <td>{showtime.date}</td>
-                                    <td>{showtime.startTime}</td>
-                                    <td>{showtime.format}</td>
+                                <tr key={showtime.maXuatChieu}>
 
                                     <td>
+                                        {showtime.phim?.tieuDe}
+                                    </td>
 
+                                    <td>
+                                        {showtime.phong_chieu?.rap_chieu?.tenRap}
+                                    </td>
+
+                                    <td>
+                                        {showtime.phong_chieu?.tenPhong}
+                                    </td>
+
+                                    <td>
+                                        {showtime.thoiGianBatDau?.split("T")[0]}
+                                    </td>
+
+                                    <td>
+                                        {showtime.thoiGianBatDau
+                                            ?.split("T")[1]
+                                            ?.substring(0, 5)}
+                                    </td>
+
+                                    <td>
+                                        {
+                                            showtime.trangThai === "sap_chieu"
+                                                ? "Sắp chiếu"
+                                                : showtime.trangThai === "dang_chieu"
+                                                    ? "Đang chiếu"
+                                                    : showtime.trangThai === "da_chieu"
+                                                        ? "Đã chiếu"
+                                                        : showtime.trangThai === "da_huy"
+                                                            ? "Đã hủy"
+                                                            : showtime.trangThai
+                                        }
+                                    </td>
+
+                                    <td>
                                         <div className={s.actions}>
 
                                             <button
@@ -381,19 +500,18 @@ const ShowtimeManager = () => {
 
                                             <button
                                                 className={s.deleteBtn}
-                                                onClick={() => handleDelete(showtime.id)}
+                                                onClick={() =>
+                                                    handleDelete(showtime.maXuatChieu)
+                                                }
                                             >
                                                 <MdDelete />
                                             </button>
 
                                         </div>
-
                                     </td>
 
                                 </tr>
-
                             ))}
-
                         </tbody>
 
                     </table>
