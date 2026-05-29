@@ -45,13 +45,14 @@ const TheaterManager = () => {
         soDienThoai: "",
         moTa: "",
 
-        phongChieus: [
-            {
-                tenPhong: "",
-                soHang: 5,
-                soCot: 5,
-            },
-        ],
+        // phongChieus: [
+        //     {
+        //         tenPhong: "",
+        //         soHang: 5,
+        //         soCot: 5,
+        //     },
+        // ],
+        phongChieus: [],
     });
 
     const [editingId, setEditingId] = useState(null);
@@ -144,21 +145,57 @@ const TheaterManager = () => {
         });
     };
 
+    const handleSeatChange = (
+        roomIndex,
+        seatIndex,
+        field,
+        value
+    ) => {
+
+        const updatedRooms =
+            [...formData.phongChieus];
+
+        updatedRooms[roomIndex]
+            .ghe[seatIndex][field] = value;
+
+        setFormData({
+            ...formData,
+            phongChieus: updatedRooms,
+        });
+    };
+
     const handleSubmit = async () => {
 
         try {
 
-            await rapChieuApi.createRapChieu(
-                formData
-            );
+            if (editingId) {
+                console.log(
+                    JSON.stringify(formData.phongChieus, null, 2)
+                );
+
+                await rapChieuApi.updateRapChieu(
+                    editingId,
+                    formData
+                );
+
+            } else {
+
+                await rapChieuApi.createRapChieu(
+                    formData
+                );
+            }
 
             await fetchTheaters();
 
             resetForm();
 
+            setEditingId(null);
+
         } catch (error) {
 
             console.error(error);
+
+            console.log(formData.phongChieus);
 
         }
     };
@@ -172,7 +209,30 @@ const TheaterManager = () => {
             diaChi: theater.diaChi || "",
             soDienThoai: theater.soDienThoai || "",
             moTa: theater.moTa || "",
-            phongChieu: theater.phongChieu || "",
+
+            phongChieus:
+                theater.phong_chieu?.map((room) => ({
+
+                    maPhong: room.maPhong,
+
+                    tenPhong: room.tenPhong || "",
+
+                    ghe: room.ghe || [],
+
+                    soHang:
+                        [...new Set(
+                            room.ghe?.map(
+                                (g) => g.hangGhe
+                            ) || []
+                        )].length,
+
+                    soCot:
+                        Math.max(
+                            ...(room.ghe?.map(
+                                (g) => g.soGhe
+                            ) || [0]
+                            )),
+                })) || [],
         });
     };
 
@@ -199,19 +259,14 @@ const TheaterManager = () => {
 
     const resetForm = () => {
 
+        setEditingId(null);
+
         setFormData({
             tenRap: "",
             diaChi: "",
             soDienThoai: "",
             moTa: "",
-
-            phongChieus: [
-                {
-                    tenPhong: "",
-                    soHang: 5,
-                    soCot: 5,
-                },
-            ],
+            phongChieus: [],
         });
     };
 
@@ -393,11 +448,11 @@ const TheaterManager = () => {
 
                     <div className={s.room_list}>
 
-                        {formData.phongChieus.map(
+                        {(formData.phongChieus || []).map(
                             (room, index) => (
 
                                 <div
-                                    key={index}
+                                    key={room.maPhong || index}
                                     className={s.room_card}
                                 >
 
@@ -408,7 +463,7 @@ const TheaterManager = () => {
                                             Phòng {index + 1}
                                         </h3>
 
-                                        {formData.phongChieus.length > 1 && (
+                                        {(formData.phongChieus || []).length > 1 && (
                                             <button
                                                 className={s.deleteRoomBtn}
                                                 onClick={() => removeRoom(index)}
@@ -470,6 +525,72 @@ const TheaterManager = () => {
                                         </div>
                                     </div>
 
+                                    <div className={s.seatList}>
+
+                                        <h4>Danh sách ghế</h4>
+
+                                        <div className={s.seatGrid}>
+
+                                            {(room.ghe || []).map(
+                                                (seat, seatIndex) => (
+
+                                                    <div
+                                                        key={seat.maGhe}
+                                                        className={s.seatCard}
+                                                    >
+
+                                                        <div className={s.seatCode}>
+                                                            {seat.hangGhe}
+                                                            {seat.soGhe}
+                                                        </div>
+
+                                                        <select
+                                                            value={seat.loaiGhe}
+                                                            onChange={(e) =>
+                                                                handleSeatChange(
+                                                                    index,
+                                                                    seatIndex,
+                                                                    "loaiGhe",
+                                                                    e.target.value
+                                                                )
+                                                            }
+                                                        >
+                                                            <option value="thuong">
+                                                                Thường
+                                                            </option>
+
+                                                            <option value="vip">
+                                                                VIP
+                                                            </option>
+                                                        </select>
+
+                                                        <select
+                                                            value={seat.trangThai}
+                                                            onChange={(e) =>
+                                                                handleSeatChange(
+                                                                    index,
+                                                                    seatIndex,
+                                                                    "trangThai",
+                                                                    e.target.value
+                                                                )
+                                                            }
+                                                        >
+                                                            <option value="hoat_dong">
+                                                                Hoạt động
+                                                            </option>
+
+                                                            <option value="bao_tri">
+                                                                Bảo trì
+                                                            </option>
+                                                        </select>
+
+                                                    </div>
+                                                )
+                                            )}
+
+                                        </div>
+                                    </div>
+
                                     <div className={s.room_preview}>
 
                                         <MdChair />
@@ -519,7 +640,9 @@ const TheaterManager = () => {
                                     <td>{theater.tenRap}</td>
                                     <td>{theater.diaChi}</td>
                                     <td>{theater.soDienThoai}</td>
-                                    <td>{theater.phongChieu}</td>
+                                    <td>
+                                        {theater.phong_chieu?.length || 0}
+                                    </td>
 
                                     <td>
                                         <div className={s.actions}>
