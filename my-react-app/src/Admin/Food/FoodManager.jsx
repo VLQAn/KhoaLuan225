@@ -58,6 +58,8 @@ const FoodManager = () => {
 
     const [theaters, setTheaters] = useState([]);
 
+    const [selectedTheater, setSelectedTheater] = useState("");
+
     useEffect(() => {
 
         if (darkMode) {
@@ -245,6 +247,14 @@ const FoodManager = () => {
         ? JSON.parse(userData)
         : null;
 
+    const filteredFoods = selectedTheater
+        ? foods.filter(
+            food =>
+                String(food.maRap) ===
+                String(selectedTheater)
+        )
+        : foods;
+
     return (
 
         <div className={s.container}>
@@ -348,27 +358,40 @@ const FoodManager = () => {
                 <div className={s.form_container}>
                     <div className={s.form_group}>
 
-                        <label>Rạp chiếu</label>
+                        <label>Lọc theo rạp</label>
 
                         <div className={s.input_box}>
 
                             <select
-                                name="maRap"
-                                value={formData.maRap}
-                                onChange={handleChange}
+                                value={selectedTheater}
+                                onChange={(e) => {
+
+                                    const value = e.target.value;
+
+                                    setSelectedTheater(value);
+
+                                    setFormData({
+                                        ...formData,
+                                        maRap: value
+                                    });
+                                }}
                             >
+
                                 <option value="">
-                                    Chọn rạp
+                                    Tất cả rạp
                                 </option>
 
                                 {theaters.map((theater) => (
+
                                     <option
                                         key={theater.maRap}
                                         value={theater.maRap}
                                     >
                                         {theater.tenRap}
                                     </option>
+
                                 ))}
+
                             </select>
 
                         </div>
@@ -468,7 +491,7 @@ const FoodManager = () => {
 
                         <tbody>
 
-                            {foods.map((food) => (
+                            {filteredFoods.map((food) => (
 
                                 <tr key={food.maMon}>
 
