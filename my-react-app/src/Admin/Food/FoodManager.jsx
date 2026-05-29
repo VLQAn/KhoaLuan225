@@ -1,4 +1,6 @@
 import styles from "./FoodManager.module.css";
+import bapNuocApi from "../../services/bapNuocApi";
+import rapChieuApi from "../../services/rapChieuApi";
 
 import {
     MdClose,
@@ -29,8 +31,6 @@ import {
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 
-import bapNuocApi from "../../services/bapNuocApi";
-
 const s = styles;
 
 const FoodManager = () => {
@@ -49,11 +49,14 @@ const FoodManager = () => {
         hinhAnh: "",
         moTa: "",
         trangThai: true,
+        maRap: "",
     });
 
     const [editingId, setEditingId] = useState(null);
 
     const [toast, setToast] = useState("");
+
+    const [theaters, setTheaters] = useState([]);
 
     useEffect(() => {
 
@@ -70,6 +73,7 @@ const FoodManager = () => {
     useEffect(() => {
 
         fetchFoods();
+        fetchTheaters();
 
     }, []);
 
@@ -95,7 +99,7 @@ const FoodManager = () => {
 
             trangThai: "DANG_BAN",
 
-            maRap: 1,
+            maRap: parseInt(formData.maRap),
         });
 
         setEditingId(null);
@@ -104,14 +108,17 @@ const FoodManager = () => {
     const handleSubmit = async () => {
 
         try {
-
             if (
                 !formData.tenMon ||
-                !formData.gia
-            ) return;
+                !formData.gia ||
+                !formData.maRap
+            ) {
+                alert("Vui lòng chọn rạp");
+                return;
+            }
 
             const payload = {
-                maRap: 1,
+                maRap: parseInt(formData.maRap),
                 tenMon: formData.tenMon,
                 gia: Number(formData.gia),
                 hinhAnh: formData.hinhAnh,
@@ -166,7 +173,7 @@ const FoodManager = () => {
             trangThai:
                 food.trangThai || "DANG_BAN",
 
-            maRap: food.maRap || 1,
+            maRap: parseInt(food.maRap) || "",
         });
     };
 
@@ -213,6 +220,22 @@ const FoodManager = () => {
         } catch (error) {
 
             console.error(error);
+        }
+    };
+
+    const fetchTheaters = async () => {
+
+        try {
+
+            const response =
+                await rapChieuApi.getAllRapChieu();
+
+            setTheaters(response);
+
+        } catch (error) {
+
+            console.error(error);
+
         }
     };
 
@@ -323,6 +346,34 @@ const FoodManager = () => {
 
                 {/* FORM */}
                 <div className={s.form_container}>
+                    <div className={s.form_group}>
+
+                        <label>Rạp chiếu</label>
+
+                        <div className={s.input_box}>
+
+                            <select
+                                name="maRap"
+                                value={formData.maRap}
+                                onChange={handleChange}
+                            >
+                                <option value="">
+                                    Chọn rạp
+                                </option>
+
+                                {theaters.map((theater) => (
+                                    <option
+                                        key={theater.maRap}
+                                        value={theater.maRap}
+                                    >
+                                        {theater.tenRap}
+                                    </option>
+                                ))}
+                            </select>
+
+                        </div>
+
+                    </div>
 
                     <div className={s.form_group}>
                         <label>Tên món</label>
