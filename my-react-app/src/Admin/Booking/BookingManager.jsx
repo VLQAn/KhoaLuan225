@@ -1,18 +1,14 @@
 import styles from "./BookingManager.module.css";
-
+import bookingApi from "../../services/bookingApi";
 import {
     MdClose,
     MdDashboard,
     MdMovie,
     MdAnalytics,
-    MdFastfood,
     MdMenu,
     MdLightMode,
     MdDarkMode,
     MdLogout,
-    MdConfirmationNumber,
-    MdCheckCircle,
-    MdCancel,
     MdAccessTime,
     MdLocationOn,
     MdChair,
@@ -20,13 +16,10 @@ import {
     MdFastfood as MdCombo,
     MdPayments,
     MdDiscount,
-    MdToggleOn,
-    MdToggleOff,
     MdKeyboardArrowDown,
     MdKeyboardArrowUp,
     MdMessage,
     MdShoppingCart,
-    MdReport,
     MdAddBox,
     MdLocalOffer,
 } from "react-icons/md";
@@ -44,56 +37,11 @@ const BookingManager = () => {
 
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-    const [autoApprove, setAutoApprove] = useState(true);
-
-    const [activeTab, setActiveTab] = useState("pending");
+    const [activeTab, setActiveTab] = useState("paying");
 
     const [expandedId, setExpandedId] = useState(null);
 
-    const bookings = [
-        {
-            id: 1,
-            movie: "Avengers: Endgame",
-            theater: "CGV Vincom",
-            address: "Vincom Plaza Kon Tum",
-            room: "Phòng 1",
-            showtime: "19:30 - 10/05/2026",
-            seats: ["A1", "A2"],
-            food: "Combo Couple",
-            total: "180000",
-            discount: "20FREEMOVIE",
-            payment: "Momo",
-            status: "pending",
-        },
-        {
-            id: 2,
-            movie: "Batman",
-            theater: "Galaxy Cinema",
-            address: "Nguyễn Huệ, TP.HCM",
-            room: "Phòng VIP",
-            showtime: "21:00 - 11/05/2026",
-            seats: ["B5", "B6", "B7"],
-            food: "",
-            total: "450000",
-            discount: "",
-            payment: "ZaloPay",
-            status: "confirmed",
-        },
-        {
-            id: 3,
-            movie: "Spider Man",
-            theater: "Lotte Cinema",
-            address: "Đà Nẵng",
-            room: "Phòng 3",
-            showtime: "18:00 - 12/05/2026",
-            seats: ["C1"],
-            food: "Pepsi + Popcorn",
-            total: "180000",
-            discount: "SPIDER50",
-            payment: "Tiền mặt",
-            status: "cancelled",
-        }
-    ];
+    const [bookings, setBookings] = useState([]);
 
     useEffect(() => {
 
@@ -107,11 +55,52 @@ const BookingManager = () => {
 
     }, [darkMode]);
 
+    useEffect(() => {
+
+        fetchBookings();
+
+    }, []);
+
+    const fetchBookings = async () => {
+
+        try {
+
+            const response =
+                await bookingApi.getAllBookings();
+
+            console.log(response.data.data);
+
+            setBookings(
+                response.data.data
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
+    };
+
     const filteredBookings = bookings.filter(
-        (booking) => booking.status === activeTab
+        booking => booking.status === activeTab
     );
 
     const userData = localStorage.getItem("user");
+
+    const payingCount =
+        bookings.filter(
+            b => b.status === "paying"
+        ).length;
+
+    const paidCount =
+        bookings.filter(
+            b => b.status === "paid"
+        ).length;
+
+    const cancelledCount =
+        bookings.filter(
+            b => b.status === "cancelled"
+        ).length;
 
     const user = userData
         ? JSON.parse(userData)
@@ -161,7 +150,6 @@ const BookingManager = () => {
                     >
                         <span><MdMessage /></span>
                         <h3>Đơn đặt vé</h3>
-                        <span className={s.msg_count}>10</span>
                     </NavLink>
                     <NavLink
                         to="/admin/showtime-manager"
@@ -199,7 +187,7 @@ const BookingManager = () => {
                 {/* HEADER */}
                 <div className={s.header}>
 
-                    <h1>Xác nhận đơn đặt vé</h1>
+                    <h1>Đơn đặt vé</h1>
 
                 </div>
 
@@ -208,24 +196,24 @@ const BookingManager = () => {
 
                     <button
                         className={
-                            activeTab === "pending"
+                            activeTab === "paying"
                                 ? s.active
                                 : ""
                         }
-                        onClick={() => setActiveTab("pending")}
+                        onClick={() => setActiveTab("paying")}
                     >
-                        Chờ xác nhận
+                        Đang thanh toán
                     </button>
 
                     <button
                         className={
-                            activeTab === "confirmed"
+                            activeTab === "paid"
                                 ? s.active
                                 : ""
                         }
-                        onClick={() => setActiveTab("confirmed")}
+                        onClick={() => setActiveTab("paid")}
                     >
-                        Đã xác nhận
+                        Đã thanh toán
                     </button>
 
                     <button
@@ -240,30 +228,6 @@ const BookingManager = () => {
                     </button>
 
                 </div>
-
-                {
-                    activeTab === "pending" && (
-                        <div
-                            className={s.auto_toggle}
-                            onClick={() => setAutoApprove(!autoApprove)}
-                        >
-
-                            {
-                                autoApprove
-                                    ? <MdToggleOn />
-                                    : <MdToggleOff />
-                            }
-
-                            <span>
-                                {
-                                    autoApprove
-                                        ? "Duyệt tự động"
-                                        : "Duyệt thủ công"
-                                }
-                            </span>
-
-                        </div>)
-                }
 
                 {/* BOOKING LIST */}
                 <div className={s.booking_container}>
@@ -342,7 +306,11 @@ const BookingManager = () => {
                                                     <p>
                                                         {booking.seats.join(", ")}
                                                     </p>
-                                                    <span>110.000 VNĐ</span>
+                                                    <span>
+                                                        {Number(
+                                                            booking.ticketPrice
+                                                        ).toLocaleString()} VNĐ
+                                                    </span>
                                                 </div>
                                             </div>
 
@@ -382,23 +350,26 @@ const BookingManager = () => {
                                                 <MdCombo />
                                                 <div>
                                                     <h4>Bắp nước</h4>
-                                                    <p>
-                                                        {
-                                                            booking.food
-                                                                ? booking.food
-                                                                : "Không có"
-                                                        }
-                                                    </p>
-                                                    <span>90.000 VNĐ</span>
+                                                    <p>{booking.food}</p>
+
+                                                    <span>
+                                                        {Number(
+                                                            booking.foodPrice
+                                                        ).toLocaleString()} VNĐ
+                                                    </span>
                                                 </div>
                                             </div>
 
                                             <div className={s.detail_item}>
                                                 <MdPayments />
                                                 <div>
-                                                    <h4>Thanh toán</h4>
-                                                    <p>{booking.payment}</p>
-                                                    <span>200.000 VNĐ</span>
+                                                    <h4>Tổng tiền</h4>
+
+                                                    <p>
+                                                        {Number(
+                                                            booking.totalPrice
+                                                        ).toLocaleString()} VNĐ
+                                                    </p>
                                                 </div>
                                             </div>
 
@@ -408,44 +379,32 @@ const BookingManager = () => {
                                                     <h4>Mã giảm giá</h4>
                                                     <p>
                                                         {
-                                                            booking.discount
-                                                                ? booking.discount
-                                                                : "Không áp dụng"
+                                                            booking.promotionCode
+                                                            || "Không áp dụng"
                                                         }
                                                     </p>
-                                                    <span>-20%</span>
+
+                                                    <span>
+                                                        {
+                                                            booking.promotionPercent
+                                                                ? `-${booking.promotionPercent}%`
+                                                                : "0%"
+                                                        }
+                                                    </span>
                                                 </div>
                                             </div>
 
                                             <div className={s.total_box}>
-                                                Tổng giá:
+                                                Tổng thanh toán:
                                                 <span>
                                                     {
-                                                        Number(booking.total)
+                                                        Number(
+                                                            booking.totalPayment
+                                                        )
                                                             .toLocaleString()
                                                     } VNĐ
                                                 </span>
                                             </div>
-
-                                            {
-                                                activeTab === "pending" && (
-
-                                                    <div className={s.action_buttons}>
-
-                                                        <button className={s.confirm_btn}>
-                                                            <MdCheckCircle />
-                                                            Xác nhận
-                                                        </button>
-
-                                                        <button className={s.cancel_btn}>
-                                                            <MdCancel />
-                                                            Hủy đơn
-                                                        </button>
-
-                                                    </div>
-
-                                                )
-                                            }
 
                                         </div>
 
@@ -517,18 +476,18 @@ const BookingManager = () => {
                     <h2>Thống kê đơn vé</h2>
 
                     <div className={s.info_item}>
-                        <p>Chờ xác nhận</p>
-                        <h3>12</h3>
+                        <p>Đang thanh toán</p>
+                        <h3>{payingCount}</h3>
                     </div>
 
                     <div className={s.info_item}>
                         <p>Đã xác nhận</p>
-                        <h3>48</h3>
+                        <h3>{paidCount}</h3>
                     </div>
 
                     <div className={s.info_item}>
                         <p>Đã hủy</p>
-                        <h3>6</h3>
+                        <h3>{cancelledCount}</h3>
                     </div>
 
                 </div>
