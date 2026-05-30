@@ -32,6 +32,9 @@ const s = styles;
 const Home = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const user = JSON.parse(
+    localStorage.getItem("user")
+  );
 
   return (
     <div className="container">
@@ -48,9 +51,17 @@ const Home = () => {
             <span><FaFacebook /></span>
             <span><FaGoogle /></span>
             <span className={s.login_link}>
-              <Link to="/register">
-                Đăng nhập / Đăng ký
-              </Link>
+              {
+                user ? (
+                  <Link to="/profile">
+                    {user.tenNguoiDung}
+                  </Link>
+                ) : (
+                  <Link to="/register">
+                    Đăng nhập / Đăng ký
+                  </Link>
+                )
+              }
             </span>
           </div>
         </div>

@@ -1,71 +1,149 @@
 import styles from "./MovieDetail.module.css";
 import { FaPlay } from "react-icons/fa";
-import { useNavigate, useParams } from "react-router-dom";
-import { MdMovie, MdLocationOn, MdAccessTime, MdDateRange } from "react-icons/md";
-import { useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
+import {
+    MdMovie,
+    MdAccessTime,
+    MdDateRange
+} from "react-icons/md";
+
+import { useEffect, useState } from "react";
+import xuatChieuApi from "../../services/xuatChieuApi";
 
 const s = styles;
 
-const dates = [
-    { label: "Hôm nay", date: "29/04" },
-    { label: "Thứ năm", date: "30/04" },
-    { label: "Thứ sáu", date: "01/05" },
-];
-
-const showtimes = [
-    {
-        date: "29/04",
-        cinema: "CGV Nha Trang",
-        times: ["18:00", "20:30", "22:00"],
-    },
-    {
-        date: "30/04",
-        cinema: "CGV Nha Trang",
-        times: ["17:00", "19:30"],
-    },
-    {
-        date: "01/05",
-        cinema: "CGV Nha Trang",
-        times: ["16:00", "21:00"],
-    },
-];
-
 const MovieDetail = () => {
+    // Hooks
     const navigate = useNavigate();
     const { id } = useParams();
-    const { state: Movie } = useLocation();
-    const [selectedDate, setSelectedDate] = useState(dates[0].date);
+    const { state: movie } = useLocation();
 
-    const movie = {
-        title: Movie?.title || "Avengers: Endgame",
-        img: Movie?.img || "https://i.pinimg.com/webp70/1200x/95/26/68/9526684fe11e38cf6bb6fbd48e37de6a.webp",
-        banner: Movie?.banner || "https://i.pinimg.com/1200x/0b/ac/89/0bac898999f616d08e0208933bfed909.jpg",
-        rating: Movie?.rating || 8.8,
-        time: Movie?.time || "181 phút",
-        date: Movie?.date || "26/04/2019",
-        director: "Anthony Russo, Joe Russo",
-        cast: [
-            "Robert Downey Jr.",
-            "Chris Evans",
-            "Scarlett Johansson",
-            "Tom Holland",
-        ],
-        genre: "Hành động, khoa học Viễn tưởng, chính kịch, siêu anh hùng, phiêu lưu, kỳ ảo",
-        desc: "Avengers: Endgame (Avengers: Hồi Kết) là bom tấn siêu anh hùng năm 2019, đóng vai trò là phần kết của câu chuyện kéo dài 11 năm trong Vũ trụ Điện ảnh Marvel (MCU) tính đến thời điểm đó. Bộ phim là hậu quả trực tiếp của Avengers: Infinity War, khi Thanos đã búng tay xóa sổ một nửa sinh vật sống trong vũ trụ.",
+    const [showtimes, setShowtimes] = useState([]);
+    const [selectedDate, setSelectedDate] = useState("");
+
+    // Hàm fetch dữ liệu lịch chiếu cho phim
+    const fetchShowtimes = async () => {
+        try {
+
+            const response =
+                await xuatChieuApi.getAll();
+
+            const data =
+                response.data;
+
+            const movieShowtimes =
+                data.filter(
+                    item =>
+                        item.maPhim === Number(id)
+                );
+
+            setShowtimes(movieShowtimes);
+
+        } catch (error) {
+
+            console.error(error);
+
+        }
+    };
+
+    const formatDateVN = (dateStr) => {
+        if (!dateStr) return "";
+
+        return dateStr.split("T")[0];
+    };
+
+    const formatTimeVN = (dateStr) => {
+        if (!dateStr) return "";
+
+        const [date, time] = dateStr.split("T");
+
+        if (!time) return "";
+
+        const [hour, minute] = time.split(":");
+
+        return `${hour}:${minute}`;
+    };
+
+    // useEffect để fetch dữ liệu khi component mount hoặc khi id thay đổi
+    useEffect(() => {
+        fetchShowtimes();
+    }, [id]);
+
+    // Dữ liệu tính toán cho phần hiển thị thông tin phim
+    const uniqueDates = [
+        ...new Set(
+            showtimes.map(item =>
+                formatDateVN(item.thoiGianBatDau)
+            )
+        )
+    ];
+
+    useEffect(() => {
+
+        if (
+            uniqueDates.length > 0 &&
+            !selectedDate
+        ) {
+            setSelectedDate(uniqueDates[0]);
+        }
+
+    }, [showtimes]);
+
+    const filteredShowtimes = showtimes.filter(
+        item =>
+            formatDateVN(item.thoiGianBatDau) === selectedDate
+    );
+
+    const groupedByCinema =
+        filteredShowtimes.reduce(
+            (acc, item) => {
+
+                const cinema =
+                    item.phong_chieu
+                        .rap_chieu
+                        .tenRap;
+
+                if (!acc[cinema]) {
+                    acc[cinema] = [];
+                }
+
+                acc[cinema].push(item);
+
+                return acc;
+
+            },
+            {}
+        );
+
+    const movieData = {
+        title: movie?.tieuDe,
+        img: movie?.anhPoster,
+        banner: movie?.anhBanner,
+        rating: movie?.danhGia,
+        time: `${movie?.thoiLuong} phút`,
+        date: new Date(
+            movie?.ngayCongChieu
+        ).toLocaleDateString("vi-VN"),
+        director: movie?.daoDien,
+        cast: movie?.dienVien?.split(",") || [],
+        genre:
+            movie?.theLoai
+                ?.map(item => item.tenTheLoai)
+                .join(", "),
+        desc: movie?.moTa,
     };
 
     return (
         <div className={s.container}>
             {/* Banner */}
-            <div className={s.banner} style={{ backgroundImage: `url(${movie.banner})` }}>
+            <div className={s.banner} style={{ backgroundImage: `url(${movieData.banner})` }}>
                 <div className={s.overlay}></div>
             </div>
 
             {/* Info */}
             <div className={s.content}>
                 <div className={s.poster}>
-                    <img src={movie.img} alt={movie.title} />
+                    <img src={movieData.img} alt={movieData.title} />
 
                     <div className={s.play}>
                         <FaPlay />
@@ -74,39 +152,39 @@ const MovieDetail = () => {
 
                 <div className={s.info}>
                     <div className={s.top}>
-                        <h1>{movie.title}</h1>
+                        <h1>{movieData.title}</h1>
                         <span className={s.rating}>
-                            {movie.rating} <span>/10</span>
+                            {movieData.rating} <span>/10</span>
                         </span>
                     </div>
 
                     <p className={s.meta}>
                         <MdMovie className={s.icon} />
-                        {movie.genre}
+                        {movieData.genre}
                     </p>
                     <p className={s.meta}>
                         <MdAccessTime className={s.icon} />
-                        {movie.time}
+                        {movieData.time}
                     </p>
                     <p className={s.meta}>
                         <MdDateRange className={s.icon} />
-                        {movie.date}
+                        {movieData.date}
                     </p>
                     <div className={s.extra_info}>
 
                         <p>
                             <span>Đạo diễn:</span>
-                            {movie.director}
+                            {movieData.director}
                         </p>
 
                         <p>
                             <span>Diễn viên:</span>
-                            {movie.cast.join(", ")}
+                            {movieData.cast.join(", ")}
                         </p>
 
                     </div>
 
-                    <p className={s.desc}>{movie.desc}</p>
+                    <p className={s.desc}>{movieData.desc}</p>
                 </div>
             </div>
 
@@ -116,39 +194,66 @@ const MovieDetail = () => {
                     <h2>Lịch chiếu</h2>
 
                     <div className={s.date_list}>
-                        {dates.map((d, i) => (
+                        {uniqueDates.map((date) => (
+
                             <div
-                                key={i}
-                                className={`${s.date_item} ${selectedDate === d.date ? s.active : ""
+                                key={date}
+                                className={`${s.date_item}
+        ${selectedDate === date
+                                        ? s.active
+                                        : ""
                                     }`}
-                                onClick={() => setSelectedDate(d.date)}
+                                onClick={() =>
+                                    setSelectedDate(date)
+                                }
                             >
-                                <p>{d.label}</p>
-                                <span>{d.date}</span>
+                                <span>{date}</span>
                             </div>
+
                         ))}
                     </div>
 
                 </div>
 
-                {showtimes
-                    .filter((c) => c.date === selectedDate)
-                    .map((c, i) => (
-                        <div key={i} className={s.cinema}>
-                            <h3 className={s.cinema_name}>{c.cinema}</h3>
+                {Object.entries(
+                    groupedByCinema
+                ).map(
+                    ([cinema, shows]) => (
 
-                            <div className={s.times}>
-                                {c.times.map((t, idx) => (
+                        <div
+                            key={cinema}
+                            className={s.cinema}
+                        >
+                            <h3
+                                className={s.cinema_name}
+                            >
+                                {cinema}
+                            </h3>
+
+                            <div
+                                className={s.times}
+                            >
+                                {shows.map(show => (
+
                                     <button
-                                        key={idx}
-                                        onClick={() => navigate(`/seat/${idx + 1}`)}
+                                        key={
+                                            show.maXuatChieu
+                                        }
+                                        onClick={() =>
+                                            navigate(
+                                                `/seat/${show.maXuatChieu}`
+                                            )
+                                        }
                                     >
-                                        {t}
+                                        {formatTimeVN(show.thoiGianBatDau)}
                                     </button>
+
                                 ))}
                             </div>
                         </div>
-                    ))}
+
+                    )
+                )}
             </div>
         </div>
     );
