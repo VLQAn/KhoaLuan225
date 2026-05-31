@@ -68,6 +68,15 @@ const xuatChieuApi = {
 
         return response.data;
     },
+
+    getAvailable: async () => {
+
+        const response = await axios.get(
+            `${API_URL}/available`
+        );
+
+        return response.data;
+    },
 };
 
 export default xuatChieuApi;

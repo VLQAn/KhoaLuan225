@@ -26,10 +26,12 @@ const MovieDetail = () => {
         try {
 
             const response =
-                await xuatChieuApi.getAll();
+                await xuatChieuApi.getAvailable();
+
+            console.log(response);
 
             const data =
-                response.data;
+                response?.data || response || [];
 
             const movieShowtimes =
                 data.filter(
@@ -42,26 +44,20 @@ const MovieDetail = () => {
         } catch (error) {
 
             console.error(error);
-
         }
     };
 
     const formatDateVN = (dateStr) => {
-        if (!dateStr) return "";
-
-        return dateStr.split("T")[0];
+        return new Date(dateStr)
+            .toLocaleDateString("vi-VN");
     };
 
     const formatTimeVN = (dateStr) => {
-        if (!dateStr) return "";
-
-        const [date, time] = dateStr.split("T");
-
-        if (!time) return "";
-
-        const [hour, minute] = time.split(":");
-
-        return `${hour}:${minute}`;
+        return new Date(dateStr)
+            .toLocaleTimeString("vi-VN", {
+                hour: "2-digit",
+                minute: "2-digit",
+            });
     };
 
     // useEffect để fetch dữ liệu khi component mount hoặc khi id thay đổi
