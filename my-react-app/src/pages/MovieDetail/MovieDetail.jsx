@@ -21,6 +21,9 @@ const MovieDetail = () => {
     const [showtimes, setShowtimes] = useState([]);
     const [selectedDate, setSelectedDate] = useState("");
 
+    const isFutureShowtime = (dateString) => {
+        return new Date(dateString).getTime() > Date.now();
+    };
     // Hàm fetch dữ liệu lịch chiếu cho phim
     const fetchShowtimes = async () => {
         try {
@@ -28,16 +31,12 @@ const MovieDetail = () => {
             const response =
                 await xuatChieuApi.getAvailable();
 
-            console.log(response);
-
             const data =
                 response?.data || response || [];
 
-            const movieShowtimes =
-                data.filter(
-                    item =>
-                        item.maPhim === Number(id)
-                );
+            const movieShowtimes = data.filter(item =>
+                item.maPhim === Number(id)
+            );
 
             setShowtimes(movieShowtimes);
 
@@ -48,16 +47,21 @@ const MovieDetail = () => {
     };
 
     const formatDateVN = (dateStr) => {
-        return new Date(dateStr)
-            .toLocaleDateString("vi-VN");
+        if (!dateStr) return "";
+
+        return dateStr.split("T")[0];
     };
 
     const formatTimeVN = (dateStr) => {
-        return new Date(dateStr)
-            .toLocaleTimeString("vi-VN", {
-                hour: "2-digit",
-                minute: "2-digit",
-            });
+        if (!dateStr) return "";
+
+        const [date, time] = dateStr.split("T");
+
+        if (!time) return "";
+
+        const [hour, minute] = time.split(":");
+
+        return `${hour}:${minute}`;
     };
 
     // useEffect để fetch dữ liệu khi component mount hoặc khi id thay đổi
@@ -66,10 +70,34 @@ const MovieDetail = () => {
     }, [id]);
 
     // Dữ liệu tính toán cho phần hiển thị thông tin phim
+    const availableShowtimes =
+        showtimes.filter(item => {
+
+            const showtime =
+                new Date(
+                    item.thoiGianBatDau.replace('Z', '')
+                );
+
+            const result =
+                showtime.getTime() > Date.now();
+
+            console.log({
+                maXuatChieu: item.maXuatChieu,
+                thoiGianBatDau: item.thoiGianBatDau,
+                showtime: showtime.toLocaleString("vi-VN"),
+                now: new Date().toLocaleString("vi-VN"),
+                result
+            });
+
+            return result;
+        });
+
     const uniqueDates = [
         ...new Set(
-            showtimes.map(item =>
-                formatDateVN(item.thoiGianBatDau)
+            availableShowtimes.map(item =>
+                formatDateVN(
+                    item.thoiGianBatDau
+                )
             )
         )
     ];
@@ -78,17 +106,22 @@ const MovieDetail = () => {
 
         if (
             uniqueDates.length > 0 &&
-            !selectedDate
+            !uniqueDates.includes(selectedDate)
         ) {
-            setSelectedDate(uniqueDates[0]);
+            setSelectedDate(
+                uniqueDates[0]
+            );
         }
 
-    }, [showtimes]);
+    }, [uniqueDates]);
 
-    const filteredShowtimes = showtimes.filter(
-        item =>
-            formatDateVN(item.thoiGianBatDau) === selectedDate
-    );
+    const filteredShowtimes =
+        availableShowtimes.filter(
+            item =>
+                formatDateVN(
+                    item.thoiGianBatDau
+                ) === selectedDate
+        );
 
     const groupedByCinema =
         filteredShowtimes.reduce(
@@ -186,6 +219,11 @@ const MovieDetail = () => {
 
             {/* Showtime */}
             <div className={s.showtime}>
+                {availableShowtimes.length === 0 && (
+                    <div className={s.empty}>
+                        Hiện chưa có suất chiếu khả dụng
+                    </div>
+                )}
                 <div className={s.showtime_header}>
                     <h2>Lịch chiếu</h2>
 
@@ -229,22 +267,28 @@ const MovieDetail = () => {
                             <div
                                 className={s.times}
                             >
-                                {shows.map(show => (
+                                {shows
+                                    .filter(show =>
+                                        isFutureShowtime(
+                                            show.thoiGianBatDau
+                                        )
+                                    )
+                                    .map(show => (
 
-                                    <button
-                                        key={
-                                            show.maXuatChieu
-                                        }
-                                        onClick={() =>
-                                            navigate(
-                                                `/seat/${show.maXuatChieu}`
-                                            )
-                                        }
-                                    >
-                                        {formatTimeVN(show.thoiGianBatDau)}
-                                    </button>
+                                        <button
+                                            key={show.maXuatChieu}
+                                            onClick={() =>
+                                                navigate(
+                                                    `/seat/${show.maXuatChieu}`
+                                                )
+                                            }
+                                        >
+                                            {formatTimeVN(
+                                                show.thoiGianBatDau
+                                            )}
+                                        </button>
 
-                                ))}
+                                    ))}
                             </div>
                         </div>
 
