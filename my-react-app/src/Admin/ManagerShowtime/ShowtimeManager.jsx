@@ -235,6 +235,32 @@ const ShowtimeManager = () => {
         }
     };
 
+    const getShowtimeStatus = (showtime) => {
+
+        const now = new Date();
+
+        const start = new Date(
+            showtime.thoiGianBatDau
+        );
+
+        const end = new Date(
+            showtime.thoiGianKetThuc
+        );
+
+        if (now < start) {
+            return "Sắp chiếu";
+        }
+
+        if (
+            now >= start &&
+            now <= end
+        ) {
+            return "Đang chiếu";
+        }
+
+        return "Đã chiếu";
+    };
+
     const userData = localStorage.getItem("user");
 
     const user = userData
@@ -475,17 +501,7 @@ const ShowtimeManager = () => {
                                     </td>
 
                                     <td>
-                                        {
-                                            showtime.trangThai === "sap_chieu"
-                                                ? "Sắp chiếu"
-                                                : showtime.trangThai === "dang_chieu"
-                                                    ? "Đang chiếu"
-                                                    : showtime.trangThai === "da_chieu"
-                                                        ? "Đã chiếu"
-                                                        : showtime.trangThai === "da_huy"
-                                                            ? "Đã hủy"
-                                                            : showtime.trangThai
-                                        }
+                                        {getShowtimeStatus(showtime)}
                                     </td>
 
                                     <td>
