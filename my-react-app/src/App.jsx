@@ -38,7 +38,7 @@ function App() {
           <Route path="/showtime/:id" element={<Showtime />} />
           <Route path="/seat/:maXuatChieu" element={<Seat />} />
           <Route path="/checkout" element={<Checkout />} />
-          <Route path="/food" element={<Food />} />
+          <Route path="/food/:maXuatChieu" element={<Food />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/review/:id" element={<Review />} />
         </Route>

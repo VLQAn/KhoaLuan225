@@ -39,7 +39,7 @@ const Seat = () => {
         }
     };
 
-    const price = 75000;
+    const price = 55000;
 
     const seatTotal = selected.length * price;
     const total = selected.length * price;
@@ -91,6 +91,12 @@ const Seat = () => {
             (a, b) => a.soGhe - b.soGhe
         );
     });
+
+    const formatVND = (value) => {
+        if (!value) return "0 VNĐ";
+
+        return Number(value).toLocaleString("vi-VN") + " VNĐ";
+    };
 
     return (<div className={s.container}>
         {/* LEFT: SEAT */}
@@ -161,7 +167,7 @@ const Seat = () => {
             <div className={s.legend}>
                 <div><span className={`${s.box} ${s.sold}`}></span> Ghế đã bán</div>
                 <div><span className={`${s.box} ${s.active}`}></span> Ghế đang chọn</div>
-                <div><span className={`${s.box} ${s.normal}`}></span> Ghế thường <b>75.000 VNĐ</b></div>
+                <div><span className={`${s.box} ${s.normal}`}></span> Ghế thường <b>55.000 VNĐ</b></div>
             </div>
         </div>
 
@@ -189,9 +195,9 @@ const Seat = () => {
                             {new Date(xuatChieu?.thoiGianBatDau).toLocaleTimeString([], {
                                 hour: "2-digit",
                                 minute: "2-digit"
-                            })} 
+                            })}
                         </b> -{" "}
-                        
+
                         Ngày chiếu: <b>
                             {new Date(xuatChieu?.thoiGianBatDau).toLocaleDateString("vi-VN")}
                         </b>
@@ -210,7 +216,7 @@ const Seat = () => {
                     </p>
 
                     <p className={s.subPrice + " " + s.total}>
-                        Giá: <b className={s.price}>{seatTotal.toLocaleString()}đ</b>
+                        Giá: <b className={s.price}>{formatVND(seatTotal)}</b>
                     </p>
                 </div>
 
@@ -220,7 +226,7 @@ const Seat = () => {
                 <div className={s.total}>
                     <span>Tổng cộng:</span>
                     <span className={s.price}>
-                        {total.toLocaleString()} VNĐ
+                        {formatVND(total)}
                     </span>
                 </div>
 
@@ -236,7 +242,15 @@ const Seat = () => {
                     <button
                         className={s.next}
                         disabled={selected.length === 0}
-                        onClick={() => navigate("/food", { state: { selected, total } })}
+                        onClick={() =>
+                            navigate(`/food/${maXuatChieu}`, {
+                                state: {
+                                    maXuatChieu,
+                                    selected,
+                                    total
+                                }
+                            })
+                        }
                     >
                         Tiếp tục
                     </button>

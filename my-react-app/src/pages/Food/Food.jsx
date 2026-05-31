@@ -1,40 +1,14 @@
 import styles from "./Food.module.css";
-import { useState } from "react";
+import React, {
+    useEffect,
+    useState
+} from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-
+import { useParams } from "react-router-dom";
+import xuatChieuApi from "../../services/xuatChieuApi";
+import bapNuocApi from "../../services/bapNuocApi";
 
 const s = styles;
-
-const foods = [
-    {
-        id: 1,
-        name: "Combo 1 medium",
-        desc: "Một bắp rang bơ truyền thống cỡ vừa + 1 Pepsi cỡ vừa",
-        price: 85000,
-        img: "https://cdn-icons-png.flaticon.com/512/1046/1046784.png",
-    },
-    {
-        id: 2,
-        name: "Combo 1 large",
-        desc: "Một bắp rang bơ truyền thống cỡ lớn + 2 Pepsi cỡ vừa + một snack bất kỳ",
-        price: 120000,
-        img: "https://cdn-icons-png.flaticon.com/512/1046/1046784.png",
-    },
-    {
-        id: 3,
-        name: "Combo gia đình 1",
-        desc: "Một bắp rang siêu lớn chọn vị + 4 nước tự chọn cỡ vừa",
-        price: 200000,
-        img: "https://cdn-icons-png.flaticon.com/512/1046/1046784.png",
-    },
-    {
-        id: 4,
-        name: "Combo gia đình 2",
-        desc: "Hai bắp rang siêu lớn chọn vị + 4 nước tự chọn cỡ lớn + 2 snack bất kỳ",
-        price: 225000,
-        img: "https://cdn-icons-png.flaticon.com/512/1046/1046784.png",
-    },
-];
 
 const Food = () => {
     const { state } = useLocation();
@@ -43,6 +17,16 @@ const Food = () => {
     const [cart, setCart] = useState({});
 
     const selected = state?.selected || [];
+
+    const seatPrice = state?.total || 0;
+
+    const { maXuatChieu } = useParams();
+
+    const [xuatChieu, setXuatChieu] = useState(null);
+
+    const [foods, setFoods] = useState([]);
+
+    const [maRap, setMaRap] = useState(null);
 
     const updateQty = (id, delta) => {
         setCart((prev) => {
@@ -56,13 +40,48 @@ const Food = () => {
         });
     };
 
-    const seatPrice = state?.total || 0;
-
     const foodTotal = foods.reduce((sum, f) => {
-        return sum + (cart[f.id] || 0) * f.price;
+        return sum + (cart[f.maMon] || 0) * Number(f.gia);
     }, 0);
 
     const total = (state?.total || 0) + foodTotal;
+
+    useEffect(() => {
+        if (!maXuatChieu) return;
+
+        const loadData = async () => {
+            try {
+                // 1. Lấy xuất chiếu
+                const xuatChieuRes = await xuatChieuApi.getById(maXuatChieu);
+                const xuatChieuData = xuatChieuRes;
+
+                setXuatChieu(xuatChieuData);
+
+                const rap = xuatChieuData?.phong_chieu?.maRap;
+                if (!rap) return;
+
+                console.log("RAP:", rap);
+
+                // 2. Lấy đồ ăn theo rạp (API backend đã filter sẵn)
+                const foodRes = await bapNuocApi.getFoodsByRap(rap);
+
+                console.log("FOODS API:", foodRes);
+
+                setFoods(foodRes.data || []);
+
+            } catch (err) {
+                console.log(err);
+            }
+        };
+
+        loadData();
+    }, [maXuatChieu]);
+
+    const formatVND = (value) => {
+        if (!value) return "0 VNĐ";
+
+        return Number(value).toLocaleString("vi-VN") + " VNĐ";
+    };
 
     return (
         <div className={s.container}>
@@ -71,19 +90,19 @@ const Food = () => {
                 <h2 className={s.title}>Chọn bắp nước</h2>
 
                 {foods.map((f) => (
-                    <div key={f.id} className={s.card}>
-                        <img src={f.img} alt="" />
+                    <div key={f.maMon} className={s.card}>
+                        <img src={f.hinhAnh} alt={f.tenMon} />
 
                         <div className={s.info}>
-                            <h3>{f.name}</h3>
-                            <p>{f.desc}</p>
-                            <span>Giá: {f.price.toLocaleString()} VND</span>
+                            <h3>{f.tenMon}</h3>
+                            <p>{f.moTa}</p>
+                            <span>Giá: {formatVND(f.gia)}</span>
                         </div>
 
                         <div className={s.qty}>
-                            <button onClick={() => updateQty(f.id, -1)}>-</button>
-                            <span>{cart[f.id] || 0}</span>
-                            <button onClick={() => updateQty(f.id, 1)}>+</button>
+                            <button onClick={() => updateQty(f.maMon, -1)}>-</button>
+                            <span>{cart[f.maMon] || 0}</span>
+                            <button onClick={() => updateQty(f.maMon, 1)}>+</button>
                         </div>
                     </div>
                 ))}
@@ -97,25 +116,28 @@ const Food = () => {
 
                     {/* Movie */}
                     <div className={s.movie}>
-                        <img
-                            src="https://image.tmdb.org/t/p/w500/q6725aR8Zs4IwGMXzZT8aC8lh41.jpg"
-                            alt="poster"
-                        />
+                        <img src={xuatChieu?.phim?.anhPoster} alt="poster" />
 
                         <div className={s.info}>
-                            <h3>{state?.movie || "Avengers: Endgame"}</h3>
+                            <h3>{xuatChieu?.phim?.tieuDe}</h3>
                             <p>2D Phụ đề</p>
                         </div>
-
-                        <span className={s.age}>16+</span>
                     </div>
 
                     {/* Cinema */}
                     <div className={s.cinema}>
-                        <b>{state?.cinema || "CGV Nha Trang"}</b> - Rạp 1
+                        <b>{xuatChieu?.phong_chieu?.rap_chieu?.tenRap}</b> - {xuatChieu?.phong_chieu?.tenPhong}
                         <p>
-                            Suất: <b>{state?.time || "20:30"}</b> -{" "}
-                            <b>{state?.date || "29/04/2026"}</b>
+                            Suất: <b>
+                                {new Date(xuatChieu?.thoiGianBatDau).toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit"
+                                })}
+                            </b> -{" "}
+
+                            Ngày chiếu: <b>
+                                {new Date(xuatChieu?.thoiGianBatDau).toLocaleDateString("vi-VN")}
+                            </b>
                         </p>
                     </div>
 
@@ -131,7 +153,7 @@ const Food = () => {
                         </p>
 
                         <p className={s.subPrice + " " + s.total}>
-                            Giá: <b className={s.price}>{seatPrice.toLocaleString()}đ</b>
+                            Giá: <b className={s.price}>{formatVND(seatPrice)}</b>
                         </p>
                     </div>
 
@@ -145,18 +167,18 @@ const Food = () => {
                             <p className={s.empty}>Chưa chọn</p>
                         ) : (
                             foods
-                                .filter(f => cart[f.id])
+                                .filter(f => cart[f.maMon])
                                 .map(f => (
-                                    <div key={f.id} className={s.foodItem}>
-                                        <span>{f.name}</span>
-                                        <span>x{cart[f.id]}</span>
+                                    <div key={f.maMon} className={s.foodItem}>
+                                        <span>{f.tenMon}</span>
+                                        <span>x{cart[f.maMon] || 0}</span>
                                     </div>
                                 ))
                         )}
 
                         <div className={s.foodTotal + " " + s.total}>
                             <span>Tiền đồ ăn:</span>
-                            <span className={s.price}>{foodTotal.toLocaleString()}đ</span>
+                            <span className={s.price}>{formatVND(foodTotal)}</span>
                         </div>
                     </div>
 

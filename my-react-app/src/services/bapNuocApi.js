@@ -6,6 +6,10 @@ const bapNuocApi = {
         return axiosClient.get("/bap-nuoc");
     },
 
+    getFoodsByRap: (maRap) => {
+        return axiosClient.get(`/bap-nuoc/by-rap/${maRap}`);
+    },
+
     createFood: (data) => {
         return axiosClient.post("/bap-nuoc", data);
     },
