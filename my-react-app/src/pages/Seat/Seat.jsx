@@ -1,17 +1,23 @@
 import styles from "./Seat.module.css";
-import { useState } from "react";
+import React, {
+    useEffect,
+    useState
+} from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import seatApi from "../../services/seatApi";
+import xuatChieuApi from "../../services/xuatChieuApi";
 
 const s = styles;
-
-const rows = ["K", "J", "I", "H", "G", "F", "E", "D", "C", "B", "A"];
-const soldSeats = ["I8", "I9", "G7"];
 
 const Seat = () => {
     const navigate = useNavigate();
     const { state } = useLocation();
 
     const [selected, setSelected] = useState([]);
+    const [soldSeats, setSoldSeats] = useState([]);
+    const [seats, setSeats] = useState([]);
+    const [xuatChieu, setXuatChieu] = useState(null);
 
     const toggleSeat = (seat) => {
         if (soldSeats.includes(seat)) return;
@@ -24,53 +30,131 @@ const Seat = () => {
 
     };
 
+    const loadXuatChieu = async () => {
+        try {
+            const data = await xuatChieuApi.getById(maXuatChieu);
+            setXuatChieu(data);
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
     const price = 75000;
 
     const seatTotal = selected.length * price;
     const total = selected.length * price;
+
+    const { maXuatChieu } =
+        useParams();
+
+    useEffect(() => {
+        if (!maXuatChieu) return;
+
+        loadSeatMap();
+        loadXuatChieu();
+    }, [maXuatChieu]);
+
+    const loadSeatMap = async () => {
+        try {
+            const response =
+                await seatApi.getSeatMap(maXuatChieu);
+
+            const seatData = response.data?.seats || [];
+
+            setSeats(seatData);
+
+            const booked = seatData
+                .filter(seat => seat.daDat)
+                .map(seat => seat.tenGhe);
+
+            setSoldSeats(booked);
+
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const groupedSeats = seats.reduce((acc, seat) => {
+
+        if (!acc[seat.hangGhe]) {
+            acc[seat.hangGhe] = [];
+        }
+
+        acc[seat.hangGhe].push(seat);
+
+        return acc;
+
+    }, {});
+
+    Object.keys(groupedSeats).forEach(row => {
+        groupedSeats[row].sort(
+            (a, b) => a.soGhe - b.soGhe
+        );
+    });
 
     return (<div className={s.container}>
         {/* LEFT: SEAT */}
         <div className={s.left}>
             <h2>Chọn ghế</h2>
 
-            <div className={s.map}>
-                {rows.map((row) => (
-                    <div key={row} className={s.row}>
-                        <span className={s.label}>{row}</span>
-
-                        <div className={s.seats}>
-                            {[...Array(16)].map((_, i) => {
-                                const num = i + 1;
-                                const seatId = row + num;
-
-                                if (num === 3 || num === 14) {
-                                    return <div key={i} className={s.space}></div>;
-                                }
-
-                                return (
-                                    <div
-                                        key={seatId}
-                                        className={`${s.seat}
-                    ${soldSeats.includes(seatId) ? s.sold : ""}
-                    ${selected.includes(seatId) ? s.active : ""}
-                  `}
-                                        onClick={() => toggleSeat(seatId)}
-                                    >
-                                        {num}
-                                    </div>
-                                );
-                            })}
-                        </div>
-
-                        <span className={s.label}>{row}</span>
-                    </div>
-                ))}
-            </div>
-
             {/* Screen */}
             <div className={s.screen}>
                 Màn hình
+            </div>
+
+            <div className={s.map}>
+                {Object.entries(groupedSeats).map(
+                    ([row, rowSeats]) => (
+
+                        <div
+                            key={row}
+                            className={s.row}
+                        >
+                            <span className={s.label}>
+                                {row}
+                            </span>
+
+                            <div className={s.seats}>
+                                {rowSeats.map((seat) => (
+
+                                    <div
+                                        key={seat.maGhe}
+                                        className={`
+                                ${s.seat}
+                                ${seat.daDat
+                                                ? s.sold
+                                                : ""
+                                            }
+                                ${selected.includes(
+                                                seat.tenGhe
+                                            )
+                                                ? s.active
+                                                : ""
+                                            }
+                                ${seat.loaiGhe === "vip"
+                                                ? s.vip
+                                                : ""
+                                            }
+                            `}
+                                        onClick={() =>
+                                            toggleSeat(
+                                                seat.tenGhe
+                                            )
+                                        }
+                                    >
+                                        {seat.soGhe}
+                                    </div>
+
+                                ))}
+                            </div>
+
+                            <span className={s.label}>
+                                {row}
+                            </span>
+                        </div>
+
+                    )
+                )}
             </div>
 
             {/* Legend */}
@@ -89,25 +173,28 @@ const Seat = () => {
 
                 {/* Movie */}
                 <div className={s.movie}>
-                    <img
-                        src="https://image.tmdb.org/t/p/w500/q6725aR8Zs4IwGMXzZT8aC8lh41.jpg"
-                        alt="poster"
-                    />
+                    <img src={xuatChieu?.phim?.anhPoster} alt="poster" />
 
                     <div className={s.info}>
-                        <h3>{state?.movie || "Avengers: Endgame"}</h3>
+                        <h3>{xuatChieu?.phim?.tieuDe}</h3>
                         <p>2D Phụ đề</p>
                     </div>
-
-                    <span className={s.age}>16+</span>
                 </div>
 
                 {/* Cinema */}
                 <div className={s.cinema}>
-                    <b>{state?.cinema || "CGV Nha Trang"}</b> - Rạp 1
+                    <b>{xuatChieu?.phong_chieu?.rap_chieu?.tenRap}</b> - {xuatChieu?.phong_chieu?.tenPhong}
                     <p>
-                        Suất: <b>{state?.time || "20:30"}</b> -{" "}
-                        <b>{state?.date || "29/04/2026"}</b>
+                        Suất: <b>
+                            {new Date(xuatChieu?.thoiGianBatDau).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit"
+                            })} 
+                        </b> -{" "}
+                        
+                        Ngày chiếu: <b>
+                            {new Date(xuatChieu?.thoiGianBatDau).toLocaleDateString("vi-VN")}
+                        </b>
                     </p>
                 </div>
 
