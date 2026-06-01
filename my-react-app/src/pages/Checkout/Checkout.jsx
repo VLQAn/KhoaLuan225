@@ -1,6 +1,8 @@
 import styles from "./Checkout.module.css";
 import { useLocation } from "react-router-dom";
 import { useState } from "react";
+import datVeApi from "../../services/datVeApi";
+import paymentApi from "../../services/paymentApi";
 
 const s = styles;
 
@@ -13,6 +15,9 @@ const Checkout = () => {
 
     const seatPrice =
         state?.seatPrice || 0;
+
+    const giaVe =
+        state?.giaVe || 0;
 
     const selectedSeats =
         state?.selectedSeats || [];
@@ -40,6 +45,83 @@ const Checkout = () => {
         : null;
 
     console.log(selectedSeats);
+
+    const handlePayment = async () => {
+
+        try {
+
+            // Tạo hóa đơn + giữ ghế
+            const bookingRes =
+                await datVeApi.create({
+                    maXuatChieu:
+                        xuatChieu.maXuatChieu,
+
+                    danhSachGhe:
+                        selectedSeats.map(
+                            seat => seat.maGhe
+                        )
+                });
+
+            console.log(
+                "BOOKING:",
+                bookingRes.data
+            );
+
+            const maHoaDon =
+                bookingRes.data.data.hoaDon.maHoaDon;
+
+            console.log(
+                "Mã hóa đơn:",
+                maHoaDon
+            );
+
+            // Lấy link VNPay
+            const payRes =
+                await paymentApi.createVNPay(
+                    maHoaDon
+                );
+
+            console.log(
+                "PAYMENT:",
+                payRes.data
+            );
+
+            const paymentUrl =
+                payRes.data.payment_url;
+
+            if (!paymentUrl) {
+
+                alert(
+                    "Không nhận được link thanh toán VNPay"
+                );
+
+                return;
+            }
+
+            console.log(
+                "Redirect:",
+                paymentUrl
+            );
+
+            // Chuyển sang VNPay
+            window.location.href =
+                paymentUrl;
+
+        } catch (error) {
+
+            console.error(error);
+
+            console.error(
+                error.response?.data
+            );
+
+            alert(
+                error.response?.data?.message
+                ||
+                "Có lỗi xảy ra"
+            );
+        }
+    };
 
     return (
         <div className={s.container}>
@@ -229,7 +311,9 @@ const Checkout = () => {
                     </div>
 
                     <button
+                        type="button"
                         className={s.payBtn}
+                        onClick={handlePayment}
                     >
                         Thanh toán ngay
                     </button>

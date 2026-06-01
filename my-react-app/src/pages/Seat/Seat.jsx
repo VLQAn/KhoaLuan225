@@ -7,6 +7,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import seatApi from "../../services/seatApi";
 import xuatChieuApi from "../../services/xuatChieuApi";
+import giaVeApi from "../../services/giaVeApi";
 
 const s = styles;
 
@@ -18,6 +19,7 @@ const Seat = () => {
     const [soldSeats, setSoldSeats] = useState([]);
     const [seats, setSeats] = useState([]);
     const [xuatChieu, setXuatChieu] = useState(null);
+    const [giaVe, setGiaVe] = useState(0);
 
     const toggleSeat = (seat) => {
 
@@ -50,7 +52,26 @@ const Seat = () => {
         }
     };
 
-    const price = 55000;
+    const loadGiaVe = async () => {
+
+        try {
+
+            const res =
+                await giaVeApi.getByXuatChieu(
+                    maXuatChieu
+                );
+
+            setGiaVe(
+                Number(res.data.gia)
+            );
+
+        } catch (error) {
+
+            console.log(error);
+        }
+    };
+
+    const price = giaVe;
 
     const seatTotal = selectedSeats.length * price;
     const total = selectedSeats.length * price;
@@ -63,6 +84,7 @@ const Seat = () => {
 
         loadSeatMap();
         loadXuatChieu();
+        loadGiaVe();
     }, [maXuatChieu]);
 
     const loadSeatMap = async () => {
@@ -172,7 +194,7 @@ const Seat = () => {
             <div className={s.legend}>
                 <div><span className={`${s.box} ${s.sold}`}></span> Ghế đã bán</div>
                 <div><span className={`${s.box} ${s.active}`}></span> Ghế đang chọn</div>
-                <div><span className={`${s.box} ${s.normal}`}></span> Ghế thường <b>55.000 VNĐ</b></div>
+                <div><span className={`${s.box} ${s.normal}`}></span> Ghế thường <b>{formatVND(giaVe)}</b></div>
             </div>
         </div>
 
@@ -257,11 +279,11 @@ const Seat = () => {
                             })
                         }
                     >
-                    Tiếp tục
-                </button>
+                        Tiếp tục
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
     </div >
     );
 };

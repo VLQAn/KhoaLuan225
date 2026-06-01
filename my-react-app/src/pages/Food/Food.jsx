@@ -18,7 +18,11 @@ const Food = () => {
 
     const selectedSeats = state?.selectedSeats || [];
 
-    const seatPrice = state?.total || 0;
+    const seatPrice =
+        state?.seatPrice || 0;
+
+    const giaVe =
+        state?.giaVe || 0;
 
     const { maXuatChieu } = useParams();
 
@@ -208,12 +212,20 @@ const Food = () => {
                                 navigate("/checkout", {
                                     state: {
                                         maXuatChieu,
+
                                         selectedSeats,
+
                                         cart,
+
                                         foods,
+
                                         total,
+                                        
                                         xuatChieu,
-                                        seatPrice
+
+                                        seatPrice,
+
+                                        giaVe
                                     }
                                 })
                             }
