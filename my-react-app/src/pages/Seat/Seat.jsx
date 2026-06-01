@@ -14,20 +14,31 @@ const Seat = () => {
     const navigate = useNavigate();
     const { state } = useLocation();
 
-    const [selected, setSelected] = useState([]);
+    const [selectedSeats, setSelectedSeats] = useState([]);
     const [soldSeats, setSoldSeats] = useState([]);
     const [seats, setSeats] = useState([]);
     const [xuatChieu, setXuatChieu] = useState(null);
 
     const toggleSeat = (seat) => {
-        if (soldSeats.includes(seat)) return;
 
-        setSelected((prev) =>
-            prev.includes(seat)
-                ? prev.filter((s) => s !== seat)
-                : [...prev, seat]
-        );
+        if (seat.daDat) return;
 
+        setSelectedSeats(prev => {
+
+            const exists =
+                prev.find(
+                    s => s.maGhe === seat.maGhe
+                );
+
+            if (exists) {
+
+                return prev.filter(
+                    s => s.maGhe !== seat.maGhe
+                );
+            }
+
+            return [...prev, seat];
+        });
     };
 
     const loadXuatChieu = async () => {
@@ -41,8 +52,8 @@ const Seat = () => {
 
     const price = 55000;
 
-    const seatTotal = selected.length * price;
-    const total = selected.length * price;
+    const seatTotal = selectedSeats.length * price;
+    const total = selectedSeats.length * price;
 
     const { maXuatChieu } =
         useParams();
@@ -131,9 +142,7 @@ const Seat = () => {
                                                 ? s.sold
                                                 : ""
                                             }
-                                ${selected.includes(
-                                                seat.tenGhe
-                                            )
+                                ${selectedSeats.some(s => s.maGhe === seat.maGhe)
                                                 ? s.active
                                                 : ""
                                             }
@@ -142,11 +151,7 @@ const Seat = () => {
                                                 : ""
                                             }
                             `}
-                                        onClick={() =>
-                                            toggleSeat(
-                                                seat.tenGhe
-                                            )
-                                        }
+                                        onClick={() => toggleSeat(seat)}
                                     >
                                         {seat.soGhe}
                                     </div>
@@ -209,10 +214,10 @@ const Seat = () => {
                 {/* Seats */}
                 <div className={s.seatInfo}>
                     <p>
-                        <b>{selected.length}x</b> Ghế đơn
+                        <b>{selectedSeats.length}x</b> Ghế đơn
                     </p>
                     <p>
-                        Ghế: <b>{selected.join(", ") || "Chưa chọn"}</b>
+                        Ghế: <b>{selectedSeats.map(s => s.tenGhe).join(", ") || "Chưa chọn"}</b>
                     </p>
 
                     <p className={s.subPrice + " " + s.total}>
@@ -241,23 +246,23 @@ const Seat = () => {
 
                     <button
                         className={s.next}
-                        disabled={selected.length === 0}
+                        disabled={selectedSeats.length === 0}
                         onClick={() =>
                             navigate(`/food/${maXuatChieu}`, {
                                 state: {
                                     maXuatChieu,
-                                    selected,
+                                    selectedSeats,
                                     total
                                 }
                             })
                         }
                     >
-                        Tiếp tục
-                    </button>
-                </div>
+                    Tiếp tục
+                </button>
             </div>
         </div>
     </div>
+    </div >
     );
 };
 

@@ -1,3 +1,166 @@
 .container {
+    max-width: 1300px;
+    margin: auto;
+    padding: 40px;
+    display: flex;
+    gap: 30px;
+}
+
+.left {
+    flex: 2;
+}
+
+.right {
+    flex: 1;
+    margin-top: 45px;
+}
+
+.movieCard {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,.08);
+    display: flex;
+    padding: 25px;
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.movieCard img {
+    width: 220px;
+    height: 320px;
+    object-fit: cover;
+    border-radius: 16px;
+}
+
+.sectionInfo {
+    flex: 1;
+}
+
+.sectionInfo h3 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.sectionInfo > p:first-of-type {
+    font-size: 18px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.infoBlock {
+    padding: 18px 0;
+    border-top: 1px solid #e6e6e6;
+}
+
+.infoBlock:first-of-type {
+    border-top: none;
+}
+
+.infoBlock h4 {
+    font-size: 22px;
+    margin-bottom: 12px;
+    color: #222;
+}
+
+.infoText {
+    display: flex;
+    font-size: 18px;
+    line-height: 1.8;
+    text-transform: uppercase;
+}
+
+.ticketRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 18px;
+}
+
+.foodRow {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.price {
+    color: #e71a0f;
+    font-weight: 700;
+}
+
+.summary {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    position: sticky;
+    top: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.08);
+}
+
+.summary h3 {
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+.total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    font-size: 24px;
+
+    margin: 25px 0;
+
+    padding-top: 20px;
+
+    border-top: 2px solid #eee;
+}
+
+.total b {
+    color: #e71a0f;
+}
+
+.payment {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    font-size: 18px;
+}
+
+.payBtn {
+    width: 100%;
+    margin-top: 25px;
+
+    border: none;
+
+    background: #e71a0f;
+
     color: white;
+
+    font-size: 18px;
+    font-weight: 700;
+
+    padding: 16px;
+
+    border-radius: 12px;
+
+    cursor: pointer;
+
+    transition: .2s;
+}
+
+.payBtn:hover {
+    transform: translateY(-2px);
+}
+
+.movieType {
+    font-size: 18px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.infoText p {
+    margin: 8px 0;
 }

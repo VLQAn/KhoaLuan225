@@ -16,7 +16,7 @@ const Food = () => {
 
     const [cart, setCart] = useState({});
 
-    const selected = state?.selected || [];
+    const selectedSeats = state?.selectedSeats || [];
 
     const seatPrice = state?.total || 0;
 
@@ -146,10 +146,10 @@ const Food = () => {
                     {/* Seats */}
                     <div className={s.seatInfo}>
                         <p>
-                            <b>{selected.length}x</b> Ghế đơn
+                            <b>{selectedSeats.length}x</b> Ghế đơn
                         </p>
                         <p>
-                            Ghế: <b>{selected.join(", ") || "Chưa chọn"}</b>
+                            Ghế: <b>{selectedSeats.map(s => s.tenGhe).join(", ") || "Chưa chọn"}</b>
                         </p>
 
                         <p className={s.subPrice + " " + s.total}>
@@ -203,8 +203,20 @@ const Food = () => {
 
                         <button
                             className={s.next}
-                            disabled={selected.length === 0}
-                            onClick={() => navigate("/checkout", { state: { selected, total } })}
+                            disabled={selectedSeats.length === 0}
+                            onClick={() =>
+                                navigate("/checkout", {
+                                    state: {
+                                        maXuatChieu,
+                                        selectedSeats,
+                                        cart,
+                                        foods,
+                                        total,
+                                        xuatChieu,
+                                        seatPrice
+                                    }
+                                })
+                            }
                         >
                             Tiếp tục
                         </button>
