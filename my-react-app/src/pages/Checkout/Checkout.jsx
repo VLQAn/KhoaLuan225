@@ -59,7 +59,13 @@ const Checkout = () => {
                     danhSachGhe:
                         selectedSeats.map(
                             seat => seat.maGhe
-                        )
+                        ),
+
+                    danhSachMonAn:
+                        Object.keys(cart).map(id => ({
+                            maMon: Number(id),
+                            soLuong: cart[id]
+                        }))
                 });
 
             console.log(
