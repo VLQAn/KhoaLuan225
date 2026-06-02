@@ -10,24 +10,8 @@ import icon4 from "../../assets/more.png";
 
 const icons = [icon1, icon2, icon3, icon4];
 
-import film1 from "../../assets/f1.jpg";
-import film2 from "../../assets/f2.jpg";
-import film3 from "../../assets/f3.jpg";
-import film4 from "../../assets/f4.jpg";
-import film5 from "../../assets/f5.jpg";
-
 import { useEffect, useState } from "react";
 import movieApi from "../../services/movieApi";
-
-const films = [film1, film2, film3, film4, film5];
-
-const related = [
-  { title: "Hàng xóm của tôi là Totoro", year: 1988 },
-  { title: "Lâu đài di động của Howl", year: 2004 },
-  { title: "Cô bé người cá Ponyo", year: 2008 },
-  { title: "Công chúa Mononoke", year: 1997 },
-  { title: "Nausicaa: Nàng công chúa ở thung lũng gió", year: 1984 },
-];
 
 const s = styles;
 
@@ -36,22 +20,22 @@ const Home = () => {
   const [searchText, setSearchText] = useState("");
   const navigate = useNavigate();
 
-  const [movies, setMovies] =
-    useState([]);
-
-  const [currentBanner,
-    setCurrentBanner] =
-    useState(0);
+  const [allMovies, setAllMovies] = useState([]);
+  const [bannerMovies, setBannerMovies] = useState([]);
+  const [currentBanner, setCurrentBanner] = useState(0);
 
   const featuredMovie =
-    movies.length > 0
-      ? movies.reduce((max, movie) =>
-        Number(movie.danhGia || 0) >
-          Number(max.danhGia || 0)
-          ? movie
-          : max
-      )
+    bannerMovies.length > 0
+      ? bannerMovies[0]
       : null;
+
+  const relatedMovies =
+    allMovies
+      .filter(
+        movie =>
+          movie.maPhim !== featuredMovie?.maPhim
+      )
+      .slice(0, 5);
 
   const user = JSON.parse(
     localStorage.getItem("user")
@@ -69,23 +53,30 @@ const Home = () => {
         const data =
           response?.data?.data || [];
 
-        const showingMovies = data
-          .filter(
-            movie => movie.trangThai === "dang_chieu"
-          )
-          .sort(
-            (a, b) =>
-              Number(b.danhGia || 0) -
-              Number(a.danhGia || 0)
-          )
-          .slice(0, 5);
+        const showingMovies = data.filter(
+          movie => movie.trangThai === "dang_chieu"
+        );
 
-        setMovies(showingMovies);
+        // Toàn bộ phim đang chiếu
+        setAllMovies(showingMovies);
+
+        // Top 5 đánh giá cao nhất
+        setBannerMovies(
+          [...showingMovies]
+            .sort(
+              (a, b) =>
+                Number(b.danhGia || 0) -
+                Number(a.danhGia || 0)
+            )
+            .slice(0, 5)
+        );
 
       } catch (err) {
 
         console.log(err);
+
       }
+
     };
 
     loadMovies();
@@ -94,14 +85,14 @@ const Home = () => {
 
   useEffect(() => {
 
-    if (movies.length === 0)
+    if (bannerMovies.length === 0)
       return;
 
     const timer =
       setInterval(() => {
 
         setCurrentBanner(prev =>
-          prev === movies.length - 1
+          prev === bannerMovies.length - 1
             ? 0
             : prev + 1
         );
@@ -111,12 +102,12 @@ const Home = () => {
     return () =>
       clearInterval(timer);
 
-  }, [movies]);
+  }, [bannerMovies]);
 
   const currentMovie =
-    movies[currentBanner] || {};
+    bannerMovies[currentBanner] || {};
 
-  if (movies.length === 0) {
+  if (bannerMovies.length === 0) {
     return (
       <div>
         Loading...
@@ -207,7 +198,7 @@ const Home = () => {
           onClick={() =>
             setCurrentBanner(
               currentBanner === 0
-                ? movies.length - 1
+                ? bannerMovies.length - 1
                 : currentBanner - 1
             )
           }
@@ -219,7 +210,7 @@ const Home = () => {
           className={s.next}
           onClick={() =>
             setCurrentBanner(
-              currentBanner === movies.length - 1
+              currentBanner === bannerMovies.length - 1
                 ? 0
                 : currentBanner + 1
             )
@@ -229,7 +220,7 @@ const Home = () => {
         </button>
 
         <div className={s.dots}>
-          {movies.map((_, i) => (
+          {bannerMovies.map((_, i) => (
             <span
               key={i}
               className={
@@ -243,7 +234,7 @@ const Home = () => {
 
         <div className={s.bannerThumbs}>
 
-          {movies.map((movie, index) => (
+          {bannerMovies.map((movie, index) => (
 
             <img
               key={movie.maPhim}
@@ -359,20 +350,27 @@ const Home = () => {
             <div className={s.search_result}>
 
               {
-                related
+                relatedMovies
                   .filter((m) =>
-                    m.title
+                    m.tieuDe
                       .toLowerCase()
                       .includes(searchText.toLowerCase())
                   )
                   .map((m, i) => (
                     <div key={i} className={s.result_item}>
 
-                      <img src={films[i]} alt="" />
+                      <img
+                        src={m.anhPoster}
+                        alt={m.tieuDe}
+                      />
 
                       <div>
-                        <h4>{m.title}</h4>
-                        <p>{m.year}</p>
+                        <h4>{m.tieuDe}</h4>
+                        <p>
+                          {new Date(
+                            m.ngayCongChieu
+                          ).toLocaleDateString("vi-VN")}
+                        </p>
                       </div>
 
                     </div>
@@ -479,15 +477,36 @@ const Home = () => {
         </div>
 
         <div className={s.list}>
-          {related.map((m, i) => (
-            <div key={i} className={s.re_card}>
+
+          {relatedMovies.map((movie) => (
+
+            <div
+              key={movie.maPhim}
+              className={s.re_card}
+              onClick={() =>
+                navigate(`/movie/${movie.maPhim}`)
+              }
+            >
+
               <div className={s.poster}>
-                <img src={films[i]} alt="" />
+                <img
+                  src={movie.anhPoster}
+                  alt={movie.tieuDe}
+                />
               </div>
-              <p>{m.title}</p>
-              <span>{m.year}</span>
+
+              <p>{movie.tieuDe}</p>
+
+              <span>
+                {new Date(
+                  movie.ngayCongChieu
+                ).toLocaleDateString("vi-VN")}
+              </span>
+
             </div>
+
           ))}
+
         </div>
       </div>
 
