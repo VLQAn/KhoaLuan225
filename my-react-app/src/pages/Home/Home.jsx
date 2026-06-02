@@ -1,5 +1,6 @@
 import styles from "./Home.module.css";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FaTwitter, FaFacebook, FaInstagram, FaSearch, FaGoogle, FaStar, FaPlay } from "react-icons/fa";
 
 import icon1 from "../../assets/cast_crew.png";
@@ -15,7 +16,8 @@ import film3 from "../../assets/f3.jpg";
 import film4 from "../../assets/f4.jpg";
 import film5 from "../../assets/f5.jpg";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import movieApi from "../../services/movieApi";
 
 const films = [film1, film2, film3, film4, film5];
 
@@ -32,14 +34,99 @@ const s = styles;
 const Home = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const navigate = useNavigate();
+
+  const [movies, setMovies] =
+    useState([]);
+
+  const [currentBanner,
+    setCurrentBanner] =
+    useState(0);
+
   const user = JSON.parse(
     localStorage.getItem("user")
   );
 
+  useEffect(() => {
+
+    const loadMovies = async () => {
+
+      try {
+
+        const response =
+          await movieApi.getAllMovies();
+
+        const data =
+          response?.data?.data || [];
+
+        const showingMovies = data
+          .filter(
+            movie => movie.trangThai === "dang_chieu"
+          )
+          .sort(
+            (a, b) =>
+              Number(b.danhGia || 0) -
+              Number(a.danhGia || 0)
+          )
+          .slice(0, 5);
+
+        setMovies(showingMovies);
+
+      } catch (err) {
+
+        console.log(err);
+      }
+    };
+
+    loadMovies();
+
+  }, []);
+
+  useEffect(() => {
+
+    if (movies.length === 0)
+      return;
+
+    const timer =
+      setInterval(() => {
+
+        setCurrentBanner(prev =>
+          prev === movies.length - 1
+            ? 0
+            : prev + 1
+        );
+
+      }, 5000);
+
+    return () =>
+      clearInterval(timer);
+
+  }, [movies]);
+
+  const currentMovie =
+    movies[currentBanner] || {};
+
+  if (movies.length === 0) {
+    return (
+      <div>
+        Loading...
+      </div>
+    );
+  }
+
   return (
     <div className="container">
       {/* BANNER */}
-      <div className={s.banner}>
+      <div
+        className={s.banner}
+        style={{
+          backgroundImage:
+            `url(${currentMovie.anhBanner})`
+        }}
+      >
+
+        <div className={s.overlay}></div>
+
         <div className={s.header}>
           <div className={s.menu}></div>
           <div className={s.logo}>RACSO</div>
@@ -65,6 +152,110 @@ const Home = () => {
             </span>
           </div>
         </div>
+
+        <div className={s.bannerContent}>
+
+          <span className={s.badge}>
+            ĐANG CHIẾU
+          </span>
+
+          <h1>
+            {currentMovie.tieuDe}
+          </h1>
+
+          <p>
+            {currentMovie.moTa?.slice(0, 180)}...
+          </p>
+
+          <div className={s.metaInfo}>
+
+            <span>
+              ⭐ {currentMovie.danhGia || "N/A"}
+            </span>
+
+            <span>
+              ⏱ {currentMovie.thoiLuong} phút
+            </span>
+
+          </div>
+
+          <button
+            className={s.bookBtn}
+            onClick={() =>
+              navigate(
+                `/movie/${currentMovie.maPhim}`
+              )
+            }
+          >
+            Đặt vé ngay
+          </button>
+
+        </div>
+
+        <button
+          className={s.prev}
+          onClick={() =>
+            setCurrentBanner(
+              currentBanner === 0
+                ? movies.length - 1
+                : currentBanner - 1
+            )
+          }
+        >
+          ❮
+        </button>
+
+        <button
+          className={s.next}
+          onClick={() =>
+            setCurrentBanner(
+              currentBanner === movies.length - 1
+                ? 0
+                : currentBanner + 1
+            )
+          }
+        >
+          ❯
+        </button>
+
+        <div className={s.dots}>
+          {movies.map((_, i) => (
+            <span
+              key={i}
+              className={
+                i === currentBanner
+                  ? s.activeDot
+                  : ""
+              }
+            />
+          ))}
+        </div>
+
+        <div className={s.bannerThumbs}>
+
+          {movies.map((movie, index) => (
+
+            <img
+              key={movie.maPhim}
+              src={movie.anhBanner}
+              alt={movie.tieuDe}
+
+              className={
+                index === currentBanner
+                  ? s.activeThumb
+                  : ""
+              }
+
+              onClick={() =>
+                setCurrentBanner(index)
+              }
+            />
+
+          )
+          )}
+
+        </div>
+
       </div>
 
       {/* CONTENT */}
@@ -298,7 +489,7 @@ const Home = () => {
           Copyright © 2024 Racso. All rights reserved.
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 
