@@ -57,7 +57,12 @@ const Food = () => {
             try {
                 // 1. Lấy xuất chiếu
                 const xuatChieuRes = await xuatChieuApi.getById(maXuatChieu);
-                const xuatChieuData = xuatChieuRes;
+
+                const xuatChieuData = {
+                    ...xuatChieuRes,
+                    thoiGianBatDau: xuatChieuRes?.thoiGianBatDau?.replace("Z", ""),
+                    thoiGianKetThuc: xuatChieuRes?.thoiGianKetThuc?.replace("Z", "")
+                };
 
                 setXuatChieu(xuatChieuData);
 
@@ -86,6 +91,10 @@ const Food = () => {
 
         return Number(value).toLocaleString("vi-VN") + " VNĐ";
     };
+
+    const displayDate = xuatChieu?.thoiGianBatDau
+        ? new Date(xuatChieu.thoiGianBatDau)
+        : null;
 
     return (
         <div className={s.container}>
@@ -133,14 +142,16 @@ const Food = () => {
                         <b>{xuatChieu?.phong_chieu?.rap_chieu?.tenRap}</b> - {xuatChieu?.phong_chieu?.tenPhong}
                         <p>
                             Suất: <b>
-                                {new Date(xuatChieu?.thoiGianBatDau).toLocaleTimeString([], {
+                                {displayDate?.toLocaleTimeString("vi-VN", {
                                     hour: "2-digit",
                                     minute: "2-digit"
                                 })}
-                            </b> -{" "}
+                            </b>
+
+                            {" - "}
 
                             Ngày chiếu: <b>
-                                {new Date(xuatChieu?.thoiGianBatDau).toLocaleDateString("vi-VN")}
+                                {displayDate?.toLocaleDateString("vi-VN")}
                             </b>
                         </p>
                     </div>
@@ -220,7 +231,7 @@ const Food = () => {
                                         foods,
 
                                         total,
-                                        
+
                                         xuatChieu,
 
                                         seatPrice,

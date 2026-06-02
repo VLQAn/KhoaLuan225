@@ -46,7 +46,19 @@ const Seat = () => {
     const loadXuatChieu = async () => {
         try {
             const data = await xuatChieuApi.getById(maXuatChieu);
+
+            if (data?.thoiGianBatDau) {
+                data.thoiGianBatDau =
+                    data.thoiGianBatDau.replace("Z", "");
+            }
+
+            if (data?.thoiGianKetThuc) {
+                data.thoiGianKetThuc =
+                    data.thoiGianKetThuc.replace("Z", "");
+            }
+
             setXuatChieu(data);
+
         } catch (err) {
             console.log(err);
         }
@@ -219,14 +231,20 @@ const Seat = () => {
                     <b>{xuatChieu?.phong_chieu?.rap_chieu?.tenRap}</b> - {xuatChieu?.phong_chieu?.tenPhong}
                     <p>
                         Suất: <b>
-                            {new Date(xuatChieu?.thoiGianBatDau).toLocaleTimeString([], {
-                                hour: "2-digit",
-                                minute: "2-digit"
-                            })}
-                        </b> -{" "}
+                            {xuatChieu?.thoiGianBatDau &&
+                                new Date(xuatChieu.thoiGianBatDau)
+                                    .toLocaleTimeString("vi-VN", {
+                                        hour: "2-digit",
+                                        minute: "2-digit"
+                                    })}
+                        </b>
+
+                        {" - "}
 
                         Ngày chiếu: <b>
-                            {new Date(xuatChieu?.thoiGianBatDau).toLocaleDateString("vi-VN")}
+                            {xuatChieu?.thoiGianBatDau &&
+                                new Date(xuatChieu.thoiGianBatDau)
+                                    .toLocaleDateString("vi-VN")}
                         </b>
                     </p>
                 </div>
@@ -274,7 +292,9 @@ const Seat = () => {
                                 state: {
                                     maXuatChieu,
                                     selectedSeats,
-                                    total
+                                    total,
+                                    seatPrice: seatTotal,
+                                    giaVe: giaVe
                                 }
                             })
                         }
