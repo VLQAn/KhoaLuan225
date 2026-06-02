@@ -70,24 +70,25 @@ body {
 }
 
 .metaInfo {
-    display: flex;
-    align-items: center;
-    gap: 30px; /* khoảng cách giữa 2 span */
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  /* khoảng cách giữa 2 span */
 
-    margin-top: 20px;
-    margin-bottom: 25px;
+  margin-top: 20px;
+  margin-bottom: 25px;
 }
 
 .metaInfo span {
-    padding: 10px 18px;
+  padding: 10px 18px;
 
-    background: rgba(255,255,255,0.12);
-    backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
 
-    border-radius: 30px;
+  border-radius: 30px;
 
-    font-size: 18px;
-    font-weight: 600;
+  font-size: 18px;
+  font-weight: 600;
 }
 
 .prev,
@@ -410,22 +411,26 @@ body {
 /* CONTENT */
 .content {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
+  gap: 50px;
+  align-items: flex-start;
   margin: 60px 0px;
 }
 
 /* LEFT */
 .left {
-  width: 60%;
+  flex: 2;
   min-width: 300px;
   display: flex;
   gap: 20px;
 }
 
 .left img {
-  width: 60%;
-  border-radius: 5px;
+  width: 30%;
+  max-width: 280px;
+  min-width: 220px;
+  height: 420px;
+  object-fit: cover;
+  border-radius: 12px;
 }
 
 .descrip {
@@ -459,7 +464,7 @@ body {
 
 /* RIGHT */
 .right {
-  width: 40%;
+  flex: 1;
   min-width: 300px;
 }
 
@@ -500,11 +505,52 @@ body {
 
 .video {
   position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  cursor: pointer;
 }
 
 .video img {
   width: 100%;
-  border-radius: 5px;
+  height: 260px;
+  object-fit: cover;
+
+  transition: transform 0.4s ease;
+}
+
+.video:hover img {
+    transform: scale(1.05);
+}
+
+.playButton {
+  position: absolute;
+
+  top: 50%;
+  left: 50%;
+
+  transform: translate(-50%, -50%);
+
+  width: 70px;
+  height: 70px;
+
+  border-radius: 50%;
+
+  background: rgba(0, 0, 0, 0.6);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: white;
+  font-size: 28px;
+
+  transition: all 0.3s ease;
+}
+
+.video:hover .playButton {
+  transform: translate(-50%, -50%) scale(1.15);
+
+  background: rgba(255, 0, 0, 0.8);
 }
 
 /* RELATED */

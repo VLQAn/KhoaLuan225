@@ -43,6 +43,16 @@ const Home = () => {
     setCurrentBanner] =
     useState(0);
 
+  const featuredMovie =
+    movies.length > 0
+      ? movies.reduce((max, movie) =>
+        Number(movie.danhGia || 0) >
+          Number(max.danhGia || 0)
+          ? movie
+          : max
+      )
+      : null;
+
   const user = JSON.parse(
     localStorage.getItem("user")
   );
@@ -266,9 +276,21 @@ const Home = () => {
           <div className={s.info_header}>
             <div>
               <h1>
-                VÙNG ĐẤT LINH HỒN <span>(2001)</span>
+                {featuredMovie?.tieuDe}
+                <span>
+                  (
+                  {featuredMovie?.ngayCongChieu?.slice(0, 4)}
+                  )
+                </span>
               </h1>
-              <p className={s.genre}>Hoat Hình | Phiêu Lưu | Gia đình</p>
+
+              <p className={s.genre}>
+                {
+                  featuredMovie?.theLoai
+                    ?.map(item => item.tenTheLoai)
+                    .join(" | ")
+                }
+              </p>
 
               <div className={s.stars}>
                 {[...Array(5)].map((_, i) => <FaStar key={i} />)}
@@ -276,10 +298,33 @@ const Home = () => {
             </div>
 
             <div className={s.info}>
-              <p><b>GIỚI HẠN:</b> 12+</p>
-              <p><b>THỜI LƯỢNG:</b> 125 phút</p>
-              <p><b>DOANH THU:</b> 415.900.000.000 VNĐ</p>
-              <p><b>NGÀY PHÁT HÀNH:</b> 28/03/2003</p>
+
+              <p>
+                <b>ĐÁNH GIÁ:</b>
+                {" "}
+                ⭐ {featuredMovie?.danhGia}
+              </p>
+
+              <p>
+                <b>THỜI LƯỢNG:</b>
+                {" "}
+                {featuredMovie?.thoiLuong} phút
+              </p>
+
+              <p>
+                <b>DOANH THU:</b>
+                {" "}
+                {(Number(featuredMovie?.danhGia || 0) * 100000000)
+                  .toLocaleString("vi-VN")}
+                {" "}VNĐ
+              </p>
+
+              <p>
+                <b>NGÀY PHÁT HÀNH:</b>
+                {" "}
+                {featuredMovie?.ngayCongChieu}
+              </p>
+
             </div>
           </div>
 
@@ -343,19 +388,47 @@ const Home = () => {
             {/* LEFT */}
             <div className={s.left}>
               <img
-                src="https://animehay.mx/wp-content/uploads/2026/01/vung-dat-linh-hon-animehay.jpg"
-                alt=""
+                src={featuredMovie?.anhPoster}
+                alt={featuredMovie?.tieuDe}
               />
 
               <div className={s.descrip}>
                 <div className={s.meta}>
-                  <p><b>DẠO DIỄN</b><br />Hayao Miyazaki</p>
-                  <p><b>TÁC GIẢ</b><br />Hayao Miyazaki</p>
-                  <p><b>DIỄN VIÊN</b><br />Rumi Hiiragi, Miyu Irino</p>
+
+                  <p>
+                    <b>ĐẠO DIỄN</b>
+                    <br />
+                    {featuredMovie?.daoDien}
+                  </p>
+
+                  <p>
+                    <b>THỂ LOẠI</b>
+                    <br />
+                    {
+                      featuredMovie?.theLoai
+                        ?.map(item => item.tenTheLoai)
+                        .join(", ")
+                    }
+                  </p>
+
+                  <p>
+                    <b>DIỄN VIÊN</b>
+                    <br />
+                    {
+                      featuredMovie?.dienVien?.length > 80
+                        ? featuredMovie.dienVien.slice(0, 80) + "..."
+                        : featuredMovie?.dienVien
+                    }
+                  </p>
+
                 </div>
 
                 <p className={s.plot}>
-                  <b>MÔ TẢ</b><br />Vùng đất linh hồn (Spirited Away) là một bộ phim hoạt hình phiêu lưu giả tưởng của Nhật Bản được đạo diễn bởi Hayao Miyazaki và sản xuất bởi Studio Ghibli. Bộ phim kể về câu chuyện của một cô bé tên Chihiro,...
+                  <b>MÔ TẢ</b>
+                  <br />
+                  {featuredMovie?.moTa?.length > 350
+                    ? featuredMovie.moTa.slice(0, 350) + "..."
+                    : featuredMovie?.moTa}
                 </p>
 
                 <button className={s.btn}>ĐẶT VÉ</button>
@@ -381,9 +454,13 @@ const Home = () => {
 
                 <div className={s.video}>
                   <img
-                    src="https://media.vov.vn/sites/default/files/styles/large/public/2021-07/c66f29f6e575486aa40db56441fa503d.jpg"
-                    alt=""
+                    src={featuredMovie?.anhBanner}
+                    alt={featuredMovie?.tieuDe}
                   />
+
+                  <div className={s.playButton}>
+                    <FaPlay />
+                  </div>
                 </div>
               </div>
 
