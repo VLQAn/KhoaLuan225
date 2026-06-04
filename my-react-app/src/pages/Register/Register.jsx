@@ -84,6 +84,8 @@ const Register = () => {
         navigate("/");
       }
 
+      console.log(response.data.data.user);
+
     } catch (error) {
 
       console.log(error.response.data);

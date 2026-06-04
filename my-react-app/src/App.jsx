@@ -20,6 +20,8 @@ import BookingManager from "./Admin/Booking/BookingManager";
 import PromotionManager from "./Admin/Promotion/PromotionManager";
 import Profile from "./pages/Profile/Profile";
 import Review from "./pages/Review/Review";
+import AdminRoute from "./routes/AdminRoute";
+import CustomerRoute from "./routes/CustomerRoute";
 
 import MainLayout from "./layout/MainLayout";
 
@@ -28,32 +30,160 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route element={<MainLayout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/movies" element={<MovieList />} />
-          <Route path="/deals" element={<Deal />} />
-          <Route path="/theaters" element={<Theater />} />
-          <Route path="/history" element={<History />} />
-          <Route path="/upcoming" element={<Upcoming />} />
-          <Route path="/movie/:id" element={<MovieDetail />} />
-          <Route path="/showtime/:id" element={<Showtime />} />
-          <Route path="/seat/:maXuatChieu" element={<Seat />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/food/:maXuatChieu" element={<Food />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/review/:id" element={<Review />} />
+          <Route path="/" element={
+            <CustomerRoute>
+              <Home />
+            </CustomerRoute>
+          } />
+
+          <Route path="/movies" element={
+            <CustomerRoute>
+              <MovieList />
+            </CustomerRoute>
+          } />
+
+          <Route path="/deals" element={
+            <CustomerRoute>
+              <Deal />
+            </CustomerRoute>
+          } />
+
+          <Route path="/theaters" element={
+            <CustomerRoute>
+              <Theater />
+            </CustomerRoute>
+          } />
+
+          <Route path="/history" element={
+            <CustomerRoute>
+              <History />
+            </CustomerRoute>
+          } />
+
+          <Route path="/upcoming" element={
+            <CustomerRoute>
+              <Upcoming />
+            </CustomerRoute>
+          } />
+
+          <Route path="/movie/:id" element={
+            <CustomerRoute>
+              <MovieDetail />
+            </CustomerRoute>
+          } />
+
+          <Route path="/showtime/:id" element={
+            <CustomerRoute>
+              <Showtime />
+            </CustomerRoute>
+          } />
+
+          <Route
+            path="/seat/:maXuatChieu"
+            element={
+              <CustomerRoute>
+                <Seat />
+              </CustomerRoute>
+            }
+          />
+
+          <Route
+            path="/checkout"
+            element={
+              <CustomerRoute>
+                <Checkout />
+              </CustomerRoute>
+            }
+          />
+
+          <Route
+            path="/food/:maXuatChieu"
+            element={
+              <CustomerRoute>
+                <Food />
+              </CustomerRoute>
+            }
+          />
+
+          <Route path="/profile" element={
+            <CustomerRoute>
+              <Profile />
+            </CustomerRoute>
+          } />
+
+          <Route path="/review/:id" element={
+            <CustomerRoute>
+              <Review />
+            </CustomerRoute>
+          } />
         </Route>
 
         {/* Những trang KHÔNG có sidebar */}
         <Route path="/register" element={<Register />} />
 
         {/* Admin routes */}
-        <Route path="/admin/home" element={<Ad_Home />} />
-        <Route path="/admin/movie-manager" element={<MovieManager />} />
-        <Route path="/admin/theater-manager" element={<TheaterManager />} />
-        <Route path="/admin/showtime-manager" element={<ShowtimeManager />} />
-        <Route path="/admin/food-manager" element={<FoodManager />} />
-        <Route path="/admin/booking-manager" element={<BookingManager />} />
-        <Route path="/admin/promotion-manager" element={<PromotionManager />} />
+        <Route
+          path="/admin/home"
+          element={
+            <AdminRoute>
+              <Ad_Home />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/movie-manager"
+          element={
+            <AdminRoute>
+              <MovieManager />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/theater-manager"
+          element={
+            <AdminRoute>
+              <TheaterManager />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/showtime-manager"
+          element={
+            <AdminRoute>
+              <ShowtimeManager />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/food-manager"
+          element={
+            <AdminRoute>
+              <FoodManager />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/booking-manager"
+          element={
+            <AdminRoute>
+              <BookingManager />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/promotion-manager"
+          element={
+            <AdminRoute>
+              <PromotionManager />
+            </AdminRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

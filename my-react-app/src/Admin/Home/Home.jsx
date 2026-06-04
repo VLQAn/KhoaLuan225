@@ -26,10 +26,12 @@ import {
 
 import { useState, useEffect, useRef } from "react";
 import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const s = styles;
 
 const Home = () => {
+    const navigate = useNavigate();
     const [darkMode, setDarkMode] = useState(() => {
         return localStorage.getItem("darkMode") === "true";
     });
@@ -104,6 +106,17 @@ const Home = () => {
     const user = userData
         ? JSON.parse(userData)
         : null;
+
+    const handleLogout = () => {
+
+        localStorage.removeItem("token");
+
+        localStorage.removeItem("user");
+
+        localStorage.removeItem("isLogin");
+
+        navigate("/register");
+    };
 
     return (
         <div className={s.container}>
