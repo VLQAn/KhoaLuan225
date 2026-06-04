@@ -106,7 +106,18 @@ const Home = () => {
     const user = userData
         ? JSON.parse(userData)
         : null;
-        
+
+    const handleLogout = () => {
+
+        localStorage.removeItem("token");
+
+        localStorage.removeItem("user");
+
+        localStorage.removeItem("isLogin");
+
+        navigate("/register");
+    };
+
     return (
         <div className={s.container}>
             {/*aside section start */}
@@ -172,7 +183,15 @@ const Home = () => {
                         <span><MdLocalOffer /></span>
                         <h3>Khuyến mãi</h3>
                     </NavLink>
-                    <a href="#">
+                    <a
+                        href="#"
+                        onClick={(e) => {
+
+                            e.preventDefault();
+
+                            handleLogout();
+                        }}
+                    >
                         <span><MdLogout /></span>
                         <h3>Logout</h3>
                     </a>
