@@ -1,28 +1,87 @@
 import { FaStar } from "react-icons/fa";
 import { MdLocationOn } from "react-icons/md";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import theaterApi from "../../services/theaterApi";
 import styles from "./Theater.module.css";
-const brands = ["Galaxy", "Beta", "CGV", "Lotte", "BHD", "Cinestar", "MegaGS", "DDC"];
 
 const s = styles;
 
-const theatersData = [
-  {
-    name: "Tên rạp 1",
-    address: "Địa chỉ 1",
-    rating: 4.2,
-    logo: "https://i.pinimg.com/1200x/28/6a/44/286a44ffe1fa38b026aeb94d157651a6.jpg",
-  },
-  {
-    name: "Tên rạp 2",
-    address: "Địa chỉ 2",
-    rating: 4.2,
-    logo: "https://i.pinimg.com/1200x/28/6a/44/286a44ffe1fa38b026aeb94d157651a6.jpg",
-  },
-];
-
 const Theater = () => {
-  const [active, setActive] = useState("Galaxy");
+  const [theaters, setTheaters] = useState([]);
+
+  const [active, setActive] =
+    useState("Tất cả");
+
+  const [selectedCity, setSelectedCity] =
+    useState("Tất cả");
+
+  useEffect(() => {
+    fetchTheaters();
+  }, []);
+
+  const fetchTheaters = async () => {
+    try {
+      const response =
+        await theaterApi.getAll();
+
+      console.log(response);
+
+      const data =
+        response?.data || [];
+
+      setTheaters(data);
+    }
+    catch (error) {
+      console.error(error);
+    }
+  };
+
+  const brands = [
+    "Tất cả",
+    ...new Set(
+      theaters.map(
+        t => t.thuongHieu
+      )
+    )
+  ];
+
+  const cities = [
+    "Tất cả",
+    ...new Set(
+      theaters.map(t => {
+
+        const parts =
+          t.diaChi.split(",");
+
+        return parts[
+          parts.length - 1
+        ].trim();
+      })
+    )
+  ];
+
+  const filteredTheaters =
+    theaters.filter(t => {
+
+      const matchBrand =
+        active === "Tất cả" ||
+        t.thuongHieu === active;
+
+      const matchCity =
+        selectedCity === "Tất cả" ||
+        t.diaChi.includes(selectedCity);
+
+      return (
+        matchBrand &&
+        matchCity
+      );
+    });
+
+  const generateRating = (id) => {
+    return (
+      4 + ((id * 7) % 10) / 10
+    ).toFixed(1);
+  };
 
   return (
     <div className={s.container}>
@@ -32,8 +91,14 @@ const Theater = () => {
         {brands.map((b) => (
           <div
             key={b}
-            className={`${s.brand_item} ${active === b ? s.active : ""}`}
-            onClick={() => setActive(b)}
+            className={`${s.brand_item}
+        ${active === b
+                ? s.active
+                : ""
+              }`}
+            onClick={() =>
+              setActive(b)
+            }
           >
             {b}
           </div>
@@ -41,26 +106,44 @@ const Theater = () => {
       </div>
 
       {/* Filter */}
-      <div className={s.filter}>
-        <select>
-          <option>Đà Nẵng</option>
-          <option>Hà Nội</option>
-          <option>Hồ Chí Minh</option>
-        </select>
-      </div>
+      <select className={s.city_select}
+        value={selectedCity}
+        onChange={(e) =>
+          setSelectedCity(
+            e.target.value
+          )
+        }
+      >
+        {cities.map(city => (
+          <option
+            key={city}
+            value={city}
+          >
+            {city}
+          </option>
+        ))}
+      </select>
 
       {/* Theater list */}
       <div className={s.theater_list}>
-        {theatersData.map((t, i) => (
-          <div key={i} className={s.theater_card}>
-            <img src={t.logo} alt="" />
+        {filteredTheaters.map((t) => (
+          <div
+            key={t.maRap}
+            className={s.theater_card}
+          >
+            <img
+              src={t.logo}
+              alt={t.tenRap}
+            />
+
             <div className={s.info}>
-              <h3>{t.name}</h3>
-              <p>{t.address}</p>
+              <h3>{t.tenRap}</h3>
+              <p>{t.diaChi}</p>
             </div>
 
             <div className={s.rating}>
-              {t.rating} <FaStar color="gold" />
+              {generateRating(t.maRap)}
+              <FaStar color="gold" />
             </div>
           </div>
         ))}
