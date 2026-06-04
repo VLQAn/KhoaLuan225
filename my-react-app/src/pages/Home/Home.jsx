@@ -107,17 +107,6 @@ const Home = () => {
   const currentMovie =
     bannerMovies[currentBanner] || {};
 
-  const handleLogout = () => {
-
-    localStorage.removeItem("token");
-
-    localStorage.removeItem("user");
-
-    localStorage.removeItem("isLogin");
-
-    navigate("/register");
-  };
-
   if (bannerMovies.length === 0) {
     return (
       <div>
