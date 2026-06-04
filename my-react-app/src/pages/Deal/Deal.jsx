@@ -62,7 +62,7 @@ function Deal() {
     <div className={s.container}>
 
       <h1 className={s.title}>
-        🎁 Khuyến mãi
+        Khuyến mãi
       </h1>
 
       <div className={s.list}>
