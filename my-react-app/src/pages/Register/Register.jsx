@@ -373,7 +373,16 @@ const Register = () => {
 
             <button
               className={s.btn + " " + s.register_btn}
-              onClick={() => setIsActive(true)}
+              onClick={() => {
+                setRegisterData({
+                  username: "",
+                  email: "",
+                  password: "",
+                  confirmPassword: "",
+                });
+
+                setIsActive(true);
+              }}
             >
               Đăng ký
             </button>
@@ -387,7 +396,14 @@ const Register = () => {
 
             <button
               className={s.btn + " " + s.login_btn}
-              onClick={() => setIsActive(false)}
+              onClick={() => {
+                setLoginData({
+                  email: "",
+                  password: "",
+                });
+
+                setIsActive(false);
+              }}
             >
               Đăng nhập
             </button>
