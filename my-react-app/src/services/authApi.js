@@ -61,6 +61,26 @@ const authApi = {
             }
         );
     },
+
+    // CHANGE PASSWORD
+    changePassword: async (data) => {
+
+        const token =
+            localStorage.getItem("token");
+
+        return await axios.post(
+            `${API_URL}/change-password`,
+            data,
+            {
+                headers: {
+                    Authorization:
+                        `Bearer ${token}`,
+                    Accept:
+                        "application/json",
+                },
+            }
+        );
+    },
 };
 
 export default authApi;

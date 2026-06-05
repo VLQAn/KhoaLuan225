@@ -11,6 +11,7 @@ import {
 
 import { useEffect, useState } from "react";
 import historyApi from "../../services/historyApi";
+import authApi from "../../services/authApi";
 
 const s = styles;
 
@@ -20,10 +21,6 @@ const Profile = () => {
 
     const [totalSpent, setTotalSpent] = useState(0);
 
-    const [password, setPassword] = useState(
-        user?.password || ""
-    );
-
     const [showPopup, setShowPopup] = useState(false);
 
     const [oldPassword, setOldPassword] = useState("");
@@ -32,43 +29,49 @@ const Profile = () => {
 
     const [confirmPassword, setConfirmPassword] = useState("");
 
-    const handleChangePassword = () => {
+    const handleChangePassword = async () => {
 
-        // kiểm tra mật khẩu cũ
-        if (oldPassword !== user.password) {
-            alert("Mật khẩu cũ không đúng!");
-            return;
+        try {
+
+            if (
+                newPassword !== confirmPassword
+            ) {
+
+                alert(
+                    "Xác nhận mật khẩu không khớp!"
+                );
+
+                return;
+            }
+
+            await authApi.changePassword({
+
+                oldPassword,
+
+                newPassword,
+
+                confirmPassword,
+
+            });
+
+            alert(
+                "Đổi mật khẩu thành công!"
+            );
+
+            setOldPassword("");
+            setNewPassword("");
+            setConfirmPassword("");
+
+            setShowPopup(false);
+
+        } catch (error) {
+
+            alert(
+                error?.response?.data?.message ||
+                "Đổi mật khẩu thất bại"
+            );
+
         }
-
-        // kiểm tra xác nhận mật khẩu
-        if (newPassword !== confirmPassword) {
-            alert("Xác nhận mật khẩu không khớp!");
-            return;
-        }
-
-        // cập nhật user
-        const updatedUser = {
-            ...user,
-            password: newPassword,
-        };
-
-        localStorage.setItem(
-            "user",
-            JSON.stringify(updatedUser)
-        );
-
-        // cập nhật state
-        setPassword(newPassword);
-
-        // reset input
-        setOldPassword("");
-        setNewPassword("");
-        setConfirmPassword("");
-
-        // đóng popup
-        setShowPopup(false);
-
-        alert("Đổi mật khẩu thành công!");
     };
 
     useEffect(() => {
@@ -157,7 +160,7 @@ const Profile = () => {
                         <MdLock />
                         <div>
                             <span>Mật khẩu</span>
-                            <h3>{password}</h3>
+                            <h3>********</h3>
                         </div>
                     </div>
 
