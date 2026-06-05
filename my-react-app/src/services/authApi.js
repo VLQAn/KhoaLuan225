@@ -81,6 +81,24 @@ const authApi = {
             }
         );
     },
+
+    // SEND OTP
+    sendOtp: async (email) => {
+
+        return await axios.post(
+            `${API_URL}/send-otp`,
+            { email }
+        );
+    },
+
+    // RESET PASSWORD
+    resetPassword: async (data) => {
+
+        return await axios.post(
+            `${API_URL}/reset-password`,
+            data
+        );
+    },
 };
 
 export default authApi;

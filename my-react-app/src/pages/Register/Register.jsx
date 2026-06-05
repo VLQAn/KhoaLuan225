@@ -12,6 +12,17 @@ const Register = () => {
   const [isActive, setIsActive] = useState(false);
   const [showForgot, setShowForgot] = useState(false);
 
+  const [otp, setOtp] = useState("");
+
+  const [newPassword, setNewPassword] =
+    useState("");
+
+  const [confirmPassword, setConfirmPassword] =
+    useState("");
+
+  const [otpSent, setOtpSent] =
+    useState(false);
+
   // LOGIN
   const [loginData, setLoginData] = useState({
     email: "",
@@ -118,7 +129,7 @@ const Register = () => {
       const response =
         await authApi.register({
 
-          hoTen: registerData.username,
+          tenNguoiDung: registerData.username,
 
           email: registerData.email,
 
@@ -142,21 +153,79 @@ const Register = () => {
     }
   };
 
-  // ================= FORGOT =================
-  const handleForgot = () => {
+  // ================= SEND OTP =================
+  const handleSendOtp = async () => {
 
-    if (!forgotEmail) {
-      alert("Vui lòng nhập email!");
-      return;
+    try {
+
+      await authApi.sendOtp(
+        forgotEmail
+      );
+
+      alert(
+        "OTP đã được gửi tới email"
+      );
+
+      setOtpSent(true);
+
+    } catch (error) {
+
+      alert(
+        error.response?.data?.message
+      );
     }
-
-    alert(
-      `Liên kết đặt lại mật khẩu đã gửi đến ${forgotEmail}`
-    );
-
-    setShowForgot(false);
-    setForgotEmail("");
   };
+
+  // ================= RESET PASSWORD =================
+  const handleResetPassword =
+    async () => {
+
+      console.log({
+        email: forgotEmail,
+        otp: otp,
+        newPassword: newPassword
+      });
+
+      if (
+        newPassword !==
+        confirmPassword
+      ) {
+
+        alert(
+          "Xác nhận mật khẩu không khớp"
+        );
+
+        return;
+      }
+
+      try {
+
+        await authApi.resetPassword({
+
+          email:
+            forgotEmail,
+
+          otp,
+
+          newPassword
+        });
+
+        alert(
+          "Đổi mật khẩu thành công"
+        );
+
+        setShowForgot(false);
+
+      } catch (error) {
+
+        console.log(error.response?.data);
+
+        alert(
+          error.response?.data?.message ||
+          "Có lỗi xảy ra"
+        );
+      }
+    };
 
   return (
 
@@ -339,31 +408,90 @@ const Register = () => {
 
               <h2>Quên mật khẩu</h2>
 
-              <p>
-                Nhập email để nhận liên kết đặt lại mật khẩu
-              </p>
+              {!otpSent ? (
+                <>
+                  <p>Nhập email để nhận mã OTP</p>
 
-              <div className={s.input_box}>
-                <input
-                  type="email"
-                  placeholder="Nhập email"
-                  value={forgotEmail}
-                  onChange={(e) =>
-                    setForgotEmail(e.target.value)
-                  }
-                />
-              </div>
+                  <div className={s.input_box}>
+                    <input
+                      type="email"
+                      placeholder="Nhập email"
+                      value={forgotEmail}
+                      onChange={(e) =>
+                        setForgotEmail(e.target.value)
+                      }
+                    />
+                  </div>
 
-              <button
-                className={s.btn}
-                onClick={handleForgot}
-              >
-                Gửi yêu cầu
-              </button>
+                  <button
+                    className={s.btn}
+                    onClick={handleSendOtp}
+                  >
+                    Gửi OTP
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p>Nhập OTP và mật khẩu mới</p>
+
+                  <div className={s.input_box}>
+                    <input
+                      type="text"
+                      placeholder="OTP"
+                      value={otp}
+                      onChange={(e) =>
+                        setOtp(e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div className={s.input_box}>
+                    <input
+                      type="password"
+                      placeholder="Mật khẩu mới"
+                      value={newPassword}
+                      onChange={(e) =>
+                        setNewPassword(e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div className={s.input_box}>
+                    <input
+                      type="password"
+                      placeholder="Xác nhận mật khẩu"
+                      value={confirmPassword}
+                      onChange={(e) =>
+                        setConfirmPassword(e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <button
+                    className={s.btn}
+                    onClick={handleResetPassword}
+                  >
+                    Đổi mật khẩu
+                  </button>
+                </>
+              )}
 
               <button
                 className={s.close_btn}
-                onClick={() => setShowForgot(false)}
+                onClick={() => {
+
+                  setShowForgot(false);
+
+                  setOtpSent(false);
+
+                  setForgotEmail("");
+
+                  setOtp("");
+
+                  setNewPassword("");
+
+                  setConfirmPassword("");
+                }}
               >
                 Đóng
               </button>
