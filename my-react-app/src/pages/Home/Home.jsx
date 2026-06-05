@@ -141,7 +141,10 @@ const Home = () => {
             <span className={s.login_link}>
               {
                 user ? (
-                  <Link to="/profile">
+                  <Link
+                    to="/profile"
+                    state={{ user }}
+                  >
                     {user.tenNguoiDung}
                   </Link>
                 ) : (

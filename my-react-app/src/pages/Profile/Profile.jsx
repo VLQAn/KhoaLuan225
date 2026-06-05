@@ -9,13 +9,16 @@ import {
     MdSave,
 } from "react-icons/md";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import historyApi from "../../services/historyApi";
 
 const s = styles;
 
 const Profile = () => {
 
     const user = JSON.parse(localStorage.getItem("user"));
+
+    const [totalSpent, setTotalSpent] = useState(0);
 
     const [password, setPassword] = useState(
         user?.password || ""
@@ -68,6 +71,42 @@ const Profile = () => {
         alert("Đổi mật khẩu thành công!");
     };
 
+    useEffect(() => {
+
+        const loadHistory = async () => {
+
+            try {
+
+                const response =
+                    await historyApi.getHistory();
+
+                const bookings =
+                    response.data || [];
+
+                const total =
+                    bookings.reduce(
+                        (sum, item) =>
+                            sum + Number(item.total || 0),
+                        0
+                    );
+
+                setTotalSpent(total);
+
+            } catch (error) {
+
+                console.error(
+                    "Lỗi lấy lịch sử:",
+                    error
+                );
+
+            }
+
+        };
+
+        loadHistory();
+
+    }, []);
+
     return (
 
         <div className={s.profile_page}>
@@ -77,10 +116,10 @@ const Profile = () => {
                 <div className={s.header}>
 
                     <div className={s.avatar}>
-                        {user?.username?.charAt(0)}
+                        {user?.tenNguoiDung?.charAt(0)}
                     </div>
 
-                    <h1>{user?.username}</h1>
+                    <h1>{user?.tenNguoiDung}</h1>
 
                     <p>Thành viên RACSO Cinema</p>
 
@@ -92,7 +131,7 @@ const Profile = () => {
                         <MdPerson />
                         <div>
                             <span>Tên tài khoản</span>
-                            <h3>{user?.username}</h3>
+                            <h3>{user?.tenNguoiDung}</h3>
                         </div>
                     </div>
 
@@ -109,7 +148,7 @@ const Profile = () => {
                         <div>
                             <span>Tổng chi tiêu</span>
                             <h3>
-                                {user?.totalSpent.toLocaleString()} VNĐ
+                                {totalSpent.toLocaleString("vi-VN")} VNĐ
                             </h3>
                         </div>
                     </div>
