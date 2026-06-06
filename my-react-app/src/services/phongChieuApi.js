@@ -16,20 +16,34 @@ const getAuthHeader = () => {
 };
 
 /**
- * Lấy danh sách phòng chiếu
+ * Danh sách tất cả phòng chiếu
  */
 const getAllPhongChieu = async () => {
 
-    const response = await axios.get(
-        API_URL,
-        getAuthHeader()
-    );
+    const response =
+        await axios.get(
+            API_URL,
+            getAuthHeader()
+        );
 
     return response.data;
 };
 
-const phongChieuApi = {
-    getAllPhongChieu,
+/**
+ * Danh sách phòng chiếu thuộc admin hiện tại
+ */
+const getMyRooms = async () => {
+
+    const response =
+        await axios.get(
+            `${API_URL}/my-rooms`,
+            getAuthHeader()
+        );
+
+    return response.data;
 };
 
-export default phongChieuApi;
+export default {
+    getAllPhongChieu,
+    getMyRooms,
+};

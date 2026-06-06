@@ -182,19 +182,17 @@ const ShowtimeManager = () => {
     };
 
     const fetchShowtimes = async () => {
-
         try {
 
             const response =
-                await xuatChieuApi.getAll();
+                await xuatChieuApi
+                    .getMyShowtimes();
 
             setShowtimes(
-                response.data || []
+                response || []
             );
 
         } catch (error) {
-
-            console.log(response.data);
 
             console.log(error);
         }
@@ -218,15 +216,14 @@ const ShowtimeManager = () => {
     };
 
     const fetchRooms = async () => {
-
         try {
 
             const response =
                 await phongChieuApi
-                    .getAllPhongChieu();
+                    .getMyRooms();
 
             setRooms(
-                response.data || []
+                response || []
             );
 
         } catch (error) {
@@ -597,12 +594,12 @@ const ShowtimeManager = () => {
 
                     <div className={s.info_item}>
                         <p>Phim đang chiếu</p>
-                        <h3>12</h3>
+                        <h3>{showtimes.length}</h3>
                     </div>
 
                     <div className={s.info_item}>
                         <p>Rạp hoạt động</p>
-                        <h3>8</h3>
+                        <h3>{rooms.length}</h3>
                     </div>
 
                 </div>
