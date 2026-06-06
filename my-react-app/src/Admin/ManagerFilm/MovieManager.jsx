@@ -21,6 +21,7 @@ import {
 
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import movieApi from "../../services/movieApi";
 import theLoaiApi from "../../services/theLoaiApi";
@@ -28,6 +29,7 @@ import theLoaiApi from "../../services/theLoaiApi";
 const s = styles;
 
 const MovieManager = () => {
+    const navigate = useNavigate();
     const [darkMode, setDarkMode] = useState(() => {
         return localStorage.getItem("darkMode") === "true";
     });
@@ -310,6 +312,17 @@ const MovieManager = () => {
         ? JSON.parse(userData)
         : null;
 
+    const handleLogout = () => {
+
+        localStorage.removeItem("token");
+
+        localStorage.removeItem("user");
+
+        localStorage.removeItem("isLogin");
+
+        navigate("/register");
+    };
+
     return (
         <div className={s.container}>
             {/* SIDEBAR */}
@@ -374,7 +387,7 @@ const MovieManager = () => {
                         <span><MdLocalOffer /></span>
                         <h3>Khuyến mãi</h3>
                     </NavLink>
-                    <a href="#">
+                    <a href="#" onClick={handleLogout}>
                         <span><MdLogout /></span>
                         <h3>Logout</h3>
                     </a>

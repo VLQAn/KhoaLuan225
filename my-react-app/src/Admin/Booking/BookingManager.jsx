@@ -17,10 +17,12 @@ import {
 
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const s = styles;
 
 const BookingManager = () => {
+    const navigate = useNavigate();
 
     const [darkMode, setDarkMode] = useState(() => {
         return localStorage.getItem("darkMode") === "true";
@@ -97,6 +99,17 @@ const BookingManager = () => {
         ? JSON.parse(userData)
         : null;
 
+    const handleLogout = () => {
+
+        localStorage.removeItem("token");
+
+        localStorage.removeItem("user");
+
+        localStorage.removeItem("isLogin");
+
+        navigate("/register");
+    };
+
     return (
 
         <div className={s.container}>
@@ -163,7 +176,15 @@ const BookingManager = () => {
                         <span><MdLocalOffer /></span>
                         <h3>Khuyến mãi</h3>
                     </NavLink>
-                    <a href="#">
+                    <a
+                        href="#"
+                        onClick={(e) => {
+
+                            e.preventDefault();
+
+                            handleLogout();
+                        }}
+                    >
                         <span><MdLogout /></span>
                         <h3>Logout</h3>
                     </a>

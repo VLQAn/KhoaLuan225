@@ -28,10 +28,12 @@ import {
 
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const s = styles;
 
 const PromotionManager = () => {
+    const navigate = useNavigate();
 
     const [darkMode, setDarkMode] = useState(() => {
         return localStorage.getItem("darkMode") === "true";
@@ -194,6 +196,17 @@ const PromotionManager = () => {
 
     const now = new Date();
 
+    const handleLogout = () => {
+
+        localStorage.removeItem("token");
+
+        localStorage.removeItem("user");
+
+        localStorage.removeItem("isLogin");
+
+        navigate("/register");
+    };
+
     return (
 
         <div className={s.container}>
@@ -271,7 +284,7 @@ const PromotionManager = () => {
                         <h3>Khuyến mãi</h3>
                     </NavLink>
 
-                    <a href="#">
+                    <a href="#" onClick={handleLogout}>
                         <span><MdLogout /></span>
                         <h3>Logout</h3>
                     </a>
