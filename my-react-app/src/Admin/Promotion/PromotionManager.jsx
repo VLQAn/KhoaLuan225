@@ -5,24 +5,25 @@ import {
     MdClose,
     MdDashboard,
     MdMovie,
-    MdAnalytics,
     MdLogout,
     MdMenu,
     MdLightMode,
     MdDarkMode,
+
     MdEdit,
     MdDelete,
     MdSave,
     MdAdd,
+
     MdLocalOffer,
     MdDiscount,
-    MdToggleOn,
-    MdToggleOff,
-    MdMessage,
-    MdShoppingCart,
-    MdAddBox,
     MdDateRange,
     MdPercent,
+
+    MdHomeWork,
+    MdConfirmationNumber,
+    MdSchedule,
+    MdFastfood,
 } from "react-icons/md";
 
 import { useEffect, useState } from "react";
@@ -234,7 +235,7 @@ const PromotionManager = () => {
                         to="/admin/theater-manager"
                         className={({ isActive }) => isActive ? s.active : ""}
                     >
-                        <span><MdAnalytics /></span>
+                        <span><MdHomeWork /></span>
                         <h3>Cập nhật rạp chiếu</h3>
                     </NavLink>
 
@@ -242,7 +243,7 @@ const PromotionManager = () => {
                         to="/admin/booking-manager"
                         className={({ isActive }) => isActive ? s.active : ""}
                     >
-                        <span><MdMessage /></span>
+                        <span><MdConfirmationNumber /></span>
                         <h3>Đơn đặt vé</h3>
                     </NavLink>
 
@@ -250,7 +251,7 @@ const PromotionManager = () => {
                         to="/admin/showtime-manager"
                         className={({ isActive }) => isActive ? s.active : ""}
                     >
-                        <span><MdShoppingCart /></span>
+                        <span><MdSchedule /></span>
                         <h3>Cập nhật xuất chiếu</h3>
                     </NavLink>
 
@@ -258,7 +259,7 @@ const PromotionManager = () => {
                         to="/admin/food-manager"
                         className={({ isActive }) => isActive ? s.active : ""}
                     >
-                        <span><MdAddBox /></span>
+                        <span><MdFastfood /></span>
                         <h3>Bắp nước</h3>
                     </NavLink>
 

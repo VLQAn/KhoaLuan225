@@ -7,10 +7,10 @@ import {
     MdClose,
     MdDashboard,
     MdMovie,
-    MdAnalytics,
-    MdMessage,
-    MdShoppingCart,
-    MdAddBox,
+    MdTheaters,
+    MdConfirmationNumber,
+    MdSchedule,
+    MdFastfood,
     MdLogout,
     MdMenu,
     MdLightMode,
@@ -20,11 +20,9 @@ import {
     MdSave,
     MdAdd,
     MdAccessTime,
-    MdTheaters,
-    MdEventSeat,
     MdMovieCreation,
-    MdReport,
     MdLocalOffer,
+    MdHomeWork,
 } from "react-icons/md";
 
 import { useEffect, useState } from "react";
@@ -258,6 +256,10 @@ const ShowtimeManager = () => {
         return "Đã chiếu";
     };
 
+    const phimDangChieu = movies.filter(
+        (movie) => movie.trangThai === "dang_chieu"
+    ).length;
+
     const userData = localStorage.getItem("user");
 
     const user = userData
@@ -298,28 +300,28 @@ const ShowtimeManager = () => {
                         to="/admin/theater-manager"
                         className={({ isActive }) => isActive ? s.active : ""}
                     >
-                        <span><MdAnalytics /></span>
+                        <span><MdHomeWork /></span>
                         <h3>Cập nhật rạp chiếu</h3>
                     </NavLink>
                     <NavLink
                         to="/admin/booking-manager"
                         className={({ isActive }) => isActive ? s.active : ""}
                     >
-                        <span><MdMessage /></span>
+                        <span><MdConfirmationNumber /></span>
                         <h3>Đơn đặt vé</h3>
                     </NavLink>
                     <NavLink
                         to="/admin/showtime-manager"
                         className={({ isActive }) => isActive ? s.active : ""}
                     >
-                        <span><MdShoppingCart /></span>
+                        <span><MdSchedule /></span>
                         <h3>Cập nhật xuất chiếu</h3>
                     </NavLink>
                     <NavLink
                         to="/admin/food-manager"
                         className={({ isActive }) => isActive ? s.active : ""}
                     >
-                        <span><MdAddBox /></span>
+                        <span><MdFastfood /></span>
                         <h3>Bắp nước</h3>
                     </NavLink>
                     <NavLink
@@ -594,7 +596,7 @@ const ShowtimeManager = () => {
 
                     <div className={s.info_item}>
                         <p>Phim đang chiếu</p>
-                        <h3>{showtimes.length}</h3>
+                        <h3>{phimDangChieu}</h3>
                     </div>
 
                     <div className={s.info_item}>

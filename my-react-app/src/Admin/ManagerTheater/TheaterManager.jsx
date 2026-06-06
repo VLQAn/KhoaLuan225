@@ -5,9 +5,6 @@ import {
     MdDashboard,
     MdMovie,
     MdAnalytics,
-    MdMessage,
-    MdShoppingCart,
-    MdAddBox,
     MdLogout,
     MdMenu,
     MdLightMode,
@@ -20,8 +17,11 @@ import {
     MdMeetingRoom,
     MdPhone,
     MdLocationOn,
-    MdReport,
     MdLocalOffer,
+    MdConfirmationNumber,
+    MdSchedule,
+    MdFastfood,
+    MdHomeWork,
 
 } from "react-icons/md";
 
@@ -44,14 +44,6 @@ const TheaterManager = () => {
         diaChi: "",
         soDienThoai: "",
         moTa: "",
-
-        // phongChieus: [
-        //     {
-        //         tenPhong: "",
-        //         soHang: 5,
-        //         soCot: 5,
-        //     },
-        // ],
         phongChieus: [],
     });
 
@@ -309,28 +301,28 @@ const TheaterManager = () => {
                         to="/admin/theater-manager"
                         className={({ isActive }) => isActive ? s.active : ""}
                     >
-                        <span><MdAnalytics /></span>
+                        <span><MdHomeWork /></span>
                         <h3>Cập nhật rạp chiếu</h3>
                     </NavLink>
                     <NavLink
                         to="/admin/booking-manager"
                         className={({ isActive }) => isActive ? s.active : ""}
                     >
-                        <span><MdMessage /></span>
+                        <span><MdConfirmationNumber /></span>
                         <h3>Đơn đặt vé</h3>
                     </NavLink>
                     <NavLink
                         to="/admin/showtime-manager"
                         className={({ isActive }) => isActive ? s.active : ""}
                     >
-                        <span><MdShoppingCart /></span>
+                        <span><MdSchedule /></span>
                         <h3>Cập nhật xuất chiếu</h3>
                     </NavLink>
                     <NavLink
                         to="/admin/food-manager"
                         className={({ isActive }) => isActive ? s.active : ""}
                     >
-                        <span><MdAddBox /></span>
+                        <span><MdFastfood /></span>
                         <h3>Bắp nước</h3>
                     </NavLink>
                     <NavLink

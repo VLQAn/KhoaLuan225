@@ -6,7 +6,6 @@ import {
     MdClose,
     MdDashboard,
     MdMovie,
-    MdAnalytics,
     MdFastfood,
     MdLogout,
     MdMenu,
@@ -17,15 +16,13 @@ import {
     MdSave,
     MdAdd,
     MdRestaurantMenu,
-    MdLocalDrink,
     MdToggleOn,
     MdToggleOff,
-    MdMessage,
-    MdShoppingCart,
-    MdReport,
-    MdAddBox,
     MdLocalOffer,
     MdDescription,
+    MdHomeWork,
+    MdConfirmationNumber,
+    MdSchedule
 } from "react-icons/md";
 
 import { useEffect, useState } from "react";
@@ -296,28 +293,28 @@ const FoodManager = () => {
                         to="/admin/theater-manager"
                         className={({ isActive }) => isActive ? s.active : ""}
                     >
-                        <span><MdAnalytics /></span>
+                        <span><MdHomeWork /></span>
                         <h3>Cập nhật rạp chiếu</h3>
                     </NavLink>
                     <NavLink
                         to="/admin/booking-manager"
                         className={({ isActive }) => isActive ? s.active : ""}
                     >
-                        <span><MdMessage /></span>
+                        <span><MdConfirmationNumber /></span>
                         <h3>Đơn đặt vé</h3>
                     </NavLink>
                     <NavLink
                         to="/admin/showtime-manager"
                         className={({ isActive }) => isActive ? s.active : ""}
                     >
-                        <span><MdShoppingCart /></span>
+                        <span><MdSchedule /></span>
                         <h3>Cập nhật xuất chiếu</h3>
                     </NavLink>
                     <NavLink
                         to="/admin/food-manager"
                         className={({ isActive }) => isActive ? s.active : ""}
                     >
-                        <span><MdAddBox /></span>
+                        <span><MdFastfood /></span>
                         <h3>Bắp nước</h3>
                     </NavLink>
                     <NavLink
