@@ -1,32 +1,27 @@
 import styles from "./Home.module.css";
 import {
     MdClose,
-    MdSettings,
     MdDashboard,
     MdMovie,
-    MdMovieCreation,
-    MdOndemandVideo,
-    MdLiveTv,
-    MdTheaters,
-    MdAnalytics,
-    MdMessage,
-    MdShoppingCart,
     MdAddBox,
     MdLogout,
-    MdReport,
     MdTrendingUp,
     MdLocalMall,
     MdStackedLineChart,
     MdMenu,
     MdLightMode,
     MdDarkMode,
-    MdAdd,
     MdLocalOffer,
+    MdHomeWork,
+    MdConfirmationNumber,
+    MdSchedule,
+    MdFastfood
 } from "react-icons/md";
 
 import { useState, useEffect, useRef } from "react";
 import { NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import dashboardApi from "../../services/dashboardApi";
 
 const s = styles;
 
@@ -37,6 +32,13 @@ const Home = () => {
     });
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [activeTab, setActiveTab] = useState("today");
+
+    const [dashboard, setDashboard] = useState({
+        raps: [],
+        topMovies: [],
+        topFoods: [],
+        goldenShowtimes: []
+    });
 
     const revenues = {
         today: {
@@ -97,6 +99,31 @@ const Home = () => {
 
     }, [darkMode]);
 
+    useEffect(() => {
+
+        const fetchDashboard =
+            async () => {
+
+                try {
+
+                    const data =
+                        await dashboardApi
+                            .getDashboard();
+
+                    console.log(data);
+
+                    setDashboard(data);
+
+                } catch (error) {
+
+                    console.error(error);
+                }
+            };
+
+        fetchDashboard();
+
+    }, []);
+
     const currentRevenue = revenues[activeTab];
     const revenueDetailRef = useRef(null);
     const seatAnalyticsRef = useRef(null);
@@ -151,28 +178,28 @@ const Home = () => {
                         to="/admin/theater-manager"
                         className={({ isActive }) => isActive ? s.active : ""}
                     >
-                        <span><MdAnalytics /></span>
+                        <span><MdHomeWork /></span>
                         <h3>Cập nhật rạp chiếu</h3>
                     </NavLink>
                     <NavLink
                         to="/admin/booking-manager"
                         className={({ isActive }) => isActive ? s.active : ""}
                     >
-                        <span><MdMessage /></span>
+                        <span><MdConfirmationNumber /></span>
                         <h3>Đơn đặt vé</h3>
                     </NavLink>
                     <NavLink
                         to="/admin/showtime-manager"
                         className={({ isActive }) => isActive ? s.active : ""}
                     >
-                        <span><MdShoppingCart /></span>
+                        <span><MdSchedule /></span>
                         <h3>Cập nhật xuất chiếu</h3>
                     </NavLink>
                     <NavLink
                         to="/admin/food-manager"
                         className={({ isActive }) => isActive ? s.active : ""}
                     >
-                        <span><MdAddBox /></span>
+                        <span><MdFastfood /></span>
                         <h3>Bắp nước</h3>
                     </NavLink>
                     <NavLink
@@ -262,7 +289,9 @@ const Home = () => {
                         <div className={s.middle}>
                             <div className={s.left}>
                                 <h3>Tổng vé bán ra</h3>
-                                <h1>{currentRevenue.sales}</h1>
+                                <h1>
+                                    {dashboard?.tongVeBan ?? 0}
+                                </h1>
                             </div>
 
                             <div className={s.progress}>
@@ -288,7 +317,12 @@ const Home = () => {
                         <div className={s.middle}>
                             <div className={s.left}>
                                 <h3>Tổng doanh thu</h3>
-                                <h1>{currentRevenue.expenses}</h1>
+                                <h1>
+                                    {Number(
+                                        dashboard?.tongDoanhThu || 0
+                                    ).toLocaleString("vi-VN")}
+                                    {" "}VNĐ
+                                </h1>
                             </div>
 
                             <div className={s.progress}>
@@ -316,7 +350,9 @@ const Home = () => {
                         <div className={s.middle}>
                             <div className={s.left}>
                                 <h3>Tỉ lệ lắp đầy ghế</h3>
-                                <h1>{currentRevenue.income}</h1>
+                                <h1>
+                                    {dashboard?.tiLeLapDay ?? 0}%
+                                </h1>
                             </div>
 
                             <div className={s.progress}>
@@ -344,26 +380,37 @@ const Home = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>Galaxy Vĩnh Trung</td>
-                                <td>430</td>
-                                <td>120Tr</td>
-                                <td className={s.primary}>80%</td>
-                            </tr>
 
-                            <tr>
-                                <td>Galaxy Thanh Khê</td>
-                                <td>310</td>
-                                <td>88Tr</td>
-                                <td className={s.primary}>71%</td>
-                            </tr>
+                            {dashboard?.raps?.map(
+                                rap => (
 
-                            <tr>
-                                <td>Galaxy Hải Châu</td>
-                                <td>510</td>
-                                <td>145Tr</td>
-                                <td className={s.primary}>92%</td>
-                            </tr>
+                                    <tr key={rap.maRap}>
+
+                                        <td>
+                                            {rap.tenRap}
+                                        </td>
+
+                                        <td>
+                                            {rap.veBan}
+                                        </td>
+
+                                        <td>
+                                            {Number(
+                                                rap.doanhThu
+                                            ).toLocaleString("vi-VN")}
+                                            VNĐ
+                                        </td>
+
+                                        <td
+                                            className={s.primary}
+                                        >
+                                            {rap.lapDay}%
+                                        </td>
+
+                                    </tr>
+                                )
+                            )}
+
                         </tbody>
                     </table>
                 </div>
@@ -411,35 +458,31 @@ const Home = () => {
                         <div className={s.food_top_card}>
                             <h2>Top combo bán chạy</h2>
 
-                            <div className={s.combo_item}>
-                                <div>
-                                    <h3>Combo Galaxy XL</h3>
-                                    <small>1.250 combo</small>
-                                </div>
-                                <span className={s.combo_img}>
-                                    <img src="https://i.pinimg.com/736x/99/60/0a/99600a38a884687cab170b068e7794b3.jpg" alt="" />
-                                </span>
-                            </div>
+                            {dashboard?.topFoods?.map(food => (
 
-                            <div className={s.combo_item}>
-                                <div>
-                                    <h3>Combo Couple</h3>
-                                    <small>980 combo</small>
-                                </div>
-                                <span className={s.combo_img}>
-                                    <img src="https://i.pinimg.com/736x/99/60/0a/99600a38a884687cab170b068e7794b3.jpg" alt="" />
-                                </span>
-                            </div>
+                                <div
+                                    key={food.maMon}
+                                    className={s.combo_item}
+                                >
 
-                            <div className={s.combo_item}>
-                                <div>
-                                    <h3>Combo Family</h3>
-                                    <small>745 combo</small>
+                                    <div>
+                                        <h3>{food.tenMon}</h3>
+
+                                        <small>
+                                            {food.tongBan} phần
+                                        </small>
+                                    </div>
+
+                                    <span className={s.combo_img}>
+                                        <img
+                                            src={food.hinhAnh}
+                                            alt={food.tenMon}
+                                        />
+                                    </span>
+
                                 </div>
-                                <span className={s.combo_img}>
-                                    <img src="https://i.pinimg.com/736x/99/60/0a/99600a38a884687cab170b068e7794b3.jpg" alt="" />
-                                </span>
-                            </div>
+
+                            ))}
                         </div>
                     </div>
                 </div>
@@ -550,31 +593,37 @@ const Home = () => {
                 {/* Start recent update */}
                 <div className={s.recent_updates}>
                     <h2>Top phim</h2>
+
                     <div className={s.updates}>
-                        <div className={s.update}>
-                            <div className={s.profile_photo}>
-                                <img src="https://i.pinimg.com/1200x/1a/74/70/1a7470b2ef79024725d3319ffc09f2c0.jpg" alt="top1" />
+
+                        {dashboard?.topMovies?.map(movie => (
+
+                            <div
+                                key={movie.maPhim}
+                                className={s.update}
+                            >
+
+                                <div className={s.profile_photo}>
+                                    <img
+                                        src={movie.anhPoster}
+                                        alt={movie.tieuDe}
+                                    />
+                                </div>
+
+                                <div className={s.message}>
+                                    <p>
+                                        <b>{movie.tieuDe}</b>
+                                    </p>
+
+                                    <small>
+                                        {movie.tongVe} vé
+                                    </small>
+                                </div>
+
                             </div>
-                            <div className={s.message}>
-                                <p><b>Avengers Endgame</b>6.589 vé</p>
-                            </div>
-                        </div>
-                        <div className={s.update}>
-                            <div className={s.profile_photo}>
-                                <img src="https://i.pinimg.com/736x/7e/2c/48/7e2c48b7fc699cf06d44fd422534f99f.jpg" alt="top2" />
-                            </div>
-                            <div className={s.message}>
-                                <p><b>Zoo Topia 2</b> 6.235 vé</p>
-                            </div>
-                        </div>
-                        <div className={s.update}>
-                            <div className={s.profile_photo}>
-                                <img src="https://i.pinimg.com/736x/bb/d9/a9/bbd9a910ee5386927c2ee1e8e4ddaa34.jpg" alt="top3" />
-                            </div>
-                            <div className={s.message}>
-                                <p><b>Mưa đỏ</b> 5.626 vé</p>
-                            </div>
-                        </div>
+
+                        ))}
+
                     </div>
                 </div>
                 {/* End recent update */}
