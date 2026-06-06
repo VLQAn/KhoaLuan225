@@ -310,7 +310,6 @@ const ShowtimeManager = () => {
                     >
                         <span><MdMessage /></span>
                         <h3>Đơn đặt vé</h3>
-                        <span className={s.msg_count}>10</span>
                     </NavLink>
                     <NavLink
                         to="/admin/showtime-manager"
