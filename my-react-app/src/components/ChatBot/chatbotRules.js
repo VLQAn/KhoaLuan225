@@ -42,7 +42,7 @@ const chatbotRules = (
     ===================== */
 
     if (
-        text.includes("sắp chiếu")
+        text.includes("sap chieu")
     ) {
 
         const upcoming =
@@ -70,8 +70,8 @@ const chatbotRules = (
     ===================== */
 
     if (
-        text.includes("khuyến mãi") ||
-        text.includes("giảm giá")
+        text.includes("khuyen mai") ||
+        text.includes("giam gia")
     ) {
 
         if (
@@ -91,10 +91,38 @@ const chatbotRules = (
     }
 
     /* =====================
+       HÀM TÌM THEO TỪ KHÓA
+    ===================== */
+
+    const findMovieByKeyword = (
+        text,
+        movies
+    ) => {
+
+        const words =
+            text.split(" ");
+
+        return movies.find(movie => {
+
+            const movieName =
+                normalizeText(
+                    movie.tieuDe
+                );
+
+            const matchedWords =
+                words.filter(word =>
+                    movieName.includes(word)
+                );
+
+            return matchedWords.length >= 2;
+        });
+    };
+
+    /* =====================
        TÌM PHIM THEO TÊN
     ===================== */
 
-    const foundMovie =
+    let foundMovie =
         movies.find(movie => {
 
             const movieName =
@@ -109,6 +137,15 @@ const chatbotRules = (
             );
         });
 
+    if (!foundMovie) {
+
+        foundMovie =
+            findMovieByKeyword(
+                text,
+                movies
+            );
+    }
+    
     if (foundMovie) {
 
         return `
@@ -133,7 +170,7 @@ const chatbotRules = (
     ===================== */
 
     if (
-        text.includes("đặt vé")
+        text.includes("dat ve")
     ) {
 
         return `
