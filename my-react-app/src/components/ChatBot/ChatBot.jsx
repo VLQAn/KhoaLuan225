@@ -4,10 +4,12 @@ import styles from "./ChatBot.module.css";
 import chatbotRules from "./chatbotRules";
 import movieApi from "../../services/movieApi";
 import khuyenMaiApi from "../../services/khuyenMaiApi";
+import { useNavigate } from "react-router-dom";
 
 const s = styles;
 
 const ChatBot = () => {
+    const navigate = useNavigate();
 
     const [open, setOpen] = useState(false);
 
@@ -138,7 +140,16 @@ const ChatBot = () => {
                                     {
                                         msg.type === "movie"
                                             ? (
-                                                <div className={s.movieCard}>
+                                                <div className={s.movieCard}
+                                                    onClick={() => {
+
+                                                        setOpen(false);
+
+                                                        navigate(
+                                                            `/movie/${msg.movie.maPhim}`
+                                                        );
+
+                                                    }}>
 
                                                     <img
                                                         src={msg.movie.anhPoster}
@@ -194,6 +205,32 @@ const ChatBot = () => {
                                                                 : msg.movie.moTa
                                                         }
                                                     </p>
+
+                                                    <span className={s.viewDetail}>
+                                                        Xem chi tiết →
+                                                    </span>
+
+                                                    {
+                                                        msg.movie.trangThai ===
+                                                        "dang_chieu" && (
+
+                                                            <button
+                                                                className={s.bookBtn}
+                                                                onClick={(e) => {
+
+                                                                    e.stopPropagation();
+
+                                                                    navigate(
+                                                                        `/showtime/${msg.movie.maPhim}`
+                                                                    );
+
+                                                                }}
+                                                            >
+                                                                Đặt vé ngay
+                                                            </button>
+
+                                                        )
+                                                    }
 
                                                 </div>
                                             )

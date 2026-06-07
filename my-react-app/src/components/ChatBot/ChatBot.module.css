@@ -121,7 +121,27 @@
 }
 
 .movieCard {
-    width: 100%;
+    cursor: pointer;
+
+    padding: 10px;
+
+    border-radius: 12px;
+
+    background: #fff;
+
+    transition: 0.3s;
+}
+
+.movieCard:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 4px 16px rgba(
+            0,
+            0,
+            0,
+            0.15
+        );
 }
 
 .movieCard img {
@@ -131,15 +151,71 @@
     object-fit: cover;
 
     border-radius: 10px;
+
+    margin-bottom: 10px;
 }
 
 .movieCard h4 {
-    margin: 10px 0;
+    margin: 8px 0;
+
     font-size: 20px;
+    font-weight: 700;
 }
 
 .movieCard p {
     margin: 6px 0;
+
     font-size: 16px;
+
     line-height: 1.5;
+}
+
+.viewDetail {
+    display: inline-block;
+
+    margin-top: 10px;
+
+    color: #e53935;
+
+    font-weight: 600;
+}
+
+.bookBtn {
+    width: 100%;
+
+    margin-top: 12px;
+    padding: 12px;
+
+    background: linear-gradient(
+        135deg,
+        #e53935,
+        #ff6b35
+    );
+
+    border: none;
+    border-radius: 10px;
+
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+.bookBtn:hover {
+    transform: scale(1.03);
+
+    box-shadow:
+        0 4px 12px rgba(
+            229,
+            57,
+            53,
+            0.4
+        );
+}
+
+.bookBtn:active {
+    transform: scale(0.98);
 }
