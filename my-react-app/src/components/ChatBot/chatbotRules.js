@@ -9,6 +9,18 @@ const chatbotRules = (
     const text =
         normalizeText(message);
 
+    const isActorSearch =
+        text.includes("dien vien")
+        ||
+        text.includes("tham gia")
+        ||
+        text.includes("cua");
+
+    const isDirectorSearch =
+        text.includes("dao dien")
+        ||
+        text.includes("cua");
+
     /* =====================================
        DANH SÁCH THỂ LOẠI
     ===================================== */
@@ -70,13 +82,90 @@ const chatbotRules = (
     };
 
     /* =====================================
+       TỪ KHÓA CÓ THỂ BỎ QUA KHI TÌM KIẾM ĐẠO DIỄN, DIỄN VIÊN
+    ===================================== */
+    const searchStopWords = [
+        "toi",
+        "muon",
+        "xem",
+        "co",
+        "nao",
+        "khong",
+        "hom",
+        "nay",
+        "toi",
+        "giup",
+        "minh",
+        "xin",
+        "phim",
+        "cua",
+        "dao",
+        "dien",
+        "dien",
+        "vien",
+        "tham",
+        "gia"
+    ];
+
+    /* =====================================
+       TỪ KHÓA CÓ THỂ BỎ QUA
+    ===================================== */
+    const stopWords = [
+        "toi",
+        "muon",
+        "xem",
+        "co",
+        "nao",
+        "khong",
+        "toi nay",
+        "hom nay",
+        "giup",
+        "minh",
+        "xin",
+        "phim",
+        "cua",
+        "dao",
+        "dien",
+        "vien",
+        "tham",
+        "gia"
+    ];
+
+    const keywords =
+        text
+            .split(" ")
+            .filter(
+                word =>
+                    word.length > 2 &&
+                    !stopWords.includes(word)
+            );
+
+    /* =====================================
+       LÀM SẠCH YÊU CẦU
+    ===================================== */
+    let cleanText = text;
+
+    stopWords.forEach(word => {
+
+        cleanText =
+            cleanText.replaceAll(
+                word,
+                ""
+            );
+
+    });
+
+    const processedText =
+        cleanText.trim();
+
+    /* =====================================
        NHẬN DIỆN THỂ LOẠI
     ===================================== */
 
     let detectedGenre =
         allGenres.find(
             genre =>
-                text.includes(
+                processedText.includes(
                     genre
                 )
         );
@@ -89,7 +178,7 @@ const chatbotRules = (
             ([keyword, genre]) => {
 
                 if (
-                    text.includes(
+                    processedText.includes(
                         keyword
                     )
                 ) {
@@ -129,7 +218,7 @@ const chatbotRules = (
     ===================================== */
 
     if (
-        text.includes("dang chieu")
+        processedText.includes("dang chieu")
     ) {
 
         const showing =
@@ -159,7 +248,7 @@ const chatbotRules = (
     ===================================== */
 
     if (
-        text.includes("sap chieu")
+        processedText.includes("sap chieu")
     ) {
 
         const upcoming =
@@ -189,9 +278,9 @@ const chatbotRules = (
     ===================================== */
 
     if (
-        text.includes("khuyen mai")
+        processedText.includes("khuyen mai")
         ||
-        text.includes("giam gia")
+        processedText.includes("giam gia")
     ) {
 
         return {
@@ -246,6 +335,68 @@ const chatbotRules = (
         };
     }
 
+    /* =====================
+       TÌM PHIM THEO DIỄN VIÊN
+    ===================== */
+
+    if (isActorSearch) {
+
+        const actorMovies =
+            movies.filter(movie => {
+
+                const actors =
+                    normalizeText(
+                        movie.dienVien || ""
+                    );
+
+                return keywords.every(
+                    keyword =>
+                        actors.includes(keyword)
+                );
+
+            });
+
+        if (actorMovies.length > 0) {
+
+            return {
+                type: "movie_list",
+                title: `🎭 Tìm thấy ${actorMovies.length} phim`,
+                movies: actorMovies.slice(0, 5)
+            };
+        }
+    }
+
+    /* =====================
+        TÌM PHIM THEO ĐẠO DIỄN
+    ===================== */
+
+    if (isDirectorSearch) {
+
+        const directorMovies =
+            movies.filter(movie => {
+
+                const director =
+                    normalizeText(
+                        movie.daoDien || ""
+                    );
+
+                return keywords.every(
+                    keyword =>
+                        director.includes(keyword)
+                );
+
+            });
+
+        if (directorMovies.length > 0) {
+
+            return {
+                type: "movie_list",
+                title: `🎬 Phim của đạo diễn`,
+                movies: directorMovies.slice(0, 5)
+            };
+        }
+    }
+
     /* =====================================
        TÌM PHIM THEO TỪ KHÓA
     ===================================== */
@@ -292,12 +443,12 @@ const chatbotRules = (
                 );
 
             return (
-                text.includes(
+                processedText.includes(
                     movieName
                 )
                 ||
                 movieName.includes(
-                    text
+                    processedText
                 )
             );
         });
@@ -306,7 +457,7 @@ const chatbotRules = (
 
         foundMovie =
             findMovieByKeyword(
-                text,
+                processedText,
                 movies
             );
     }
@@ -324,7 +475,7 @@ const chatbotRules = (
     ===================================== */
 
     if (
-        text.includes("dat ve")
+        processedText.includes("dat ve")
     ) {
 
         return {
