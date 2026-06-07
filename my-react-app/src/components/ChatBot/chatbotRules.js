@@ -1,3 +1,5 @@
+import { normalizeText } from "./chatbotUtils";
+
 const chatbotRules = (
     message,
     movies,
@@ -5,7 +7,7 @@ const chatbotRules = (
 ) => {
 
     const text =
-        message.toLowerCase();
+        normalizeText(message);
 
     /* =====================
        PHIM ĐANG CHIẾU
@@ -93,12 +95,19 @@ const chatbotRules = (
     ===================== */
 
     const foundMovie =
-        movies.find(
-            movie =>
-                text.includes(
-                    movie.tieuDe.toLowerCase()
-                )
-        );
+        movies.find(movie => {
+
+            const movieName =
+                normalizeText(
+                    movie.tieuDe
+                );
+
+            return (
+                text.includes(movieName)
+                ||
+                movieName.includes(text)
+            );
+        });
 
     if (foundMovie) {
 
