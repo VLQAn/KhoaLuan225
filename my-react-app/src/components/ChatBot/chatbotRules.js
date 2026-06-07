@@ -9,40 +9,154 @@ const chatbotRules = (
     const text =
         normalizeText(message);
 
-    /* =====================
+    /* =====================================
+       DANH SÁCH THỂ LOẠI
+    ===================================== */
+
+    const allGenres = [];
+
+    movies.forEach(movie => {
+
+        movie.theLoai?.forEach(type => {
+
+            const genre =
+                normalizeText(
+                    type.tenTheLoai
+                );
+
+            if (
+                !allGenres.includes(
+                    genre
+                )
+            ) {
+                allGenres.push(
+                    genre
+                );
+            }
+
+        });
+
+    });
+
+    /* =====================================
+       TỪ KHÓA THỂ LOẠI THAY THẾ
+    ===================================== */
+
+    const genreAlias = {
+
+        "phim ma":
+            "kinh di",
+
+        "ma quy":
+            "kinh di",
+
+        "hai huoc":
+            "hai",
+
+        "tinh yeu":
+            "lang man",
+
+        "yeu duong":
+            "lang man",
+
+        "sieu nhan":
+            "sieu anh hung",
+
+        "xac song":
+            "zombie",
+
+        "vo":
+            "vo thuat"
+    };
+
+    /* =====================================
+       NHẬN DIỆN THỂ LOẠI
+    ===================================== */
+
+    let detectedGenre =
+        allGenres.find(
+            genre =>
+                text.includes(
+                    genre
+                )
+        );
+
+    if (!detectedGenre) {
+
+        Object.entries(
+            genreAlias
+        ).forEach(
+            ([keyword, genre]) => {
+
+                if (
+                    text.includes(
+                        keyword
+                    )
+                ) {
+                    detectedGenre =
+                        genre;
+                }
+
+            }
+        );
+    }
+
+    /* =====================================
+       DANH SÁCH PHIM THEO THỂ LOẠI
+    ===================================== */
+
+    const genreMovies =
+        detectedGenre
+            ? movies.filter(movie =>
+
+                movie.trangThai ===
+                "dang_chieu"
+
+                &&
+
+                movie.theLoai?.some(
+                    type =>
+
+                        normalizeText(
+                            type.tenTheLoai
+                        ) === detectedGenre
+                )
+            )
+            : [];
+
+    /* =====================================
        PHIM ĐANG CHIẾU
-    ===================== */
+    ===================================== */
 
     if (
-        text.includes("đang chiếu")
+        text.includes("dang chieu")
     ) {
 
         const showing =
             movies.filter(
-                m =>
-                    m.trangThai ===
+                movie =>
+                    movie.trangThai ===
                     "dang_chieu"
             );
 
-        if (showing.length === 0)
-            return {
-                type: "text",
-                text: "Hiện chưa có phim đang chiếu."
-            };
-
-        return (
-            "🎬 Phim đang chiếu:\n\n" +
-            showing
-                .map(
-                    m => `• ${m.tieuDe}`
-                )
-                .join("\n")
-        );
+        return {
+            type: "text",
+            text:
+                showing.length > 0
+                    ? "🎬 Phim đang chiếu:\n\n" +
+                    showing
+                        .map(
+                            movie =>
+                                `• ${movie.tieuDe}`
+                        )
+                        .join("\n")
+                    : "Hiện chưa có phim đang chiếu."
+        };
     }
 
-    /* =====================
+    /* =====================================
        PHIM SẮP CHIẾU
-    ===================== */
+    ===================================== */
 
     if (
         text.includes("sap chieu")
@@ -50,52 +164,91 @@ const chatbotRules = (
 
         const upcoming =
             movies.filter(
-                m =>
-                    m.trangThai ===
+                movie =>
+                    movie.trangThai ===
                     "sap_chieu"
             );
-
-        if (upcoming.length === 0)
-            return "Hiện chưa có phim sắp chiếu.";
 
         return {
             type: "text",
             text:
-                "🎥 Phim sắp chiếu:\n\n" +
-                upcoming
-                    .map(m => `• ${m.tieuDe}`)
-                    .join("\n")
+                upcoming.length > 0
+                    ? "🎥 Phim sắp chiếu:\n\n" +
+                    upcoming
+                        .map(
+                            movie =>
+                                `• ${movie.tieuDe}`
+                        )
+                        .join("\n")
+                    : "Hiện chưa có phim sắp chiếu."
         };
     }
 
-    /* =====================
+    /* =====================================
        KHUYẾN MÃI
-    ===================== */
+    ===================================== */
 
     if (
-        text.includes("khuyen mai") ||
+        text.includes("khuyen mai")
+        ||
         text.includes("giam gia")
     ) {
 
-        if (
-            promotions.length === 0
-        ) {
-            return "Hiện chưa có chương trình khuyến mãi.";
-        }
-
-        return (
-            "🎁 Khuyến mãi hiện có:\n\n" +
-            promotions
-                .map(
-                    p => `• ${p.tenKhuyenMai}`
-                )
-                .join("\n")
-        );
+        return {
+            type: "text",
+            text:
+                promotions.length > 0
+                    ? "🎁 Khuyến mãi hiện có:\n\n" +
+                    promotions
+                        .map(
+                            promo =>
+                                `• ${promo.tenKhuyenMai}`
+                        )
+                        .join("\n")
+                    : "Hiện chưa có chương trình khuyến mãi."
+        };
     }
 
-    /* =====================
-       HÀM TÌM THEO TỪ KHÓA
-    ===================== */
+    /* =====================================
+       TÌM PHIM THEO THỂ LOẠI
+       (ƯU TIÊN CAO)
+    ===================================== */
+
+    if (detectedGenre) {
+
+        if (
+            genreMovies.length === 0
+        ) {
+
+            return {
+                type: "text",
+                text:
+                    `Hiện chưa có phim ${detectedGenre} đang chiếu.`
+            };
+        }
+
+        return {
+
+            type: "movie_list",
+
+            title:
+                `🎬 ${detectedGenre.toUpperCase()} (${genreMovies.length} phim)`,
+
+            movies:
+                genreMovies
+                    .sort(
+                        (a, b) =>
+                            Number(b.danhGia || 0)
+                            -
+                            Number(a.danhGia || 0)
+                    )
+                    .slice(0, 5)
+        };
+    }
+
+    /* =====================================
+       TÌM PHIM THEO TỪ KHÓA
+    ===================================== */
 
     const findMovieByKeyword = (
         text,
@@ -113,17 +266,22 @@ const chatbotRules = (
                 );
 
             const matchedWords =
-                words.filter(word =>
-                    movieName.includes(word)
+                words.filter(
+                    word =>
+                        movieName.includes(
+                            word
+                        )
                 );
 
-            return matchedWords.length >= 2;
+            return (
+                matchedWords.length >= 2
+            );
         });
     };
 
-    /* =====================
+    /* =====================================
        TÌM PHIM THEO TÊN
-    ===================== */
+    ===================================== */
 
     let foundMovie =
         movies.find(movie => {
@@ -134,9 +292,13 @@ const chatbotRules = (
                 );
 
             return (
-                text.includes(movieName)
+                text.includes(
+                    movieName
+                )
                 ||
-                movieName.includes(text)
+                movieName.includes(
+                    text
+                )
             );
         });
 
@@ -157,34 +319,41 @@ const chatbotRules = (
         };
     }
 
-    /* =====================
-       ĐẶT VÉ
-    ===================== */
+    /* =====================================
+       HƯỚNG DẪN ĐẶT VÉ
+    ===================================== */
 
     if (
         text.includes("dat ve")
     ) {
 
-        return `
-Bạn có thể đặt vé theo các bước:
-
-1. Chọn phim
-2. Chọn suất chiếu
-3. Chọn ghế
-4. Thanh toán
-`;
+        return {
+            type: "text",
+            text:
+                "Bạn có thể đặt vé theo các bước:\n\n" +
+                "1. Chọn phim\n" +
+                "2. Chọn suất chiếu\n" +
+                "3. Chọn ghế\n" +
+                "4. Thanh toán"
+        };
     }
 
-    return `
-Xin lỗi, tôi chưa hiểu câu hỏi.
+    /* =====================================
+       MẶC ĐỊNH
+    ===================================== */
 
-Bạn có thể hỏi:
-
-• Phim đang chiếu
-• Phim sắp chiếu
-• Khuyến mãi
-• Tên phim bất kỳ
-`;
+    return {
+        type: "text",
+        text:
+            "Xin lỗi, tôi chưa hiểu câu hỏi.\n\n" +
+            "Bạn có thể hỏi:\n\n" +
+            "• Phim đang chiếu\n" +
+            "• Phim sắp chiếu\n" +
+            "• Khuyến mãi\n" +
+            "• Phim kinh dị\n" +
+            "• Phim hành động\n" +
+            "• Tên phim bất kỳ"
+    };
 };
 
 export default chatbotRules;

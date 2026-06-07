@@ -138,103 +138,157 @@ const ChatBot = () => {
                                 >
 
                                     {
-                                        msg.type === "movie"
-                                            ? (
-                                                <div className={s.movieCard}
-                                                    onClick={() => {
+                                        msg.type === "movie_list" ? (
 
-                                                        setOpen(false);
+                                            <div>
 
-                                                        navigate(
-                                                            `/movie/${msg.movie.maPhim}`
-                                                        );
+                                                <h4>{msg.title}</h4>
 
-                                                    }}>
+                                                {
+                                                    msg.movies.map(movie => (
 
-                                                    <img
-                                                        src={msg.movie.anhPoster}
-                                                        alt={msg.movie.tieuDe}
-                                                    />
+                                                        <div
+                                                            key={movie.maPhim}
+                                                            className={s.movieCard}
+                                                            onClick={() => {
 
-                                                    <h4>
-                                                        {msg.movie.tieuDe}
-                                                    </h4>
+                                                                setOpen(false);
 
-                                                    <p>
-                                                        🎭 Thể loại:
-                                                        {" "}
-                                                        {
-                                                            msg.movie.theLoai
-                                                                ?.map(
-                                                                    t => t.tenTheLoai
-                                                                )
-                                                                .join(", ")
-                                                        }
-                                                    </p>
+                                                                navigate(
+                                                                    `/movie/${movie.maPhim}`
+                                                                );
 
-                                                    <p>
-                                                        ⏱ {msg.movie.thoiLuong} phút
-                                                    </p>
+                                                            }}
+                                                        >
 
-                                                    <p>
-                                                        ⭐ {msg.movie.danhGia}
-                                                    </p>
+                                                            <img
+                                                                src={movie.anhPoster}
+                                                                alt={movie.tieuDe}
+                                                            />
 
-                                                    <p>
-                                                        🎬 Đạo diễn:
-                                                        {" "}
-                                                        {msg.movie.daoDien}
-                                                    </p>
+                                                            <h4>
+                                                                {movie.tieuDe}
+                                                            </h4>
 
-                                                    <p>
-                                                        🎭 Diễn viên:
-                                                        {" "}
-                                                        {
-                                                            msg.movie.dienVien?.length > 60
-                                                                ? msg.movie.dienVien.slice(0, 60) + "..."
-                                                                : msg.movie.dienVien
-                                                        }
-                                                    </p>
+                                                            <p>
+                                                                🎭 {
+                                                                    movie.theLoai
+                                                                        ?.map(
+                                                                            t => t.tenTheLoai
+                                                                        )
+                                                                        .join(", ")
+                                                                }
+                                                            </p>
 
-                                                    <p>
-                                                        📝
-                                                        {" "}
-                                                        {
-                                                            msg.movie.moTa?.length > 120
-                                                                ? msg.movie.moTa.slice(0, 120) + "..."
-                                                                : msg.movie.moTa
-                                                        }
-                                                    </p>
+                                                            <p>
+                                                                ⏱ {movie.thoiLuong} phút
+                                                            </p>
 
-                                                    <span className={s.viewDetail}>
-                                                        Xem chi tiết →
-                                                    </span>
+                                                        </div>
 
+                                                    ))
+                                                }
+
+                                            </div>
+
+                                        ) : msg.type === "movie" ? (
+
+                                            <div
+                                                className={s.movieCard}
+                                                onClick={() => {
+
+                                                    setOpen(false);
+
+                                                    navigate(
+                                                        `/movie/${msg.movie.maPhim}`
+                                                    );
+
+                                                }}
+                                            >
+
+                                                <img
+                                                    src={msg.movie.anhPoster}
+                                                    alt={msg.movie.tieuDe}
+                                                />
+
+                                                <h4>
+                                                    {msg.movie.tieuDe}
+                                                </h4>
+
+                                                <p>
+                                                    🎭 Thể loại: {" "}
                                                     {
-                                                        msg.movie.trangThai ===
-                                                        "dang_chieu" && (
-
-                                                            <button
-                                                                className={s.bookBtn}
-                                                                onClick={(e) => {
-
-                                                                    e.stopPropagation();
-
-                                                                    navigate(
-                                                                        `/showtime/${msg.movie.maPhim}`
-                                                                    );
-
-                                                                }}
-                                                            >
-                                                                Đặt vé ngay
-                                                            </button>
-
-                                                        )
+                                                        msg.movie.theLoai
+                                                            ?.map(
+                                                                t => t.tenTheLoai
+                                                            )
+                                                            .join(", ")
                                                     }
+                                                </p>
 
-                                                </div>
-                                            )
-                                            : msg.text
+                                                <p>
+                                                    ⏱ {msg.movie.thoiLuong} phút
+                                                </p>
+
+                                                <p>
+                                                    ⭐ {msg.movie.danhGia}
+                                                </p>
+
+                                                <p>
+                                                    🎬 Đạo diễn: {" "}
+                                                    {msg.movie.daoDien}
+                                                </p>
+
+                                                <p>
+                                                    🎭 Diễn viên: {" "}
+                                                    {
+                                                        msg.movie.dienVien?.length > 60
+                                                            ? msg.movie.dienVien.slice(0, 60) + "..."
+                                                            : msg.movie.dienVien
+                                                    }
+                                                </p>
+
+                                                <p>
+                                                    📝 {" "}
+                                                    {
+                                                        msg.movie.moTa?.length > 120
+                                                            ? msg.movie.moTa.slice(0, 120) + "..."
+                                                            : msg.movie.moTa
+                                                    }
+                                                </p>
+
+                                                <span className={s.viewDetail}>
+                                                    Xem chi tiết →
+                                                </span>
+
+                                                {
+                                                    msg.movie.trangThai === "dang_chieu" && (
+
+                                                        <button
+                                                            className={s.bookBtn}
+                                                            onClick={(e) => {
+
+                                                                e.stopPropagation();
+
+                                                                navigate(
+                                                                    `/showtime/${msg.movie.maPhim}`
+                                                                );
+
+                                                            }}
+                                                        >
+                                                            Đặt vé ngay
+                                                        </button>
+
+                                                    )
+                                                }
+
+                                            </div>
+
+                                        ) : (
+
+                                            msg.text
+
+                                        )
                                     }
 
                                 </div>
