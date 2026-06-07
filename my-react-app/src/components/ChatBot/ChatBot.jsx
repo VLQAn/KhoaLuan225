@@ -84,13 +84,16 @@ const ChatBot = () => {
             text: input
         };
 
-        const botMessage = {
-            sender: "bot",
-            text: chatbotRules(
+        const botResponse =
+            chatbotRules(
                 input,
                 movies,
                 promotions
-            )
+            );
+
+        const botMessage = {
+            sender: "bot",
+            ...botResponse
         };
 
         setMessages(prev => [
@@ -121,22 +124,73 @@ const ChatBot = () => {
 
                         <div className={s.messages}>
 
-                            {
-                                messages.map((msg, index) => (
+                            {messages.map((msg, index) => (
 
-                                    <div
-                                        key={index}
-                                        className={
-                                            msg.sender === "user"
-                                                ? s.user
-                                                : s.bot
-                                        }
-                                    >
-                                        {msg.text}
-                                    </div>
+                                <div
+                                    key={index}
+                                    className={
+                                        msg.sender === "user"
+                                            ? s.user
+                                            : s.bot
+                                    }
+                                >
 
-                                ))
-                            }
+                                    {
+                                        msg.type === "movie"
+                                            ? (
+                                                <div className={s.movieCard}>
+
+                                                    <img
+                                                        src={msg.movie.anhPoster}
+                                                        alt={msg.movie.tieuDe}
+                                                    />
+
+                                                    <h4>
+                                                        {msg.movie.tieuDe}
+                                                    </h4>
+
+                                                    <p>
+                                                        ⏱ {msg.movie.thoiLuong} phút
+                                                    </p>
+
+                                                    <p>
+                                                        ⭐ {msg.movie.danhGia}
+                                                    </p>
+
+                                                    <p>
+                                                        🎬 Đạo diễn:
+                                                        {" "}
+                                                        {msg.movie.daoDien}
+                                                    </p>
+
+                                                    <p>
+                                                        🎭 Diễn viên:
+                                                        {" "}
+                                                        {
+                                                            msg.movie.dienVien?.length > 60
+                                                                ? msg.movie.dienVien.slice(0, 60) + "..."
+                                                                : msg.movie.dienVien
+                                                        }
+                                                    </p>
+
+                                                    <p>
+                                                        📝
+                                                        {" "}
+                                                        {
+                                                            msg.movie.moTa?.length > 120
+                                                                ? msg.movie.moTa.slice(0, 120) + "..."
+                                                                : msg.movie.moTa
+                                                        }
+                                                    </p>
+
+                                                </div>
+                                            )
+                                            : msg.text
+                                    }
+
+                                </div>
+
+                            ))}
 
                         </div>
 

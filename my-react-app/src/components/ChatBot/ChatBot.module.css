@@ -119,3 +119,25 @@
 
     cursor: pointer;
 }
+
+.movieCard {
+    width: 100%;
+}
+
+.movieCard img {
+    width: 100%;
+    height: 220px;
+
+    object-fit: cover;
+
+    border-radius: 10px;
+}
+
+.movieCard h4 {
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.movieCard p {
+    margin: 4px 0;
+}

@@ -25,7 +25,10 @@ const chatbotRules = (
             );
 
         if (showing.length === 0)
-            return "Hiện chưa có phim đang chiếu.";
+            return {
+                type: "text",
+                text: "Hiện chưa có phim đang chiếu."
+            };
 
         return (
             "🎬 Phim đang chiếu:\n\n" +
@@ -55,14 +58,14 @@ const chatbotRules = (
         if (upcoming.length === 0)
             return "Hiện chưa có phim sắp chiếu.";
 
-        return (
-            "🎥 Phim sắp chiếu:\n\n" +
-            upcoming
-                .map(
-                    m => `• ${m.tieuDe}`
-                )
-                .join("\n")
-        );
+        return {
+            type: "text",
+            text:
+                "🎥 Phim sắp chiếu:\n\n" +
+                upcoming
+                    .map(m => `• ${m.tieuDe}`)
+                    .join("\n")
+        };
     }
 
     /* =====================
@@ -145,24 +148,13 @@ const chatbotRules = (
                 movies
             );
     }
-    
+
     if (foundMovie) {
 
-        return `
-🎬 ${foundMovie.tieuDe}
-
-⏱ ${foundMovie.thoiLuong} phút
-
-🎭 ${foundMovie.theLoai
-                ?.map(
-                    t => t.tenTheLoai
-                )
-                .join(", ")}
-
-🎬 Đạo diễn: ${foundMovie.daoDien}
-
-⭐ Đánh giá: ${foundMovie.danhGia}
-`;
+        return {
+            type: "movie",
+            movie: foundMovie
+        };
     }
 
     /* =====================
