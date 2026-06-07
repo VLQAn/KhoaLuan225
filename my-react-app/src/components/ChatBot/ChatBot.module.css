@@ -28,7 +28,7 @@
     right: 30px;
     bottom: 110px;
 
-    width: 360px;
+    width: 620px;
     height: 500px;
 
     background: white;
@@ -134,10 +134,12 @@
 }
 
 .movieCard h4 {
-    margin-top: 10px;
-    margin-bottom: 5px;
+    margin: 10px 0;
+    font-size: 20px;
 }
 
 .movieCard p {
-    margin: 4px 0;
+    margin: 6px 0;
+    font-size: 16px;
+    line-height: 1.5;
 }

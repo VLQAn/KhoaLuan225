@@ -150,6 +150,18 @@ const ChatBot = () => {
                                                     </h4>
 
                                                     <p>
+                                                        🎭 Thể loại:
+                                                        {" "}
+                                                        {
+                                                            msg.movie.theLoai
+                                                                ?.map(
+                                                                    t => t.tenTheLoai
+                                                                )
+                                                                .join(", ")
+                                                        }
+                                                    </p>
+
+                                                    <p>
                                                         ⏱ {msg.movie.thoiLuong} phút
                                                     </p>
 
