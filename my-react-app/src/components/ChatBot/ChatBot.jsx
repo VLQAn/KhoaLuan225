@@ -2,12 +2,17 @@ import { useState, useEffect } from "react";
 import { FaComments, FaPaperPlane } from "react-icons/fa";
 import styles from "./ChatBot.module.css";
 import chatbotRules from "./chatbotRules";
+import movieApi from "../../services/movieApi";
+import khuyenMaiApi from "../../services/khuyenMaiApi";
 
 const s = styles;
 
 const ChatBot = () => {
 
     const [open, setOpen] = useState(false);
+
+    const [movies, setMovies] = useState([]);
+    const [promotions, setPromotions] = useState([]);
 
     const [messages, setMessages] = useState([
         {
@@ -38,6 +43,38 @@ const ChatBot = () => {
 
     }, [messages]);
 
+    useEffect(() => {
+
+        const loadData = async () => {
+
+            try {
+
+                const movieRes =
+                    await movieApi.getAllMovies();
+
+                const promoRes =
+                    await khuyenMaiApi.getAll();
+
+                setMovies(
+                    movieRes?.data?.data || []
+                );
+
+                setPromotions(
+                    promoRes?.data?.data || []
+                );
+
+            } catch (err) {
+
+                console.log(err);
+
+            }
+
+        };
+
+        loadData();
+
+    }, []);
+
     const handleSend = () => {
 
         if (!input.trim()) return;
@@ -49,7 +86,11 @@ const ChatBot = () => {
 
         const botMessage = {
             sender: "bot",
-            text: chatbotRules(input)
+            text: chatbotRules(
+                input,
+                movies,
+                promotions
+            )
         };
 
         setMessages(prev => [

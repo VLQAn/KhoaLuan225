@@ -1,39 +1,152 @@
-const chatbotRules = (message) => {
-    const text = message.toLowerCase();
+const chatbotRules = (
+    message,
+    movies,
+    promotions
+) => {
+
+    const text =
+        message.toLowerCase();
+
+    /* =====================
+       PHIM ĐANG CHIẾU
+    ===================== */
 
     if (
-        text.includes("phim") &&
         text.includes("đang chiếu")
     ) {
-        return "Bạn có thể xem danh sách phim đang chiếu tại mục Phim.";
+
+        const showing =
+            movies.filter(
+                m =>
+                    m.trangThai ===
+                    "dang_chieu"
+            );
+
+        if (showing.length === 0)
+            return "Hiện chưa có phim đang chiếu.";
+
+        return (
+            "🎬 Phim đang chiếu:\n\n" +
+            showing
+                .map(
+                    m => `• ${m.tieuDe}`
+                )
+                .join("\n")
+        );
     }
+
+    /* =====================
+       PHIM SẮP CHIẾU
+    ===================== */
+
+    if (
+        text.includes("sắp chiếu")
+    ) {
+
+        const upcoming =
+            movies.filter(
+                m =>
+                    m.trangThai ===
+                    "sap_chieu"
+            );
+
+        if (upcoming.length === 0)
+            return "Hiện chưa có phim sắp chiếu.";
+
+        return (
+            "🎥 Phim sắp chiếu:\n\n" +
+            upcoming
+                .map(
+                    m => `• ${m.tieuDe}`
+                )
+                .join("\n")
+        );
+    }
+
+    /* =====================
+       KHUYẾN MÃI
+    ===================== */
 
     if (
         text.includes("khuyến mãi") ||
         text.includes("giảm giá")
     ) {
-        return "Bạn có thể xem các chương trình khuyến mãi tại mục Khuyến Mãi.";
+
+        if (
+            promotions.length === 0
+        ) {
+            return "Hiện chưa có chương trình khuyến mãi.";
+        }
+
+        return (
+            "🎁 Khuyến mãi hiện có:\n\n" +
+            promotions
+                .map(
+                    p => `• ${p.tenKhuyenMai}`
+                )
+                .join("\n")
+        );
     }
+
+    /* =====================
+       TÌM PHIM THEO TÊN
+    ===================== */
+
+    const foundMovie =
+        movies.find(
+            movie =>
+                text.includes(
+                    movie.tieuDe.toLowerCase()
+                )
+        );
+
+    if (foundMovie) {
+
+        return `
+🎬 ${foundMovie.tieuDe}
+
+⏱ ${foundMovie.thoiLuong} phút
+
+🎭 ${foundMovie.theLoai
+                ?.map(
+                    t => t.tenTheLoai
+                )
+                .join(", ")}
+
+🎬 Đạo diễn: ${foundMovie.daoDien}
+
+⭐ Đánh giá: ${foundMovie.danhGia}
+`;
+    }
+
+    /* =====================
+       ĐẶT VÉ
+    ===================== */
 
     if (
         text.includes("đặt vé")
     ) {
-        return "Để đặt vé, hãy chọn phim → suất chiếu → ghế ngồi → thanh toán.";
+
+        return `
+Bạn có thể đặt vé theo các bước:
+
+1. Chọn phim
+2. Chọn suất chiếu
+3. Chọn ghế
+4. Thanh toán
+`;
     }
 
-    if (
-        text.includes("liên hệ")
-    ) {
-        return "Bạn có thể liên hệ RACSO qua email hoặc số điện thoại ở cuối trang.";
-    }
+    return `
+Xin lỗi, tôi chưa hiểu câu hỏi.
 
-    if (
-        text.includes("mở cửa")
-    ) {
-        return "Rạp mở cửa từ 8:00 đến 23:00 mỗi ngày.";
-    }
+Bạn có thể hỏi:
 
-    return "Xin lỗi, tôi chưa hiểu câu hỏi của bạn. Bạn có thể hỏi về phim, khuyến mãi hoặc cách đặt vé.";
+• Phim đang chiếu
+• Phim sắp chiếu
+• Khuyến mãi
+• Tên phim bất kỳ
+`;
 };
 
 export default chatbotRules;

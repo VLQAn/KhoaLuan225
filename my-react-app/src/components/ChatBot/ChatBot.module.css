@@ -76,6 +76,8 @@
     border-radius: 12px;
 
     max-width: 80%;
+
+    white-space: pre-line;
 }
 
 .user {
@@ -90,6 +92,8 @@
     max-width: 80%;
 
     margin-left: auto;
+
+    white-space: pre-line;
 }
 
 .inputArea {
