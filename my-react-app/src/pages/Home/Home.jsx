@@ -1,7 +1,7 @@
 import styles from "./Home.module.css";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { FaTwitter, FaFacebook, FaInstagram, FaSearch, FaGoogle, FaStar, FaPlay } from "react-icons/fa";
+import { FaTwitter, FaFacebook, FaInstagram, FaSearch, FaGoogle, FaStar, FaPlay, FaComments } from "react-icons/fa";
 
 import icon1 from "../../assets/cast_crew.png";
 import icon2 from "../../assets/award.png";
@@ -10,24 +10,40 @@ import icon4 from "../../assets/more.png";
 
 const icons = [icon1, icon2, icon3, icon4];
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import movieApi from "../../services/movieApi";
 
 const s = styles;
 
 const Home = () => {
-  const [showSearch, setShowSearch] = useState(false);
-  const [searchText, setSearchText] = useState("");
+  /* =========================
+   NAVIGATION
+========================= */
   const navigate = useNavigate();
 
+  /* =========================
+   SEARCH
+========================= */
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchText, setSearchText] = useState("");
+
+  /* =========================
+   MOVIES
+========================= */
   const [allMovies, setAllMovies] = useState([]);
   const [bannerMovies, setBannerMovies] = useState([]);
   const [currentBanner, setCurrentBanner] = useState(0);
 
+  /* =========================
+ COMPUTED DATA
+========================= */
   const featuredMovie =
     bannerMovies.length > 0
       ? bannerMovies[0]
       : null;
+
+  const currentMovie =
+    bannerMovies[currentBanner] || {};
 
   const relatedMovies =
     allMovies
@@ -41,6 +57,9 @@ const Home = () => {
     localStorage.getItem("user")
   );
 
+  /* =========================
+   LOAD MOVIES
+========================= */
   useEffect(() => {
 
     const loadMovies = async () => {
@@ -83,6 +102,9 @@ const Home = () => {
 
   }, []);
 
+  /* =========================
+   AUTO BANNER SLIDE
+========================= */
   useEffect(() => {
 
     if (bannerMovies.length === 0)
@@ -103,9 +125,6 @@ const Home = () => {
       clearInterval(timer);
 
   }, [bannerMovies]);
-
-  const currentMovie =
-    bannerMovies[currentBanner] || {};
 
   if (bannerMovies.length === 0) {
     return (
