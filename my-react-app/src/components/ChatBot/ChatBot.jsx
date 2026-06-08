@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FaComments, FaPaperPlane } from "react-icons/fa";
 import styles from "./ChatBot.module.css";
 import chatbotRules from "./chatbotRules";
@@ -10,6 +10,8 @@ const s = styles;
 
 const ChatBot = () => {
     const navigate = useNavigate();
+
+    const messagesEndRef = useRef(null);
 
     const [open, setOpen] = useState(false);
 
@@ -76,6 +78,14 @@ const ChatBot = () => {
         loadData();
 
     }, []);
+
+    useEffect(() => {
+
+        messagesEndRef.current?.scrollIntoView({
+            behavior: "smooth"
+        });
+
+    }, [messages]);
 
     const handleSend = () => {
 
@@ -294,6 +304,7 @@ const ChatBot = () => {
                                 </div>
 
                             ))}
+                            <div ref={messagesEndRef} />
 
                         </div>
 
