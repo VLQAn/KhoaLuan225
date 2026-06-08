@@ -175,6 +175,46 @@ const chatbotRules = (
         );
 
     /* =====================================
+NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
+===================================== */
+
+    const bookingKeywords = [
+        "dat ve",
+        "mua ve",
+        "book ve",
+        "dat cho",
+        "giu cho"
+    ];
+
+    const isBookingIntent =
+        bookingKeywords.some(
+            keyword =>
+                processedText.includes(
+                    keyword
+                )
+        );
+
+    const detectMovieInMessage = (
+        text,
+        movies
+    ) => {
+
+        return movies.find(movie => {
+
+            const movieName =
+                normalizeText(
+                    movie.tieuDe
+                );
+
+            return (
+                text.includes(
+                    movieName
+                )
+            );
+        });
+    };
+
+    /* =====================================
         NHẬN DIỆN NĂM PHÁT HÀNH
     ===================================== */
 
@@ -580,6 +620,42 @@ const chatbotRules = (
             );
         });
     };
+
+    /* =====================================
+   Ý ĐỊNH ĐẶT VÉ
+===================================== */
+
+    if (isBookingIntent) {
+
+        const detectedMovie =
+            detectMovieInMessage(
+                processedText,
+                movies
+            );
+
+        // CASE 1
+        // Có tên phim
+
+        if (detectedMovie) {
+
+            return {
+                type: "booking_intent",
+                movie: detectedMovie,
+                text:
+                    `🎟️ Bạn muốn đặt vé phim "${detectedMovie.tieuDe}" phải không?`
+            };
+        }
+
+        // CASE 2
+        // Chưa có tên phim
+
+        return {
+            type: "booking_intent",
+            movie: null,
+            text:
+                "🎟️ Bạn muốn đặt vé phim nào?"
+        };
+    }
 
     /* =====================================
        TÌM PHIM THEO TÊN
