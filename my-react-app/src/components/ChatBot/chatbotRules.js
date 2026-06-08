@@ -159,6 +159,20 @@ const chatbotRules = (
         cleanText.trim();
 
     /* =====================================
+        NHẬN DIỆN NĂM PHÁT HÀNH
+    ===================================== */
+
+    const yearMatch =
+        processedText.match(
+            /\b(19|20)\d{2}\b/
+        );
+
+    const detectedYear =
+        yearMatch
+            ? Number(yearMatch[0])
+            : null;
+
+    /* =====================================
        NHẬN DIỆN THỂ LOẠI
     ===================================== */
 
@@ -295,6 +309,44 @@ const chatbotRules = (
                         )
                         .join("\n")
                     : "Hiện chưa có chương trình khuyến mãi."
+        };
+    }
+
+    /* =====================================
+   TÌM PHIM THEO NĂM PHÁT HÀNH
+===================================== */
+
+    if (detectedYear) {
+
+        const moviesByYear =
+            movies.filter(movie => {
+
+                if (!movie.ngayCongChieu)
+                    return false;
+
+                const year =
+                    new Date(
+                        movie.ngayCongChieu
+                    ).getFullYear();
+
+                return year === detectedYear;
+            });
+
+        if (moviesByYear.length > 0) {
+
+            return {
+                type: "movie_list",
+                title:
+                    `📅 Phim năm ${detectedYear}`,
+                movies:
+                    moviesByYear.slice(0, 10)
+            };
+        }
+
+        return {
+            type: "text",
+            text:
+                `Không tìm thấy phim phát hành năm ${detectedYear}.`
         };
     }
 
