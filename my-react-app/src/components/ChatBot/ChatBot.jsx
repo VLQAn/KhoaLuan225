@@ -13,6 +13,9 @@ const ChatBot = () => {
 
     const messagesEndRef = useRef(null);
 
+    const [chatContext, setChatContext] =
+        useState(null);
+
     const [open, setOpen] = useState(false);
 
     const [movies, setMovies] = useState([]);
@@ -100,8 +103,32 @@ const ChatBot = () => {
             chatbotRules(
                 input,
                 movies,
-                promotions
+                promotions,
+                chatContext
             );
+
+        if (
+            botResponse.type ===
+            "booking_start"
+        ) {
+
+            setChatContext({
+                intent: "BOOKING"
+            });
+
+        }
+
+        if (
+            botResponse.type ===
+            "booking_movie"
+        ) {
+
+            setChatContext({
+                intent: "BOOKING",
+                movie: botResponse.movie
+            });
+
+        }
 
         const botMessage = {
             sender: "bot",

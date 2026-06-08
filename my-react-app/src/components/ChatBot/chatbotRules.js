@@ -3,11 +3,47 @@ import { normalizeText } from "./chatbotUtils";
 const chatbotRules = (
     message,
     movies,
-    promotions
+    promotions,
+    chatContext
 ) => {
 
     const text =
         normalizeText(message);
+    /* =====================================
+   CONTEXT ĐẶT VÉ
+===================================== */
+
+    if (
+        chatContext?.intent ===
+        "BOOKING"
+    ) {
+
+        const movie =
+            movies.find(movie => {
+
+                const movieName =
+                    normalizeText(
+                        movie.tieuDe
+                    );
+
+                return text.includes(
+                    movieName
+                );
+            });
+
+        if (movie) {
+
+            return {
+
+                type: "booking_movie",
+
+                movie,
+
+                text:
+                    `🎟️ Bạn muốn xem suất chiếu nào của "${movie.tieuDe}"?`
+            };
+        }
+    }
 
     const isActorSearch =
         text.includes("dien vien")
@@ -639,10 +675,13 @@ NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
         if (detectedMovie) {
 
             return {
-                type: "booking_intent",
+
+                type: "booking_movie",
+
                 movie: detectedMovie,
+
                 text:
-                    `🎟️ Bạn muốn đặt vé phim "${detectedMovie.tieuDe}" phải không?`
+                    `🎟️ Bạn muốn xem suất chiếu nào của "${detectedMovie.tieuDe}"?`
             };
         }
 
