@@ -158,6 +158,22 @@ const chatbotRules = (
     const processedText =
         cleanText.trim();
 
+    const suggestionKeywords = [
+        "goi y",
+        "de xuat",
+        "recommend",
+        "hay",
+        "nen xem"
+    ];
+
+    const isSuggestion =
+        suggestionKeywords.some(
+            keyword =>
+                processedText.includes(
+                    keyword
+                )
+        );
+
     /* =====================================
         NHẬN DIỆN NĂM PHÁT HÀNH
     ===================================== */
@@ -347,6 +363,89 @@ const chatbotRules = (
             type: "text",
             text:
                 `Không tìm thấy phim phát hành năm ${detectedYear}.`
+        };
+    }
+
+    /* =====================================
+   GỢI Ý PHIM
+===================================== */
+
+    if (
+        isSuggestion &&
+        detectedGenre
+    ) {
+
+        const suggestedMovies =
+            movies
+                .filter(movie =>
+
+                    movie.trangThai ===
+                    "dang_chieu"
+
+                    &&
+
+                    movie.theLoai?.some(
+                        type =>
+
+                            normalizeText(
+                                type.tenTheLoai
+                            ) === detectedGenre
+                    )
+                )
+                .sort(
+                    (a, b) =>
+                        Number(b.danhGia || 0)
+                        -
+                        Number(a.danhGia || 0)
+                );
+
+        if (
+            suggestedMovies.length > 0
+        ) {
+
+            return {
+                type: "movie_list",
+
+                title:
+                    `⭐ Gợi ý phim ${detectedGenre}`,
+
+                movies:
+                    suggestedMovies.slice(
+                        0,
+                        5
+                    )
+            };
+        }
+    }
+
+    if (
+        isSuggestion &&
+        !detectedGenre
+    ) {
+
+        const bestMovies =
+            movies
+                .filter(
+                    movie =>
+                        movie.trangThai ===
+                        "dang_chieu"
+                )
+                .sort(
+                    (a, b) =>
+                        Number(b.danhGia || 0)
+                        -
+                        Number(a.danhGia || 0)
+                );
+
+        return {
+            type: "movie_list",
+            title:
+                "⭐ Phim được đề xuất",
+            movies:
+                bestMovies.slice(
+                    0,
+                    5
+                )
         };
     }
 
