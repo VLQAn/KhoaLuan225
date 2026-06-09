@@ -5,16 +5,17 @@ import chatbotRules from "./chatbotRules";
 import movieApi from "../../services/movieApi";
 import khuyenMaiApi from "../../services/khuyenMaiApi";
 import { useNavigate } from "react-router-dom";
+import xuatChieuApi from "../../services/xuatChieuApi";
 
 const s = styles;
 
 const ChatBot = () => {
     const navigate = useNavigate();
 
-    const messagesEndRef = useRef(null);
+    const [showtimes, setShowtimes] =
+        useState([]);
 
-    const [chatContext, setChatContext] =
-        useState(null);
+    const messagesEndRef = useRef(null);
 
     const [open, setOpen] = useState(false);
 
@@ -55,6 +56,12 @@ const ChatBot = () => {
         const loadData = async () => {
 
             try {
+                const showtimeRes =
+                    await xuatChieuApi.getAvailable();
+
+                console.log("SHOWTIMES", showtimeRes);
+
+                setShowtimes(showtimeRes || []);
 
                 const movieRes =
                     await movieApi.getAllMovies();
@@ -104,31 +111,10 @@ const ChatBot = () => {
                 input,
                 movies,
                 promotions,
-                chatContext
+                showtimes,
             );
 
-        if (
-            botResponse.type ===
-            "booking_start"
-        ) {
-
-            setChatContext({
-                intent: "BOOKING"
-            });
-
-        }
-
-        if (
-            botResponse.type ===
-            "booking_movie"
-        ) {
-
-            setChatContext({
-                intent: "BOOKING",
-                movie: botResponse.movie
-            });
-
-        }
+        console.log("BOT RESPONSE", botResponse);
 
         const botMessage = {
             sender: "bot",
@@ -173,9 +159,39 @@ const ChatBot = () => {
                                             : s.bot
                                     }
                                 >
-
                                     {
-                                        msg.type === "movie_list" ? (
+                                        msg.type === "showtime_list" ? (
+
+                                            <div>
+
+                                                <h4>
+                                                    {msg.text}
+                                                </h4>
+
+                                                <div className={s.showtimeList}>
+
+                                                    {
+                                                        msg.showtimes.map(showtime => (
+
+                                                            <button
+                                                                key={showtime.maXuatChieu}
+                                                                className={s.showtimeBtn}
+                                                            >
+                                                                {
+                                                                    new Date(
+                                                                        showtime.thoiGianBatDau
+                                                                    ).toLocaleString("vi-VN")
+                                                                }
+                                                            </button>
+
+                                                        ))
+                                                    }
+
+                                                </div>
+
+                                            </div>
+
+                                        ) : msg.type === "movie_list" ? (
 
                                             <div>
 

@@ -4,46 +4,11 @@ const chatbotRules = (
     message,
     movies,
     promotions,
-    chatContext
+    showtimes,
 ) => {
 
     const text =
         normalizeText(message);
-    /* =====================================
-   CONTEXT ĐẶT VÉ
-===================================== */
-
-    if (
-        chatContext?.intent ===
-        "BOOKING"
-    ) {
-
-        const movie =
-            movies.find(movie => {
-
-                const movieName =
-                    normalizeText(
-                        movie.tieuDe
-                    );
-
-                return text.includes(
-                    movieName
-                );
-            });
-
-        if (movie) {
-
-            return {
-
-                type: "booking_movie",
-
-                movie,
-
-                text:
-                    `🎟️ Bạn muốn xem suất chiếu nào của "${movie.tieuDe}"?`
-            };
-        }
-    }
 
     const isActorSearch =
         text.includes("dien vien")
@@ -147,6 +112,10 @@ const chatbotRules = (
        TỪ KHÓA CÓ THỂ BỎ QUA
     ===================================== */
     const stopWords = [
+        "thong",
+        "tin",
+        "chi",
+        "tiet",
         "toi",
         "muon",
         "xem",
@@ -230,24 +199,59 @@ NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
                 )
         );
 
-    const detectMovieInMessage = (
+    const findBestMovieMatch = (
         text,
         movies
     ) => {
 
-        return movies.find(movie => {
+        const words =
+            text.split(" ");
+
+        let bestMovie = null;
+        let bestScore = 0;
+
+        movies.forEach(movie => {
 
             const movieName =
                 normalizeText(
                     movie.tieuDe
                 );
 
-            return (
-                text.includes(
-                    movieName
-                )
-            );
+            const score =
+                words.filter(
+                    word =>
+                        movieName.includes(
+                            word
+                        )
+                ).length;
+
+            if (score > bestScore) {
+
+                bestScore = score;
+                bestMovie = movie;
+
+            }
+
         });
+
+        return bestScore >= Math.min(
+            2,
+            words.length
+        )
+            ? bestMovie
+            : null;
+    };
+
+    const detectMovieInMessage = (
+        text,
+        movies
+    ) => {
+
+        return findBestMovieMatch(
+            text,
+            movies
+        );
+
     };
 
     /* =====================================
@@ -662,39 +666,79 @@ NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
 ===================================== */
 
     if (isBookingIntent) {
+        const movieQuery =
+            processedText
+                .replace("dat ve", "")
+                .replace("mua ve", "")
+                .replace("book ve", "")
+                .replace("dat cho", "")
+                .replace("giu cho", "")
+                .trim();
+
+        if (!movieQuery) {
+
+            return {
+                type: "booking_intent",
+                text:
+                    "🎟️ Bạn muốn đặt vé phim nào?"
+            };
+
+        }
 
         const detectedMovie =
-            detectMovieInMessage(
-                processedText,
+            findBestMovieMatch(
+                movieQuery,
                 movies
             );
 
-        // CASE 1
-        // Có tên phim
+        console.log(
+            "BOOKING MOVIE:",
+            detectedMovie?.tieuDe
+        );
 
         if (detectedMovie) {
 
+            const movieShowtimes =
+                showtimes.filter(
+                    showtime =>
+                        showtime.maPhim ===
+                        detectedMovie.maPhim
+                );
+
+            console.log(
+                "BOOKING SHOWTIMES:",
+                movieShowtimes
+            );
+
+            if (movieShowtimes.length > 0) {
+
+                return {
+                    type: "showtime_list",
+                    movie: detectedMovie,
+                    showtimes: movieShowtimes,
+                    text:
+                        `🎟️ Các suất chiếu của "${detectedMovie.tieuDe}"`
+                };
+            }
+
             return {
-
-                type: "booking_movie",
-
-                movie: detectedMovie,
-
+                type: "text",
                 text:
-                    `🎟️ Bạn muốn xem suất chiếu nào của "${detectedMovie.tieuDe}"?`
+                    `🎬 "${detectedMovie.tieuDe}" hiện chưa có suất chiếu.`
             };
         }
 
-        // CASE 2
-        // Chưa có tên phim
-
         return {
             type: "booking_intent",
-            movie: null,
             text:
                 "🎟️ Bạn muốn đặt vé phim nào?"
         };
     }
+
+    const isMovieInfoIntent =
+        text.includes("thong tin")
+        ||
+        text.includes("chi tiet");
 
     /* =====================================
        TÌM PHIM THEO TÊN
@@ -722,13 +766,55 @@ NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
     if (!foundMovie) {
 
         foundMovie =
-            findMovieByKeyword(
+            findBestMovieMatch(
                 processedText,
                 movies
             );
     }
 
+    console.log(
+        "PROCESSED TEXT:",
+        processedText
+    );
+
+    console.log(
+        "FOUND MOVIE:",
+        foundMovie?.tieuDe
+    );
+
     if (foundMovie) {
+
+        // Người dùng hỏi thông tin phim
+
+        if (isMovieInfoIntent) {
+
+            return {
+                type: "movie",
+                movie: foundMovie
+            };
+        }
+
+        const movieShowtimes =
+            showtimes.filter(
+                showtime =>
+                    showtime.maPhim ===
+                    foundMovie.maPhim
+            );
+
+        if (movieShowtimes.length > 0) {
+
+            return {
+
+                type: "showtime_list",
+
+                movie: foundMovie,
+
+                showtimes: movieShowtimes,
+
+                text:
+                    `🎟️ Các suất chiếu của "${foundMovie.tieuDe}"`
+            };
+        }
 
         return {
             type: "movie",
