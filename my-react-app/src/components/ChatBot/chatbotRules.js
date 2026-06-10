@@ -112,10 +112,8 @@ const chatbotRules = (
        TỪ KHÓA CÓ THỂ BỎ QUA
     ===================================== */
     const stopWords = [
-        "thong",
-        "tin",
-        "chi",
-        "tiet",
+        "thong tin",
+        "chi tiet",
         "toi",
         "muon",
         "xem",
@@ -203,9 +201,39 @@ NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
         text,
         movies
     ) => {
-
         const words =
-            text.split(" ");
+            text
+                .split(" ")
+                .filter(
+                    word =>
+                        word.length > 2
+                        &&
+                        ![
+                            "phim",
+                            "rap",
+                            "galaxy",
+                            "cgv",
+                            "lotte",
+                            "beta",
+                            "xuat",
+                            "chieu",
+                            "thong",
+                            "tin",
+                            "chi",
+                            "tiet",
+                            "hom",
+                            "nay",
+                            "ngay",
+                            "mai",
+                            "o",
+                            "cac",
+                            "nhung",
+                            "suat",
+                            "xuat",
+                            "lich",
+                            "tai"
+                        ].includes(word)
+                );
 
         let bestMovie = null;
         let bestScore = 0;
@@ -225,6 +253,11 @@ NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
                         )
                 ).length;
 
+            console.log(
+                movie.tieuDe,
+                score
+            );
+
             if (score > bestScore) {
 
                 bestScore = score;
@@ -234,10 +267,7 @@ NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
 
         });
 
-        return bestScore >= Math.min(
-            2,
-            words.length
-        )
+        return bestScore >= 1
             ? bestMovie
             : null;
     };
@@ -267,6 +297,86 @@ NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
         yearMatch
             ? Number(yearMatch[0])
             : null;
+
+    const detectDate = (text) => {
+
+        const today = new Date();
+
+        if (text.includes("hom nay")) {
+            return today;
+        }
+
+        if (text.includes("ngay mai")) {
+
+            const tomorrow =
+                new Date(today);
+
+            tomorrow.setDate(
+                today.getDate() + 1
+            );
+
+            return tomorrow;
+        }
+
+        return null;
+    };
+
+    const originalText = text;
+
+    const detectedDate =
+        detectDate(originalText);
+
+    /* =====================================
+   NHẬN DIỆN RẠP CHIẾU
+===================================== */
+    const allCinemas = [];
+
+    showtimes.forEach(showtime => {
+
+        if (
+            showtime.tenRap &&
+            !allCinemas.includes(
+                normalizeText(
+                    showtime.tenRap
+                )
+            )
+        ) {
+
+            allCinemas.push(
+                normalizeText(
+                    showtime.tenRap
+                )
+            );
+        }
+
+    });
+
+    const cinemaAlias = {
+        cgv: "cgv",
+        lotte: "lotte",
+        beta: "beta",
+        galaxy: "galaxy"
+    };
+
+    let detectedCinema = null;
+
+    console.log(
+        "DETECTED CINEMA:",
+        detectedCinema
+    );
+
+    Object.keys(cinemaAlias).forEach(key => {
+
+        if (text.includes(key)) {
+            detectedCinema = key;
+        }
+
+    });
+
+    console.log(
+        "FOUND CINEMA:",
+        detectedCinema
+    );
 
     /* =====================================
        NHẬN DIỆN THỂ LOẠI
@@ -698,12 +808,50 @@ NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
 
         if (detectedMovie) {
 
-            const movieShowtimes =
+            let movieShowtimes =
                 showtimes.filter(
                     showtime =>
                         showtime.maPhim ===
                         detectedMovie.maPhim
                 );
+
+            if (detectedDate) {
+
+                movieShowtimes =
+                    movieShowtimes.filter(
+                        showtime => {
+
+                            const showDate =
+                                new Date(
+                                    showtime.thoiGianBatDau
+                                );
+
+                            return (
+                                showDate.toDateString()
+                                ===
+                                detectedDate.toDateString()
+                            );
+                        }
+                    );
+            }
+
+            /* =====================================
+                LỌC RẠP
+            ===================================== */
+
+            if (detectedCinema) {
+
+                movieShowtimes =
+                    movieShowtimes.filter(
+                        showtime =>
+
+                            normalizeText(
+                                showtime.tenRap || ""
+                            ).includes(
+                                detectedCinema
+                            )
+                    );
+            }
 
             console.log(
                 "BOOKING SHOWTIMES:",
@@ -783,8 +931,9 @@ NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
     );
 
     if (foundMovie) {
-
-        // Người dùng hỏi thông tin phim
+        /* ==========================
+       THÔNG TIN PHIM
+    ========================== */
 
         if (isMovieInfoIntent) {
 
@@ -794,31 +943,73 @@ NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
             };
         }
 
-        const movieShowtimes =
+        let movieShowtimes =
             showtimes.filter(
                 showtime =>
                     showtime.maPhim ===
                     foundMovie.maPhim
             );
 
-        if (movieShowtimes.length > 0) {
+        console.log(
+            "MOVIE SHOWTIMES BEFORE CINEMA FILTER:",
+            movieShowtimes
+        );
 
-            return {
+        // lọc ngày
 
-                type: "showtime_list",
+        if (detectedDate) {
 
-                movie: foundMovie,
+            movieShowtimes =
+                movieShowtimes.filter(
+                    showtime => {
 
-                showtimes: movieShowtimes,
+                        const showDate =
+                            new Date(
+                                showtime.thoiGianBatDau
+                            );
 
-                text:
-                    `🎟️ Các suất chiếu của "${foundMovie.tieuDe}"`
-            };
+                        return (
+                            showDate.toDateString()
+                            ===
+                            detectedDate.toDateString()
+                        );
+                    }
+                );
         }
 
+        /* =====================================
+            LỌC THEO RẠP
+        ===================================== */
+
+        if (detectedCinema) {
+
+            movieShowtimes =
+                movieShowtimes.filter(
+                    showtime =>
+
+                        normalizeText(
+                            showtime
+                                ?.phong_chieu
+                                ?.rap_chieu
+                                ?.tenRap || ""
+                        ).includes(
+                            detectedCinema
+                        )
+                );
+        }
+
+        console.log("DATE:", detectedDate);
+
+        console.log("CINEMA:", detectedCinema);
+
+        console.log("SHOWTIMES:", movieShowtimes);
+
         return {
-            type: "movie",
-            movie: foundMovie
+            type: "showtime_list",
+            movie: foundMovie,
+            showtimes: movieShowtimes,
+            text:
+                `🎟️ Các suất chiếu của "${foundMovie.tieuDe}"`
         };
     }
 
