@@ -116,6 +116,11 @@ const getAvailable =
                 `${API_URL}/available`
             );
 
+        console.log(
+            "AVAILABLE SHOWTIMES",
+            response
+        );
+
         return response.data;
     };
 

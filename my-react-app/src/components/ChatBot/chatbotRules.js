@@ -7,6 +7,14 @@ const chatbotRules = (
     showtimes,
 ) => {
 
+    console.log(
+        "SHOWTIMES RECEIVED:",
+        showtimes.map(x => ({
+            maXuatChieu: x.maXuatChieu,
+            maPhim: x.maPhim
+        }))
+    );
+
     const text =
         normalizeText(message);
 
@@ -333,20 +341,19 @@ NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
 
     showtimes.forEach(showtime => {
 
-        if (
-            showtime.tenRap &&
-            !allCinemas.includes(
-                normalizeText(
-                    showtime.tenRap
-                )
-            )
-        ) {
-
-            allCinemas.push(
-                normalizeText(
-                    showtime.tenRap
-                )
+        const cinemaName =
+            normalizeText(
+                showtime
+                    ?.phong_chieu
+                    ?.rap_chieu
+                    ?.tenRap || ""
             );
+
+        if (
+            cinemaName &&
+            !allCinemas.includes(cinemaName)
+        ) {
+            allCinemas.push(cinemaName);
         }
 
     });
@@ -807,6 +814,14 @@ NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
         );
 
         if (detectedMovie) {
+            movieShowtimes =
+                movieShowtimes.filter(
+                    showtime =>
+
+                        new Date(
+                            showtime.thoiGianKetThuc
+                        ) > new Date()
+                );
 
             let movieShowtimes =
                 showtimes.filter(
@@ -846,7 +861,10 @@ NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
                         showtime =>
 
                             normalizeText(
-                                showtime.tenRap || ""
+                                showtime
+                                    ?.phong_chieu
+                                    ?.rap_chieu
+                                    ?.tenRap || ""
                             ).includes(
                                 detectedCinema
                             )
@@ -884,9 +902,9 @@ NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
     }
 
     const isMovieInfoIntent =
-        text.includes("thong tin")
+        originalText.includes("thong tin")
         ||
-        text.includes("chi tiet");
+        originalText.includes("chi tiet");
 
     /* =====================================
        TÌM PHIM THEO TÊN
@@ -948,6 +966,36 @@ NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
                 showtime =>
                     showtime.maPhim ===
                     foundMovie.maPhim
+            );
+
+        console.log("===== CHECK TIME =====");
+
+        movieShowtimes.forEach(showtime => {
+
+            console.log({
+                maXuatChieu: showtime.maXuatChieu,
+                thoiGianKetThuc: showtime.thoiGianKetThuc,
+                endDate: new Date(showtime.thoiGianKetThuc),
+                now: new Date(),
+                result:
+                    new Date(showtime.thoiGianKetThuc)
+                    >
+                    new Date()
+            });
+
+        });
+
+        /* =====================================
+            CHỈ LẤY SUẤT CHƯA DIỄN RA
+        ===================================== */
+
+        movieShowtimes =
+            movieShowtimes.filter(
+                showtime =>
+
+                    new Date(
+                        showtime.thoiGianKetThuc
+                    ) > new Date()
             );
 
         console.log(

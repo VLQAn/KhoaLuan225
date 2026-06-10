@@ -59,7 +59,15 @@ const ChatBot = () => {
                 const showtimeRes =
                     await xuatChieuApi.getAvailable();
 
-                console.log("SHOWTIMES", showtimeRes);
+                console.log(
+                    "SHOWTIMES RAW:",
+                    showtimeRes
+                );
+
+                console.log(
+                    "IS ARRAY:",
+                    Array.isArray(showtimeRes)
+                );
 
                 setShowtimes(showtimeRes || []);
 
@@ -115,6 +123,14 @@ const ChatBot = () => {
             );
 
         console.log("BOT RESPONSE", botResponse);
+
+        console.log(
+            "SHOWTIMES BEFORE CHATBOT:",
+            showtimes.map(x => ({
+                maXuatChieu: x.maXuatChieu,
+                maPhim: x.maPhim
+            }))
+        );
 
         const botMessage = {
             sender: "bot",
