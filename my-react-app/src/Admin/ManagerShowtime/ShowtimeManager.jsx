@@ -73,6 +73,35 @@ const ShowtimeManager = () => {
 
     }, []);
 
+    const formatDate = (dateString) => {
+
+        if (!dateString) return "";
+
+        return new Date(dateString)
+            .toLocaleDateString(
+                "vi-VN",
+                {
+                    timeZone: "Asia/Ho_Chi_Minh",
+                }
+            );
+    };
+
+    const formatTime = (dateString) => {
+
+        if (!dateString) return "";
+
+        return new Date(dateString)
+            .toLocaleTimeString(
+                "vi-VN",
+                {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: false,
+                    timeZone: "Asia/Ho_Chi_Minh",
+                }
+            );
+    };
+
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -147,14 +176,58 @@ const ShowtimeManager = () => {
             showtime.maXuatChieu
         );
 
-        const date =
+        const dateObj = new Date(
             showtime.thoiGianBatDau
-                ?.split("T")[0];
+        );
 
-        const time =
-            showtime.thoiGianBatDau
-                ?.split("T")[1]
-                ?.substring(0, 5);
+        const year =
+            dateObj.toLocaleString(
+                "en-US",
+                {
+                    year: "numeric",
+                    timeZone: "Asia/Ho_Chi_Minh",
+                }
+            );
+
+        const month =
+            dateObj.toLocaleString(
+                "en-US",
+                {
+                    month: "2-digit",
+                    timeZone: "Asia/Ho_Chi_Minh",
+                }
+            );
+
+        const day =
+            dateObj.toLocaleString(
+                "en-US",
+                {
+                    day: "2-digit",
+                    timeZone: "Asia/Ho_Chi_Minh",
+                }
+            );
+
+        const hours =
+            dateObj.toLocaleString(
+                "en-US",
+                {
+                    hour: "2-digit",
+                    hour12: false,
+                    timeZone: "Asia/Ho_Chi_Minh",
+                }
+            );
+
+        const minutes =
+            dateObj.toLocaleString(
+                "en-US",
+                {
+                    minute: "2-digit",
+                    timeZone: "Asia/Ho_Chi_Minh",
+                }
+            );
+
+        const date = `${year}-${month}-${day}`;
+        const time = `${hours}:${minutes}`;
 
         setFormData({
             maPhim: showtime.maPhim,
@@ -527,13 +600,11 @@ const ShowtimeManager = () => {
                                     </td>
 
                                     <td>
-                                        {showtime.thoiGianBatDau?.split("T")[0]}
+                                        {formatDate(showtime.thoiGianBatDau)}
                                     </td>
 
                                     <td>
-                                        {showtime.thoiGianBatDau
-                                            ?.split("T")[1]
-                                            ?.substring(0, 5)}
+                                        {formatTime(showtime.thoiGianBatDau)}
                                     </td>
 
                                     <td>
