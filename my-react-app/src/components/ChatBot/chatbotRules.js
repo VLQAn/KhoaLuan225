@@ -814,6 +814,14 @@ NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
         );
 
         if (detectedMovie) {
+
+            let movieShowtimes =
+                showtimes.filter(
+                    showtime =>
+                        showtime.maPhim ===
+                        detectedMovie.maPhim
+                );
+
             movieShowtimes =
                 movieShowtimes.filter(
                     showtime =>
@@ -823,12 +831,12 @@ NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
                         ) > new Date()
                 );
 
-            let movieShowtimes =
-                showtimes.filter(
-                    showtime =>
-                        showtime.maPhim ===
-                        detectedMovie.maPhim
-                );
+            movieShowtimes.sort(
+                (a, b) =>
+                    new Date(a.thoiGianBatDau)
+                    -
+                    new Date(b.thoiGianBatDau)
+            );
 
             if (detectedDate) {
 
@@ -967,6 +975,13 @@ NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
                     showtime.maPhim ===
                     foundMovie.maPhim
             );
+
+        movieShowtimes.sort(
+            (a, b) =>
+                new Date(a.thoiGianBatDau)
+                -
+                new Date(b.thoiGianBatDau)
+        );
 
         console.log("===== CHECK TIME =====");
 
