@@ -47,21 +47,32 @@ const MovieDetail = () => {
     };
 
     const formatDateVN = (dateStr) => {
+
         if (!dateStr) return "";
 
-        return dateStr.split("T")[0];
+        return new Date(dateStr)
+            .toLocaleDateString(
+                "vi-VN",
+                {
+                    timeZone: "Asia/Ho_Chi_Minh",
+                }
+            );
     };
 
     const formatTimeVN = (dateStr) => {
+
         if (!dateStr) return "";
 
-        const [date, time] = dateStr.split("T");
-
-        if (!time) return "";
-
-        const [hour, minute] = time.split(":");
-
-        return `${hour}:${minute}`;
+        return new Date(dateStr)
+            .toLocaleTimeString(
+                "vi-VN",
+                {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: false,
+                    timeZone: "Asia/Ho_Chi_Minh",
+                }
+            );
     };
 
     // useEffect để fetch dữ liệu khi component mount hoặc khi id thay đổi
@@ -75,19 +86,11 @@ const MovieDetail = () => {
 
             const showtime =
                 new Date(
-                    item.thoiGianBatDau.replace('Z', '')
+                    item.thoiGianBatDau
                 );
 
             const result =
                 showtime.getTime() > Date.now();
-
-            console.log({
-                maXuatChieu: item.maXuatChieu,
-                thoiGianBatDau: item.thoiGianBatDau,
-                showtime: showtime.toLocaleString("vi-VN"),
-                now: new Date().toLocaleString("vi-VN"),
-                result
-            });
 
             return result;
         });

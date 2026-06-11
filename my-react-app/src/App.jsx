@@ -7,7 +7,6 @@ import Theater from "./pages/Theater/Theater";
 import History from "./pages/History/History";
 import Upcoming from "./pages/Upcoming/Upcoming";
 import MovieDetail from "./pages/MovieDetail/MovieDetail";
-import Showtime from "./pages/Showtime/Showtime";
 import Seat from "./pages/Seat/Seat";
 import Checkout from "./pages/Checkout/Checkout";
 import Food from "./pages/Food/Food";
@@ -69,12 +68,6 @@ function App() {
           <Route path="/movie/:id" element={
             <CustomerRoute>
               <MovieDetail />
-            </CustomerRoute>
-          } />
-
-          <Route path="/showtime/:id" element={
-            <CustomerRoute>
-              <Showtime />
             </CustomerRoute>
           } />
 
