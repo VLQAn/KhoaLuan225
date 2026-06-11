@@ -263,8 +263,15 @@ const ShowtimeManager = () => {
                 await xuatChieuApi
                     .getMyShowtimes();
 
+            const sortedShowtimes =
+                (response || []).sort(
+                    (a, b) =>
+                        new Date(a.thoiGianBatDau) -
+                        new Date(b.thoiGianBatDau)
+                );
+
             setShowtimes(
-                response || []
+                sortedShowtimes
             );
 
         } catch (error) {
