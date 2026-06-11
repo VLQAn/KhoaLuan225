@@ -301,11 +301,31 @@ const chatbotRules = (
 
         const today = new Date();
 
-        if (text.includes("hom nay")) {
+        /* ==========================
+           HÔM NAY
+        ========================== */
+
+        if (
+            text.includes("hom nay")
+            ||
+            text.includes("toi nay")
+            ||
+            text.includes("chieu nay")
+        ) {
             return today;
         }
 
-        if (text.includes("ngay mai")) {
+        /* ==========================
+           NGÀY MAI
+        ========================== */
+
+        if (
+            text.includes("ngay mai")
+            ||
+            text.includes("toi mai")
+            ||
+            text.includes("sang mai")
+        ) {
 
             const tomorrow =
                 new Date(today);
@@ -315,6 +335,70 @@ const chatbotRules = (
             );
 
             return tomorrow;
+        }
+
+        /* ==========================
+           CUỐI TUẦN
+        ========================== */
+
+        if (
+            text.includes("cuoi tuan")
+        ) {
+
+            const weekend =
+                new Date(today);
+
+            const daysUntilSaturday =
+                (6 - today.getDay() + 7) % 7;
+
+            weekend.setDate(
+                today.getDate()
+                +
+                daysUntilSaturday
+            );
+
+            return weekend;
+        }
+
+        /* ==========================
+           THỨ TRONG TUẦN
+        ========================== */
+
+        const weekdays = {
+            "thu 2": 1,
+            "thu 3": 2,
+            "thu 4": 3,
+            "thu 5": 4,
+            "thu 6": 5,
+            "thu 7": 6,
+            "chu nhat": 0
+        };
+
+        for (const [key, targetDay]
+            of Object.entries(weekdays)) {
+
+            if (text.includes(key)) {
+
+                const result =
+                    new Date(today);
+
+                let diff =
+                    targetDay
+                    -
+                    today.getDay();
+
+                if (diff < 0) {
+                    diff += 7;
+                }
+
+                result.setDate(
+                    today.getDate()
+                    +
+                    diff
+                );
+
+                return result;
+            }
         }
 
         return null;
@@ -823,6 +907,11 @@ const chatbotRules = (
 
             if (detectedDate) {
 
+                const isWeekendSearch =
+                    originalText.includes(
+                        "cuoi tuan"
+                    );
+
                 movieShowtimes =
                     movieShowtimes.filter(
                         showtime => {
@@ -831,6 +920,15 @@ const chatbotRules = (
                                 new Date(
                                     showtime.thoiGianBatDau
                                 );
+
+                            if (isWeekendSearch) {
+
+                                return (
+                                    showDate.getDay() === 6
+                                    ||
+                                    showDate.getDay() === 0
+                                );
+                            }
 
                             return (
                                 showDate.toDateString()
