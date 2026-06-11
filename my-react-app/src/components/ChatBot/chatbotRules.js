@@ -897,28 +897,58 @@ const chatbotRules = (
         ||
         originalText.includes("chi tiet");
 
+    if (intent === "recommendation") {
+
+        const bestMovies =
+            movies
+                .filter(
+                    movie =>
+                        movie.trangThai ===
+                        "dang_chieu"
+                )
+                .sort(
+                    (a, b) =>
+                        Number(b.danhGia || 0)
+                        -
+                        Number(a.danhGia || 0)
+                );
+
+        return {
+            type: "movie_list",
+            title:
+                "⭐ Phim đáng xem hôm nay",
+            movies:
+                bestMovies.slice(0, 5)
+        };
+    }
+
     /* =====================================
        TÌM PHIM THEO TÊN
     ===================================== */
 
-    let foundMovie =
-        movies.find(movie => {
+    let foundMovie = null;
 
-            const movieName =
-                normalizeText(
-                    movie.tieuDe
+    if (processedText.length >= 3) {
+
+        foundMovie =
+            movies.find(movie => {
+
+                const movieName =
+                    normalizeText(
+                        movie.tieuDe
+                    );
+
+                return (
+                    processedText.includes(
+                        movieName
+                    )
+                    ||
+                    movieName.includes(
+                        processedText
+                    )
                 );
-
-            return (
-                processedText.includes(
-                    movieName
-                )
-                ||
-                movieName.includes(
-                    processedText
-                )
-            );
-        });
+            });
+    }
 
     if (!foundMovie) {
 

@@ -45,7 +45,12 @@ export const detectIntent = (message) => {
             "de xuat",
             "hay",
             "nen xem",
-            "dang xem"
+            "dang xem",
+            "co gi xem",
+            "xem gi",
+            "co phim gi hay",
+            "phim hay",
+            "xem phim nao"
         ]
     };
 
