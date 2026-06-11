@@ -34,9 +34,13 @@ const MovieDetail = () => {
             const data =
                 response?.data || response || [];
 
-            const movieShowtimes = data.filter(item =>
-                item.maPhim === Number(id)
-            );
+            const movieShowtimes = data
+                .filter(item => item.maPhim === Number(id))
+                .sort(
+                    (a, b) =>
+                        new Date(a.thoiGianBatDau) -
+                        new Date(b.thoiGianBatDau)
+                );
 
             setShowtimes(movieShowtimes);
 
