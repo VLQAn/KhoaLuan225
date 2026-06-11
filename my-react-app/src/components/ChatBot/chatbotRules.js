@@ -1,4 +1,5 @@
 import { normalizeText } from "./chatbotUtils";
+import { detectIntent } from "./chatbotIntents";
 
 const chatbotRules = (
     message,
@@ -17,6 +18,8 @@ const chatbotRules = (
 
     const text =
         normalizeText(message);
+
+    const intent = detectIntent(text);
 
     const isActorSearch =
         text.includes("dien vien")
@@ -186,8 +189,8 @@ const chatbotRules = (
         );
 
     /* =====================================
-NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
-===================================== */
+        NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
+    ===================================== */
 
     const bookingKeywords = [
         "dat ve",
@@ -278,18 +281,6 @@ NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
         return bestScore >= 1
             ? bestMovie
             : null;
-    };
-
-    const detectMovieInMessage = (
-        text,
-        movies
-    ) => {
-
-        return findBestMovieMatch(
-            text,
-            movies
-        );
-
     };
 
     /* =====================================
@@ -444,9 +435,7 @@ NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
        PHIM ĐANG CHIẾU
     ===================================== */
 
-    if (
-        processedText.includes("dang chieu")
-    ) {
+    if (intent === "showing_movies") {
 
         const showing =
             movies.filter(
@@ -474,9 +463,7 @@ NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
        PHIM SẮP CHIẾU
     ===================================== */
 
-    if (
-        processedText.includes("sap chieu")
-    ) {
+    if (intent === "upcoming_movies") {
 
         const upcoming =
             movies.filter(
@@ -504,11 +491,7 @@ NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
        KHUYẾN MÃI
     ===================================== */
 
-    if (
-        processedText.includes("khuyen mai")
-        ||
-        processedText.includes("giam gia")
-    ) {
+    if (intent === "promotions") {
 
         return {
             type: "text",
@@ -782,7 +765,7 @@ NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
    Ý ĐỊNH ĐẶT VÉ
 ===================================== */
 
-    if (isBookingIntent) {
+    if (intent === "booking") {
         const movieQuery =
             processedText
                 .replace("dat ve", "")
@@ -944,6 +927,42 @@ NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
                 processedText,
                 movies
             );
+    }
+
+    if (
+        foundMovie &&
+        intent === "showtime"
+    ) {
+
+        let movieShowtimes =
+            showtimes.filter(
+                showtime =>
+                    showtime.maPhim ===
+                    foundMovie.maPhim
+            );
+
+        movieShowtimes =
+            movieShowtimes.filter(
+                showtime =>
+                    new Date(
+                        showtime.thoiGianKetThuc
+                    ) > new Date()
+            );
+
+        movieShowtimes.sort(
+            (a, b) =>
+                new Date(a.thoiGianBatDau)
+                -
+                new Date(b.thoiGianBatDau)
+        );
+
+        return {
+            type: "showtime_list",
+            movie: foundMovie,
+            showtimes: movieShowtimes,
+            text:
+                `🎟️ Lịch chiếu của "${foundMovie.tieuDe}"`
+        };
     }
 
     console.log(
