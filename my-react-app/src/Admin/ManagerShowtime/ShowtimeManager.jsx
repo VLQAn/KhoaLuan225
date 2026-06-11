@@ -51,6 +51,8 @@ const ShowtimeManager = () => {
 
     const [editingId, setEditingId] = useState(null);
 
+    const [selectedStatus, setSelectedStatus] = useState("all");
+
     useEffect(() => {
 
         if (darkMode) {
@@ -261,6 +263,29 @@ const ShowtimeManager = () => {
     const phimDangChieu = movies.filter(
         (movie) => movie.trangThai === "dang_chieu"
     ).length;
+
+    const sapChieuCount = showtimes.filter(
+        (s) => getShowtimeStatus(s) === "Sắp chiếu"
+    ).length;
+
+    const dangChieuCount = showtimes.filter(
+        (s) => getShowtimeStatus(s) === "Đang chiếu"
+    ).length;
+
+    const daChieuCount = showtimes.filter(
+        (s) => getShowtimeStatus(s) === "Đã chiếu"
+    ).length;
+
+    const filteredShowtimes = showtimes.filter((showtime) => {
+
+        if (selectedStatus === "all") {
+            return true;
+        }
+
+        return (
+            getShowtimeStatus(showtime) === selectedStatus
+        );
+    });
 
     const userData = localStorage.getItem("user");
 
@@ -486,7 +511,7 @@ const ShowtimeManager = () => {
                         </thead>
 
                         <tbody>
-                            {showtimes.map((showtime) => (
+                            {filteredShowtimes.map((showtime) => (
                                 <tr key={showtime.maXuatChieu}>
 
                                     <td>
@@ -602,19 +627,36 @@ const ShowtimeManager = () => {
 
                     <h2>Thông tin xuất chiếu</h2>
 
-                    <div className={s.info_item}>
-                        <p>Tổng xuất chiếu</p>
+                    <div
+                        className={s.info_item}
+                        onClick={() => setSelectedStatus("all")}
+                    >
+                        <p>Tất cả xuất chiếu</p>
                         <h3>{showtimes.length}</h3>
                     </div>
 
-                    <div className={s.info_item}>
-                        <p>Phim đang chiếu</p>
-                        <h3>{phimDangChieu}</h3>
+                    <div
+                        className={s.info_item}
+                        onClick={() => setSelectedStatus("Sắp chiếu")}
+                    >
+                        <p>Xuất sắp chiếu</p>
+                        <h3>{sapChieuCount}</h3>
                     </div>
 
-                    <div className={s.info_item}>
-                        <p>Rạp hoạt động</p>
-                        <h3>{rooms.length}</h3>
+                    <div
+                        className={s.info_item}
+                        onClick={() => setSelectedStatus("Đang chiếu")}
+                    >
+                        <p>Xuất đang chiếu</p>
+                        <h3>{dangChieuCount}</h3>
+                    </div>
+
+                    <div
+                        className={s.info_item}
+                        onClick={() => setSelectedStatus("Đã chiếu")}
+                    >
+                        <p>Xuất đã chiếu</p>
+                        <h3>{daChieuCount}</h3>
                     </div>
 
                 </div>
