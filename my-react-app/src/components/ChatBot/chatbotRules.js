@@ -301,29 +301,30 @@ const chatbotRules = (
 
         const today = new Date();
 
-        /* ==========================
+        text = normalizeText(text);
+
+        /* =====================
            HÔM NAY
-        ========================== */
+        ===================== */
 
         if (
-            text.includes("hom nay")
-            ||
-            text.includes("toi nay")
-            ||
+            text.includes("hom nay") ||
+            text.includes("toi nay") ||
             text.includes("chieu nay")
         ) {
-            return today;
+            return {
+                type: "single",
+                date: today
+            };
         }
 
-        /* ==========================
+        /* =====================
            NGÀY MAI
-        ========================== */
+        ===================== */
 
         if (
-            text.includes("ngay mai")
-            ||
-            text.includes("toi mai")
-            ||
+            text.includes("ngay mai") ||
+            text.includes("toi mai") ||
             text.includes("sang mai")
         ) {
 
@@ -331,38 +332,31 @@ const chatbotRules = (
                 new Date(today);
 
             tomorrow.setDate(
-                today.getDate() + 1
+                tomorrow.getDate() + 1
             );
 
-            return tomorrow;
+            return {
+                type: "single",
+                date: tomorrow
+            };
         }
 
-        /* ==========================
+        /* =====================
            CUỐI TUẦN
-        ========================== */
+        ===================== */
 
         if (
             text.includes("cuoi tuan")
         ) {
 
-            const weekend =
-                new Date(today);
-
-            const daysUntilSaturday =
-                (6 - today.getDay() + 7) % 7;
-
-            weekend.setDate(
-                today.getDate()
-                +
-                daysUntilSaturday
-            );
-
-            return weekend;
+            return {
+                type: "weekend"
+            };
         }
 
-        /* ==========================
+        /* =====================
            THỨ TRONG TUẦN
-        ========================== */
+        ===================== */
 
         const weekdays = {
             "thu 2": 1,
@@ -374,10 +368,14 @@ const chatbotRules = (
             "chu nhat": 0
         };
 
-        for (const [key, targetDay]
-            of Object.entries(weekdays)) {
+        for (
+            const [key, targetDay]
+            of Object.entries(weekdays)
+        ) {
 
-            if (text.includes(key)) {
+            if (
+                text.includes(key)
+            ) {
 
                 const result =
                     new Date(today);
@@ -397,8 +395,74 @@ const chatbotRules = (
                     diff
                 );
 
-                return result;
+                return {
+                    type: "single",
+                    date: result
+                };
             }
+        }
+
+        /* =====================
+           DD/MM
+        ===================== */
+
+        let match =
+            text.match(
+                /\b(\d{1,2})\/(\d{1,2})\b/
+            );
+
+        if (match) {
+
+            return {
+                type: "single",
+                date: new Date(
+                    today.getFullYear(),
+                    Number(match[2]) - 1,
+                    Number(match[1])
+                )
+            };
+        }
+
+        /* =====================
+           DD-MM
+        ===================== */
+
+        match =
+            text.match(
+                /\b(\d{1,2})-(\d{1,2})\b/
+            );
+
+        if (match) {
+
+            return {
+                type: "single",
+                date: new Date(
+                    today.getFullYear(),
+                    Number(match[2]) - 1,
+                    Number(match[1])
+                )
+            };
+        }
+
+        /* =====================
+           DD THANG MM
+        ===================== */
+
+        match =
+            text.match(
+                /\b(\d{1,2})\s*thang\s*(\d{1,2})\b/
+            );
+
+        if (match) {
+
+            return {
+                type: "single",
+                date: new Date(
+                    today.getFullYear(),
+                    Number(match[2]) - 1,
+                    Number(match[1])
+                )
+            };
         }
 
         return null;
