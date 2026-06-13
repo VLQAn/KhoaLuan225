@@ -1,5 +1,9 @@
 import { normalizeText } from "./chatbotUtils";
 import { detectIntent } from "./chatbotIntents";
+import { detectDate } from "./chatbotDate";
+import { detectCinema } from "./chatbotCinema";
+import { findBestMovieMatch } from "./chatbotMovie";
+import { filterShowtimes } from "./chatbotShowtime";
 
 const chatbotRules = (
     message,
@@ -7,13 +11,11 @@ const chatbotRules = (
     promotions,
     showtimes,
 ) => {
-
     console.log(
-        "SHOWTIMES RECEIVED:",
-        showtimes.map(x => ({
-            maXuatChieu: x.maXuatChieu,
-            maPhim: x.maPhim
-        }))
+        "ALL CINEMAS",
+        showtimes.map(
+            x => x?.phong_chieu?.rap_chieu?.tenRap
+        )
     );
 
     const text =
@@ -208,81 +210,6 @@ const chatbotRules = (
                 )
         );
 
-    const findBestMovieMatch = (
-        text,
-        movies
-    ) => {
-        const words =
-            text
-                .split(" ")
-                .filter(
-                    word =>
-                        word.length > 2
-                        &&
-                        ![
-                            "phim",
-                            "rap",
-                            "galaxy",
-                            "cgv",
-                            "lotte",
-                            "beta",
-                            "xuat",
-                            "chieu",
-                            "thong",
-                            "tin",
-                            "chi",
-                            "tiet",
-                            "hom",
-                            "nay",
-                            "ngay",
-                            "mai",
-                            "o",
-                            "cac",
-                            "nhung",
-                            "suat",
-                            "xuat",
-                            "lich",
-                            "tai"
-                        ].includes(word)
-                );
-
-        let bestMovie = null;
-        let bestScore = 0;
-
-        movies.forEach(movie => {
-
-            const movieName =
-                normalizeText(
-                    movie.tieuDe
-                );
-
-            const score =
-                words.filter(
-                    word =>
-                        movieName.includes(
-                            word
-                        )
-                ).length;
-
-            console.log(
-                movie.tieuDe,
-                score
-            );
-
-            if (score > bestScore) {
-
-                bestScore = score;
-                bestMovie = movie;
-
-            }
-
-        });
-
-        return bestScore >= 1
-            ? bestMovie
-            : null;
-    };
-
     /* =====================================
         NHẬN DIỆN NĂM PHÁT HÀNH
     ===================================== */
@@ -297,185 +224,20 @@ const chatbotRules = (
             ? Number(yearMatch[0])
             : null;
 
-    const detectDate = (text) => {
-
-        const today = new Date();
-
-        text = normalizeText(text);
-
-        /* =====================
-           HÔM NAY
-        ===================== */
-
-        if (
-            text.includes("hom nay") ||
-            text.includes("toi nay") ||
-            text.includes("chieu nay")
-        ) {
-            return {
-                type: "single",
-                date: today
-            };
-        }
-
-        /* =====================
-           NGÀY MAI
-        ===================== */
-
-        if (
-            text.includes("ngay mai") ||
-            text.includes("toi mai") ||
-            text.includes("sang mai")
-        ) {
-
-            const tomorrow =
-                new Date(today);
-
-            tomorrow.setDate(
-                tomorrow.getDate() + 1
-            );
-
-            return {
-                type: "single",
-                date: tomorrow
-            };
-        }
-
-        /* =====================
-           CUỐI TUẦN
-        ===================== */
-
-        if (
-            text.includes("cuoi tuan")
-        ) {
-
-            return {
-                type: "weekend"
-            };
-        }
-
-        /* =====================
-           THỨ TRONG TUẦN
-        ===================== */
-
-        const weekdays = {
-            "thu 2": 1,
-            "thu 3": 2,
-            "thu 4": 3,
-            "thu 5": 4,
-            "thu 6": 5,
-            "thu 7": 6,
-            "chu nhat": 0
-        };
-
-        for (
-            const [key, targetDay]
-            of Object.entries(weekdays)
-        ) {
-
-            if (
-                text.includes(key)
-            ) {
-
-                const result =
-                    new Date(today);
-
-                let diff =
-                    targetDay
-                    -
-                    today.getDay();
-
-                if (diff < 0) {
-                    diff += 7;
-                }
-
-                result.setDate(
-                    today.getDate()
-                    +
-                    diff
-                );
-
-                return {
-                    type: "single",
-                    date: result
-                };
-            }
-        }
-
-        /* =====================
-           DD/MM
-        ===================== */
-
-        let match =
-            text.match(
-                /\b(\d{1,2})\/(\d{1,2})\b/
-            );
-
-        if (match) {
-
-            return {
-                type: "single",
-                date: new Date(
-                    today.getFullYear(),
-                    Number(match[2]) - 1,
-                    Number(match[1])
-                )
-            };
-        }
-
-        /* =====================
-           DD-MM
-        ===================== */
-
-        match =
-            text.match(
-                /\b(\d{1,2})-(\d{1,2})\b/
-            );
-
-        if (match) {
-
-            return {
-                type: "single",
-                date: new Date(
-                    today.getFullYear(),
-                    Number(match[2]) - 1,
-                    Number(match[1])
-                )
-            };
-        }
-
-        /* =====================
-           DD THANG MM
-        ===================== */
-
-        match =
-            text.match(
-                /\b(\d{1,2})\s*thang\s*(\d{1,2})\b/
-            );
-
-        if (match) {
-
-            return {
-                type: "single",
-                date: new Date(
-                    today.getFullYear(),
-                    Number(match[2]) - 1,
-                    Number(match[1])
-                )
-            };
-        }
-
-        return null;
-    };
-
     const originalText = text;
 
     const detectedDate =
         detectDate(originalText);
 
+    const detectedCinema =
+        detectCinema(
+            originalText,
+            showtimes
+        );
+
     /* =====================================
-   NHẬN DIỆN RẠP CHIẾU
-===================================== */
+        NHẬN DIỆN RẠP CHIẾU
+    ===================================== */
     const allCinemas = [];
 
     showtimes.forEach(showtime => {
@@ -496,33 +258,6 @@ const chatbotRules = (
         }
 
     });
-
-    const cinemaAlias = {
-        cgv: "cgv",
-        lotte: "lotte",
-        beta: "beta",
-        galaxy: "galaxy"
-    };
-
-    let detectedCinema = null;
-
-    console.log(
-        "DETECTED CINEMA:",
-        detectedCinema
-    );
-
-    Object.keys(cinemaAlias).forEach(key => {
-
-        if (text.includes(key)) {
-            detectedCinema = key;
-        }
-
-    });
-
-    console.log(
-        "FOUND CINEMA:",
-        detectedCinema
-    );
 
     /* =====================================
        NHẬN DIỆN THỂ LOẠI
@@ -910,8 +645,8 @@ const chatbotRules = (
     };
 
     /* =====================================
-   Ý ĐỊNH ĐẶT VÉ
-===================================== */
+        Ý ĐỊNH ĐẶT VÉ
+    ===================================== */
 
     if (intent === "booking") {
         const movieQuery =
@@ -939,95 +674,15 @@ const chatbotRules = (
                 movies
             );
 
-        console.log(
-            "BOOKING MOVIE:",
-            detectedMovie?.tieuDe
-        );
-
         if (detectedMovie) {
 
-            let movieShowtimes =
-                showtimes.filter(
-                    showtime =>
-                        showtime.maPhim ===
-                        detectedMovie.maPhim
+            const movieShowtimes =
+                filterShowtimes(
+                    showtimes,
+                    detectedMovie,
+                    detectedDate,
+                    detectedCinema
                 );
-
-            movieShowtimes =
-                movieShowtimes.filter(
-                    showtime =>
-
-                        new Date(
-                            showtime.thoiGianKetThuc
-                        ) > new Date()
-                );
-
-            movieShowtimes.sort(
-                (a, b) =>
-                    new Date(a.thoiGianBatDau)
-                    -
-                    new Date(b.thoiGianBatDau)
-            );
-
-            if (detectedDate) {
-
-                const isWeekendSearch =
-                    originalText.includes(
-                        "cuoi tuan"
-                    );
-
-                movieShowtimes =
-                    movieShowtimes.filter(
-                        showtime => {
-
-                            const showDate =
-                                new Date(
-                                    showtime.thoiGianBatDau
-                                );
-
-                            if (isWeekendSearch) {
-
-                                return (
-                                    showDate.getDay() === 6
-                                    ||
-                                    showDate.getDay() === 0
-                                );
-                            }
-
-                            return (
-                                showDate.toDateString()
-                                ===
-                                detectedDate.toDateString()
-                            );
-                        }
-                    );
-            }
-
-            /* =====================================
-                LỌC RẠP
-            ===================================== */
-
-            if (detectedCinema) {
-
-                movieShowtimes =
-                    movieShowtimes.filter(
-                        showtime =>
-
-                            normalizeText(
-                                showtime
-                                    ?.phong_chieu
-                                    ?.rap_chieu
-                                    ?.tenRap || ""
-                            ).includes(
-                                detectedCinema
-                            )
-                    );
-            }
-
-            console.log(
-                "BOOKING SHOWTIMES:",
-                movieShowtimes
-            );
 
             if (movieShowtimes.length > 0) {
 
@@ -1046,12 +701,6 @@ const chatbotRules = (
                     `🎬 "${detectedMovie.tieuDe}" hiện chưa có suất chiếu.`
             };
         }
-
-        return {
-            type: "booking_intent",
-            text:
-                "🎟️ Bạn muốn đặt vé phim nào?"
-        };
     }
 
     const isMovieInfoIntent =
@@ -1121,162 +770,71 @@ const chatbotRules = (
             );
     }
 
-    if (
-        foundMovie &&
-        intent === "showtime"
-    ) {
-
-        let movieShowtimes =
-            showtimes.filter(
-                showtime =>
-                    showtime.maPhim ===
-                    foundMovie.maPhim
-            );
-
-        movieShowtimes =
-            movieShowtimes.filter(
-                showtime =>
-                    new Date(
-                        showtime.thoiGianKetThuc
-                    ) > new Date()
-            );
-
-        movieShowtimes.sort(
-            (a, b) =>
-                new Date(a.thoiGianBatDau)
-                -
-                new Date(b.thoiGianBatDau)
+    const shouldShowShowtimes =
+        foundMovie
+        &&
+        (
+            intent === "showtime"
+            ||
+            intent === "booking"
+            ||
+            detectedDate
+            ||
+            detectedCinema
         );
+
+    if (shouldShowShowtimes) {
+        const movieShowtimes =
+            filterShowtimes(
+                showtimes,
+                foundMovie,
+                detectedDate,
+                detectedCinema
+            );
+
+        if (movieShowtimes.length === 0) {
+            return {
+                type: "text",
+                text:
+                    `🎬 Hiện chưa có suất chiếu phù hợp cho "${foundMovie.tieuDe}".`
+            };
+        }
+
+        let title =
+            `🎟️ Lịch chiếu của "${foundMovie.tieuDe}"`;
+
+        if (detectedCinema) {
+            title +=
+                ` tại ${detectedCinema.value}`;
+        }
+
+        if (detectedDate?.type === "single") {
+            title +=
+                ` ngày ${detectedDate.date.toLocaleDateString("vi-VN")}`;
+        }
+
+        if (detectedDate?.type === "weekend") {
+            title +=
+                ` cuối tuần`;
+        }
 
         return {
             type: "showtime_list",
             movie: foundMovie,
             showtimes: movieShowtimes,
-            text:
-                `🎟️ Lịch chiếu của "${foundMovie.tieuDe}"`
+            text: title
         };
     }
 
-    console.log(
-        "PROCESSED TEXT:",
-        processedText
-    );
-
-    console.log(
-        "FOUND MOVIE:",
-        foundMovie?.tieuDe
-    );
-
     if (foundMovie) {
-        /* ==========================
-       THÔNG TIN PHIM
-    ========================== */
 
-        if (isMovieInfoIntent) {
-
-            return {
-                type: "movie",
-                movie: foundMovie
-            };
-        }
-
-        let movieShowtimes =
-            showtimes.filter(
-                showtime =>
-                    showtime.maPhim ===
-                    foundMovie.maPhim
+        const movieShowtimes =
+            filterShowtimes(
+                showtimes,
+                foundMovie,
+                detectedDate,
+                detectedCinema
             );
-
-        movieShowtimes.sort(
-            (a, b) =>
-                new Date(a.thoiGianBatDau)
-                -
-                new Date(b.thoiGianBatDau)
-        );
-
-        console.log("===== CHECK TIME =====");
-
-        movieShowtimes.forEach(showtime => {
-
-            console.log({
-                maXuatChieu: showtime.maXuatChieu,
-                thoiGianKetThuc: showtime.thoiGianKetThuc,
-                endDate: new Date(showtime.thoiGianKetThuc),
-                now: new Date(),
-                result:
-                    new Date(showtime.thoiGianKetThuc)
-                    >
-                    new Date()
-            });
-
-        });
-
-        /* =====================================
-            CHỈ LẤY SUẤT CHƯA DIỄN RA
-        ===================================== */
-
-        movieShowtimes =
-            movieShowtimes.filter(
-                showtime =>
-
-                    new Date(
-                        showtime.thoiGianKetThuc
-                    ) > new Date()
-            );
-
-        console.log(
-            "MOVIE SHOWTIMES BEFORE CINEMA FILTER:",
-            movieShowtimes
-        );
-
-        // lọc ngày
-
-        if (detectedDate) {
-
-            movieShowtimes =
-                movieShowtimes.filter(
-                    showtime => {
-
-                        const showDate =
-                            new Date(
-                                showtime.thoiGianBatDau
-                            );
-
-                        return (
-                            showDate.toDateString()
-                            ===
-                            detectedDate.toDateString()
-                        );
-                    }
-                );
-        }
-
-        /* =====================================
-            LỌC THEO RẠP
-        ===================================== */
-
-        if (detectedCinema) {
-
-            movieShowtimes =
-                movieShowtimes.filter(
-                    showtime =>
-
-                        normalizeText(
-                            showtime
-                                ?.phong_chieu
-                                ?.rap_chieu
-                                ?.tenRap || ""
-                        ).includes(
-                            detectedCinema
-                        )
-                );
-        }
-
-        console.log("DATE:", detectedDate);
-
-        console.log("CINEMA:", detectedCinema);
-
-        console.log("SHOWTIMES:", movieShowtimes);
 
         return {
             type: "showtime_list",
