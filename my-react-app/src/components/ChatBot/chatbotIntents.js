@@ -51,6 +51,14 @@ export const detectIntent = (message) => {
             "co phim gi hay",
             "phim hay",
             "xem phim nao"
+        ],
+
+        top_movies: [
+            "top phim",
+            "top 5 phim",
+            "phim hay nhat",
+            "phim duoc danh gia cao",
+            "phim diem cao"
         ]
     };
 

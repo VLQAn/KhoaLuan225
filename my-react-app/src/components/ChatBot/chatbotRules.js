@@ -6,6 +6,7 @@ import { findBestMovieMatch } from "./chatbotMovie";
 import { filterShowtimes } from "./chatbotShowtime";
 import { detectTimePeriod } from "./chatbotTime";
 import { detectMovieInfoIntent } from "./chatbotMovieInfo";
+import { detectRatingFilter } from "./chatbotRating";
 
 const chatbotRules = (
     message,
@@ -228,6 +229,11 @@ const chatbotRules = (
 
     const originalText = text;
 
+    const detectedRating =
+        detectRatingFilter(
+            originalText
+        );
+
     const detectedDate =
         detectDate(originalText);
 
@@ -399,8 +405,89 @@ const chatbotRules = (
     }
 
     /* =====================================
-   TÌM PHIM THEO NĂM PHÁT HÀNH
-===================================== */
+       TOP PHIM HAY NHẤT
+    ===================================== */
+    if (intent === "top_movies") {
+
+        const topMovies =
+            movies
+                .filter(
+                    movie =>
+                        movie.trangThai ===
+                        "dang_chieu"
+                )
+                .sort(
+                    (a, b) =>
+                        Number(b.danhGia)
+                        -
+                        Number(a.danhGia)
+                );
+
+        return {
+            type: "movie_list",
+            title:
+                "🏆 Top phim đánh giá cao",
+            movies:
+                topMovies.slice(0, 5)
+        };
+    }
+
+    /* =====================================
+       RATING PHIM
+    ===================================== */
+    if (detectedRating) {
+
+        const ratingMovies =
+            movies
+                .filter(movie => {
+
+                    const rating =
+                        Number(
+                            movie.danhGia || 0
+                        );
+
+                    return (
+                        movie.trangThai ===
+                        "dang_chieu"
+
+                        &&
+
+                        rating >=
+                        detectedRating
+                    );
+                })
+                .sort(
+                    (a, b) =>
+                        Number(b.danhGia)
+                        -
+                        Number(a.danhGia)
+                );
+        if (
+            ratingMovies.length > 0
+        ) {
+
+            return {
+                type: "movie_list",
+                title:
+                    `⭐ Phim đang chiếu từ ${detectedRating} điểm trở lên`,
+                movies:
+                    ratingMovies.slice(
+                        0,
+                        10
+                    )
+            };
+        }
+
+        return {
+            type: "text",
+            text:
+                `Không tìm thấy phim nào từ ${detectedRating} điểm trở lên.`
+        };
+    }
+
+    /* =====================================
+        TÌM PHIM THEO NĂM PHÁT HÀNH
+    ===================================== */
 
     if (detectedYear) {
 
