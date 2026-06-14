@@ -8,13 +8,12 @@ export const findBestMovieMatch = (
     const words =
         normalizeText(text)
             .split(" ")
-            .filter(
-                word =>
-                    word.length > 2
-            );
+            .filter(Boolean);
+
+    console.log("QUERY:", text);
+    console.log("WORDS:", words);
 
     let bestMovie = null;
-
     let bestScore = 0;
 
     movies.forEach(movie => {
@@ -30,6 +29,14 @@ export const findBestMovieMatch = (
                     movieName.includes(word)
             ).length;
 
+        if (score > 0) {
+            console.log(
+                movie.tieuDe,
+                "=>",
+                score
+            );
+        }
+
         if (
             score > bestScore
         ) {
@@ -40,6 +47,12 @@ export const findBestMovieMatch = (
         }
 
     });
+
+    console.log(
+        "BEST:",
+        bestMovie?.tieuDe,
+        bestScore
+    );
 
     return bestScore >= 1
         ? bestMovie

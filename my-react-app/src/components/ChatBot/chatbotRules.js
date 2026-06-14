@@ -347,6 +347,73 @@ const chatbotRules = (
             : [];
 
     /* =====================================
+        SO SÁNH PHIM
+    ===================================== */
+    if (comparison) {
+
+        const {
+            movie1,
+            movie2
+        } = comparison;
+
+        let advice = "";
+
+        const genre1 =
+            movie1.theLoai
+                ?.map(
+                    x =>
+                        x.tenTheLoai
+                )
+                .join(", ");
+
+        const genre2 =
+            movie2.theLoai
+                ?.map(
+                    x =>
+                        x.tenTheLoai
+                )
+                .join(", ");
+
+        if (
+            normalizeText(
+                genre2
+            ).includes(
+                "sieu anh hung"
+            )
+        ) {
+
+            advice =
+                `Nếu bạn thích anh hùng và là fan DC thì nên xem ${movie2.tieuDe}. Nhưng nếu bạn muốn phiêu lưu giữa các ngân hà thì ${movie1.tieuDe} là lựa chọn đáng giá.`;
+        }
+
+        else {
+
+            advice =
+                `Cả hai đều đáng xem. ${movie1.tieuDe} được đánh giá ${movie1.danhGia}/10 còn ${movie2.tieuDe} được đánh giá ${movie2.danhGia}/10.`;
+        }
+
+        return {
+
+            type: "text",
+
+            text:
+                `🎬 So sánh phim\n\n` +
+
+                `⭐ ${movie1.tieuDe}: ${movie1.danhGia}/10\n` +
+
+                `⭐ ${movie2.tieuDe}: ${movie2.danhGia}/10\n\n` +
+
+                `🎭 Thể loại:\n` +
+
+                `• ${movie1.tieuDe}: ${genre1}\n` +
+
+                `• ${movie2.tieuDe}: ${genre2}\n\n` +
+
+                `💡 Gợi ý:\n\n${advice}`
+        };
+    }
+
+    /* =====================================
        PHIM ĐANG CHIẾU
     ===================================== */
 
@@ -1057,83 +1124,6 @@ const chatbotRules = (
             };
         }
     }
-
-    /* =====================================
-       SO SÁNH PHIM
-    ===================================== */
-    if (comparison) {
-
-        const {
-            movie1,
-            movie2
-        } = comparison;
-
-        let advice = "";
-
-        const genre1 =
-            movie1.theLoai
-                ?.map(
-                    x =>
-                        x.tenTheLoai
-                )
-                .join(", ");
-
-        const genre2 =
-            movie2.theLoai
-                ?.map(
-                    x =>
-                        x.tenTheLoai
-                )
-                .join(", ");
-
-        if (
-            normalizeText(
-                genre2
-            ).includes(
-                "sieu anh hung"
-            )
-        ) {
-
-            advice =
-                `Nếu bạn thích anh hùng và là fan DC thì nên xem ${movie2.tieuDe}. Nhưng nếu bạn muốn phiêu lưu giữa các ngân hà thì ${movie1.tieuDe} là lựa chọn đáng giá.`;
-        }
-
-        else {
-
-            advice =
-                `Cả hai đều đáng xem. ${movie1.tieuDe} được đánh giá ${movie1.danhGia}/10 còn ${movie2.tieuDe} được đánh giá ${movie2.danhGia}/10.`;
-        }
-
-        return {
-
-            type: "text",
-
-            text:
-                `🎬 So sánh phim\n\n` +
-
-                `⭐ ${movie1.tieuDe}: ${movie1.danhGia}/10\n` +
-
-                `⭐ ${movie2.tieuDe}: ${movie2.danhGia}/10\n\n` +
-
-                `🎭 Thể loại:\n` +
-
-                `• ${movie1.tieuDe}: ${genre1}\n` +
-
-                `• ${movie2.tieuDe}: ${genre2}\n\n` +
-
-                `💡 Gợi ý:\n\n${advice}`
-        };
-    }
-
-    console.log(
-        "FOUND CINEMA:",
-        foundCinema
-    );
-
-    console.log(
-        "ORIGINAL:",
-        originalText
-    );
 
     /* =====================================
        ĐỊA CHỈ RẠP
