@@ -91,3 +91,39 @@ export const detectCinema = (
     return null;
 
 };
+
+export const findCinema = (
+    message,
+    showtimes
+) => {
+
+    const text =
+        normalizeText(message);
+
+    for (const showtime of showtimes) {
+
+        const cinema =
+            showtime
+                ?.phong_chieu
+                ?.rap_chieu;
+
+        if (!cinema)
+            continue;
+
+        const cinemaName =
+            normalizeText(
+                cinema.tenRap
+            );
+
+        if (
+            text.includes(
+                cinemaName
+            )
+        ) {
+
+            return cinema;
+        }
+    }
+
+    return null;
+};

@@ -1,26 +1,22 @@
 import { normalizeText } from "./chatbotUtils";
 import { detectIntent } from "./chatbotIntents";
 import { detectDate } from "./chatbotDate";
-import { detectCinema } from "./chatbotCinema";
+import { detectCinema, findCinema } from "./chatbotCinema";
 import { findBestMovieMatch } from "./chatbotMovie";
 import { filterShowtimes } from "./chatbotShowtime";
 import { detectTimePeriod } from "./chatbotTime";
 import { detectMovieInfoIntent } from "./chatbotMovieInfo";
 import { detectRatingFilter } from "./chatbotRating";
 import { isMovieDiscoveryQuery } from "./chatbotMovieDiscovery";
+import { detectMovieComparison } from "./chatbotCompare";
 
 const chatbotRules = (
     message,
     movies,
     promotions,
     showtimes,
+    cinemas,
 ) => {
-    console.log(
-        "ALL CINEMAS",
-        showtimes.map(
-            x => x?.phong_chieu?.rap_chieu?.tenRap
-        )
-    );
 
     const text =
         normalizeText(message);
@@ -215,7 +211,7 @@ const chatbotRules = (
         );
 
     /* =====================================
-        NHẬN DIỆN NĂM PHÁT HÀNH
+        CÁC BIẾN NHẬN DIỆN
     ===================================== */
 
     const yearMatch =
@@ -229,6 +225,17 @@ const chatbotRules = (
             : null;
 
     const originalText = text;
+
+    console.log(
+        "CINEMAS:",
+        cinemas
+    );
+
+    const foundCinema =
+        findCinema(
+            originalText,
+            showtimes
+        );
 
     const detectedRating =
         detectRatingFilter(
@@ -252,6 +259,12 @@ const chatbotRules = (
     const isMovieDiscovery =
         isMovieDiscoveryQuery(
             originalText
+        );
+
+    const comparison =
+        detectMovieComparison(
+            originalText,
+            movies
         );
 
     /* =====================================
@@ -530,8 +543,8 @@ const chatbotRules = (
     }
 
     /* =====================================
-   GỢI Ý PHIM
-===================================== */
+        GỢI Ý PHIM
+    ===================================== */
 
     if (
         isSuggestion &&
@@ -1043,6 +1056,129 @@ const chatbotRules = (
                     "🎬 Không tìm thấy phim phù hợp với yêu cầu của bạn."
             };
         }
+    }
+
+    /* =====================================
+       SO SÁNH PHIM
+    ===================================== */
+    if (comparison) {
+
+        const {
+            movie1,
+            movie2
+        } = comparison;
+
+        let advice = "";
+
+        const genre1 =
+            movie1.theLoai
+                ?.map(
+                    x =>
+                        x.tenTheLoai
+                )
+                .join(", ");
+
+        const genre2 =
+            movie2.theLoai
+                ?.map(
+                    x =>
+                        x.tenTheLoai
+                )
+                .join(", ");
+
+        if (
+            normalizeText(
+                genre2
+            ).includes(
+                "sieu anh hung"
+            )
+        ) {
+
+            advice =
+                `Nếu bạn thích anh hùng và là fan DC thì nên xem ${movie2.tieuDe}. Nhưng nếu bạn muốn phiêu lưu giữa các ngân hà thì ${movie1.tieuDe} là lựa chọn đáng giá.`;
+        }
+
+        else {
+
+            advice =
+                `Cả hai đều đáng xem. ${movie1.tieuDe} được đánh giá ${movie1.danhGia}/10 còn ${movie2.tieuDe} được đánh giá ${movie2.danhGia}/10.`;
+        }
+
+        return {
+
+            type: "text",
+
+            text:
+                `🎬 So sánh phim\n\n` +
+
+                `⭐ ${movie1.tieuDe}: ${movie1.danhGia}/10\n` +
+
+                `⭐ ${movie2.tieuDe}: ${movie2.danhGia}/10\n\n` +
+
+                `🎭 Thể loại:\n` +
+
+                `• ${movie1.tieuDe}: ${genre1}\n` +
+
+                `• ${movie2.tieuDe}: ${genre2}\n\n` +
+
+                `💡 Gợi ý:\n\n${advice}`
+        };
+    }
+
+    console.log(
+        "FOUND CINEMA:",
+        foundCinema
+    );
+
+    console.log(
+        "ORIGINAL:",
+        originalText
+    );
+
+    /* =====================================
+       ĐỊA CHỈ RẠP
+    ===================================== */
+    if (
+        foundCinema &&
+        (
+            originalText.includes("dia chi")
+            ||
+            originalText.includes("o dau")
+        )
+    ) {
+
+        return {
+
+            type: "text",
+
+            text:
+                `📍 ${foundCinema.tenRap}\n\n` +
+
+                `Địa chỉ: ${foundCinema.diaChi}`
+        };
+    }
+
+    /* =====================================
+       LIÊN HỆ RẠP
+    ===================================== */
+    if (
+        foundCinema &&
+        (
+            originalText.includes("so dien thoai")
+            ||
+            originalText.includes("lien he")
+        )
+    ) {
+
+        return {
+
+            type: "text",
+
+            text:
+                `☎️ ${foundCinema.tenRap}\n\n` +
+
+                `${foundCinema.soDienThoai}`
+        };
     }
 
     /* =====================================

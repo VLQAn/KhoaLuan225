@@ -31,6 +31,9 @@ const ChatBot = () => {
 
     const [input, setInput] = useState("");
 
+    const [cinemas, setCinemas] =
+        useState([]);
+
     useEffect(() => {
 
         const saved =
@@ -120,17 +123,8 @@ const ChatBot = () => {
                 movies,
                 promotions,
                 showtimes,
+                cinemas,
             );
-
-        console.log("BOT RESPONSE", botResponse);
-
-        console.log(
-            "SHOWTIMES BEFORE CHATBOT:",
-            showtimes.map(x => ({
-                maXuatChieu: x.maXuatChieu,
-                maPhim: x.maPhim
-            }))
-        );
 
         const botMessage = {
             sender: "bot",
