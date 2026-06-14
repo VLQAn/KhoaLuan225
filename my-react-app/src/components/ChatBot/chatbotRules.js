@@ -7,6 +7,7 @@ import { filterShowtimes } from "./chatbotShowtime";
 import { detectTimePeriod } from "./chatbotTime";
 import { detectMovieInfoIntent } from "./chatbotMovieInfo";
 import { detectRatingFilter } from "./chatbotRating";
+import { isMovieDiscoveryQuery } from "./chatbotMovieDiscovery";
 
 const chatbotRules = (
     message,
@@ -246,6 +247,11 @@ const chatbotRules = (
         detectCinema(
             originalText,
             showtimes
+        );
+
+    const isMovieDiscovery =
+        isMovieDiscoveryQuery(
+            originalText
         );
 
     /* =====================================
@@ -611,7 +617,20 @@ const chatbotRules = (
        (ƯU TIÊN CAO)
     ===================================== */
 
-    if (detectedGenre) {
+    if (
+        detectedGenre
+        &&
+        !isMovieDiscovery
+    ) {
+        console.log(
+            "GENRE:",
+            detectedGenre
+        );
+
+        console.log(
+            "DISCOVERY:",
+            isMovieDiscovery
+        );
 
         if (
             genreMovies.length === 0
@@ -826,6 +845,204 @@ const chatbotRules = (
             movies:
                 bestMovies.slice(0, 5)
         };
+    }
+
+    /* =====================================
+       NHẬN DIỆN TÊN PHIM
+    ===================================== */
+    if (isMovieDiscovery) {
+
+        let filteredShowtimes =
+            [...showtimes];
+
+        // chỉ lấy suất còn hiệu lực
+
+        filteredShowtimes =
+            filteredShowtimes.filter(
+                showtime =>
+                    new Date(
+                        showtime.thoiGianKetThuc
+                    ) > new Date()
+            );
+
+        // ngày
+        if (detectedDate) {
+
+            filteredShowtimes =
+                filteredShowtimes.filter(
+                    showtime => {
+
+                        const showDate =
+                            new Date(
+                                showtime.thoiGianBatDau
+                            );
+
+                        if (
+                            detectedDate.type ===
+                            "weekend"
+                        ) {
+
+                            return (
+                                showDate.getDay() === 6
+                                ||
+                                showDate.getDay() === 0
+                            );
+                        }
+
+                        return (
+                            showDate.toDateString()
+                            ===
+                            detectedDate.date.toDateString()
+                        );
+                    }
+                );
+        }
+
+        //buổi sáng, chiểu, tối
+        if (detectedTimePeriod) {
+
+            filteredShowtimes =
+                filteredShowtimes.filter(
+                    showtime => {
+
+                        const hour =
+                            new Date(
+                                showtime.thoiGianBatDau
+                            ).getHours();
+
+                        switch (
+                        detectedTimePeriod
+                        ) {
+
+                            case "morning":
+                                return (
+                                    hour >= 6 &&
+                                    hour < 12
+                                );
+
+                            case "afternoon":
+                                return (
+                                    hour >= 14 &&
+                                    hour < 18
+                                );
+
+                            case "evening":
+                                return (
+                                    hour >= 18
+                                );
+
+                            default:
+                                return true;
+                        }
+                    }
+                );
+        }
+
+        // lọc rap
+        if (detectedCinema) {
+
+            filteredShowtimes =
+                filteredShowtimes.filter(
+                    showtime => {
+
+                        const cinemaName =
+                            normalizeText(
+                                showtime
+                                    ?.phong_chieu
+                                    ?.rap_chieu
+                                    ?.tenRap || ""
+                            );
+
+                        if (
+                            detectedCinema.type ===
+                            "brand"
+                        ) {
+
+                            return cinemaName.includes(
+                                detectedCinema.value
+                            );
+                        }
+
+                        return (
+                            cinemaName ===
+                            detectedCinema.value
+                        );
+                    }
+                );
+        }
+
+        // lọc thể loại
+        let matchedMovies =
+            movies.filter(movie => {
+
+                const exists =
+                    filteredShowtimes.some(
+                        showtime =>
+                            showtime.maPhim ===
+                            movie.maPhim
+                    );
+
+                if (!exists)
+                    return false;
+
+                if (!detectedGenre)
+                    return true;
+
+                return movie.theLoai?.some(
+                    type =>
+                        normalizeText(
+                            type.tenTheLoai
+                        ) === detectedGenre
+                );
+            });
+
+        // chỉ lấy phim đang chiếu
+        matchedMovies =
+            matchedMovies.filter(
+                movie =>
+                    movie.trangThai ===
+                    "dang_chieu"
+            );
+
+        // trả kết quả
+        if (matchedMovies.length > 0) {
+            let title = "🎬 Phim phù hợp";
+
+            if (detectedGenre) {
+                title =
+                    `🎬 Phim ${detectedGenre}`;
+            }
+
+            if (detectedTimePeriod) {
+                title += " theo khung giờ yêu cầu";
+            }
+
+            if (detectedCinema) {
+                title += ` tại ${detectedCinema.value}`;
+            }
+
+            return {
+
+                type: "movie_list",
+
+                title: title,
+
+                movies:
+                    matchedMovies.slice(
+                        0,
+                        10
+                    )
+            };
+        }
+
+        if (matchedMovies.length === 0) {
+
+            return {
+                type: "text",
+                text:
+                    "🎬 Không tìm thấy phim phù hợp với yêu cầu của bạn."
+            };
+        }
     }
 
     /* =====================================
