@@ -4,6 +4,8 @@ import { detectDate } from "./chatbotDate";
 import { detectCinema } from "./chatbotCinema";
 import { findBestMovieMatch } from "./chatbotMovie";
 import { filterShowtimes } from "./chatbotShowtime";
+import { detectTimePeriod } from "./chatbotTime";
+import { detectMovieInfoIntent } from "./chatbotMovieInfo";
 
 const chatbotRules = (
     message,
@@ -228,6 +230,11 @@ const chatbotRules = (
 
     const detectedDate =
         detectDate(originalText);
+
+    const detectedTimePeriod =
+        detectTimePeriod(
+            originalText
+        );
 
     const detectedCinema =
         detectCinema(
@@ -681,7 +688,8 @@ const chatbotRules = (
                     showtimes,
                     detectedMovie,
                     detectedDate,
-                    detectedCinema
+                    detectedCinema,
+                    detectedTimePeriod
                 );
 
             if (movieShowtimes.length > 0) {
@@ -770,6 +778,90 @@ const chatbotRules = (
             );
     }
 
+    const movieInfoIntent =
+        detectMovieInfoIntent(
+            originalText
+        );
+
+    if (
+        foundMovie
+        &&
+        movieInfoIntent ===
+        "duration"
+    ) {
+
+        return {
+            type: "text",
+
+            text:
+                `⏱️ ${foundMovie.tieuDe} có thời lượng ${foundMovie.thoiLuong} phút.`
+        };
+    }
+
+    if (
+        foundMovie
+        &&
+        movieInfoIntent ===
+        "director"
+    ) {
+
+        return {
+
+            type: "text",
+
+            text:
+                `🎬 Đạo diễn: ${foundMovie.daoDien}`
+        };
+    }
+
+    if (
+        foundMovie
+        &&
+        movieInfoIntent ===
+        "cast"
+    ) {
+
+        return {
+
+            type: "text",
+
+            text:
+                `🎭 Diễn viên:\n${foundMovie.dienVien}`
+        };
+    }
+
+    if (
+        foundMovie
+        &&
+        movieInfoIntent ===
+        "description"
+    ) {
+
+        return {
+
+            type: "text",
+
+            text:
+                `📖 ${foundMovie.moTa}`
+        };
+    }
+
+    if (
+        foundMovie
+        &&
+        movieInfoIntent ===
+        "rating"
+    ) {
+
+        return {
+
+            type: "text",
+
+            text:
+                `⭐ Đánh giá: ${foundMovie.danhGia}/10`
+        };
+    }
+
     const shouldShowShowtimes =
         foundMovie
         &&
@@ -781,6 +873,8 @@ const chatbotRules = (
             detectedDate
             ||
             detectedCinema
+            ||
+            detectedTimePeriod
         );
 
     if (shouldShowShowtimes) {
@@ -789,7 +883,8 @@ const chatbotRules = (
                 showtimes,
                 foundMovie,
                 detectedDate,
-                detectedCinema
+                detectedCinema,
+                detectedTimePeriod
             );
 
         if (movieShowtimes.length === 0) {
@@ -833,7 +928,8 @@ const chatbotRules = (
                 showtimes,
                 foundMovie,
                 detectedDate,
-                detectedCinema
+                detectedCinema,
+                detectedTimePeriod
             );
 
         return {

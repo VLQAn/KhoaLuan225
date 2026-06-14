@@ -4,7 +4,8 @@ export const filterShowtimes = (
     showtimes,
     movie,
     detectedDate,
-    detectedCinema
+    detectedCinema,
+    timePeriod
 ) => {
 
     let result =
@@ -21,6 +22,49 @@ export const filterShowtimes = (
                     showtime.thoiGianKetThuc
                 ) > new Date()
         );
+
+    if (timePeriod) {
+
+        result =
+            result.filter(
+                showtime => {
+
+                    const hour =
+                        new Date(
+                            showtime.thoiGianBatDau
+                        ).getHours();
+
+                    switch (timePeriod) {
+
+                        case "morning":
+                            return (
+                                hour >= 6 &&
+                                hour < 12
+                            );
+
+                        case "noon":
+                            return (
+                                hour >= 12 &&
+                                hour < 14
+                            );
+
+                        case "afternoon":
+                            return (
+                                hour >= 14 &&
+                                hour < 18
+                            );
+
+                        case "evening":
+                            return (
+                                hour >= 18
+                            );
+
+                        default:
+                            return true;
+                    }
+                }
+            );
+    }
 
     if (detectedDate) {
 
