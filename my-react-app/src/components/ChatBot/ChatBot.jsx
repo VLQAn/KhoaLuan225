@@ -153,7 +153,55 @@ const ChatBot = () => {
             const aiReply =
                 await chatBotService.askAI(input);
 
-            if (aiReply.type === "booking") {
+            if (
+                aiReply.type ===
+                "booking_showtimes"
+            ) {
+
+                setMessages(prev => [
+                    ...prev,
+                    userMessage,
+                    {
+                        sender: "bot",
+                        type: "showtime_list",
+                        text:
+                            `🎟️ Chọn suất chiếu phim ${aiReply.movieTitle}`,
+                        showtimes:
+                            aiReply.showtimes
+                    }
+                ]);
+
+                setInput("");
+
+                return;
+            }
+
+            if (
+                aiReply.type === "booking" &&
+                aiReply.action === "select_movie"
+            ) {
+
+                setMessages(prev => [
+                    ...prev,
+                    userMessage,
+                    {
+                        sender: "bot",
+                        text: aiReply.reply
+                    }
+                ]);
+
+                setTimeout(() => {
+
+                    navigate(
+                        `/movie/${aiReply.movieId}`
+                    );
+
+                }, 1500);
+
+                setInput("");
+
+                return;
+            } {
 
                 setMessages(prev => [
                     ...prev,
@@ -242,6 +290,14 @@ const ChatBot = () => {
                                                             <button
                                                                 key={showtime.maXuatChieu}
                                                                 className={s.showtimeBtn}
+                                                                onClick={() => {
+
+                                                                    navigate(
+                                                                        `/seat/${showtime.maXuatChieu}`
+                                                                    );
+
+                                                                    setOpen(false);
+                                                                }}
                                                             >
                                                                 {
                                                                     new Date(
