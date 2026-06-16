@@ -1,61 +1,61 @@
-import { normalizeText } from "./chatbotUtils";
+// import { normalizeText } from "./chatbotUtils";
 
-export const findBestMovieMatch = (
-    text,
-    movies
-) => {
+// export const findBestMovieMatch = (
+//     text,
+//     movies
+// ) => {
 
-    const words =
-        normalizeText(text)
-            .split(" ")
-            .filter(Boolean);
+//     const words =
+//         normalizeText(text)
+//             .split(" ")
+//             .filter(Boolean);
 
-    console.log("QUERY:", text);
-    console.log("WORDS:", words);
+//     console.log("QUERY:", text);
+//     console.log("WORDS:", words);
 
-    let bestMovie = null;
-    let bestScore = 0;
+//     let bestMovie = null;
+//     let bestScore = 0;
 
-    movies.forEach(movie => {
+//     movies.forEach(movie => {
 
-        const movieName =
-            normalizeText(
-                movie.tieuDe
-            );
+//         const movieName =
+//             normalizeText(
+//                 movie.tieuDe
+//             );
 
-        const score =
-            words.filter(
-                word =>
-                    movieName.includes(word)
-            ).length;
+//         const score =
+//             words.filter(
+//                 word =>
+//                     movieName.includes(word)
+//             ).length;
 
-        if (score > 0) {
-            console.log(
-                movie.tieuDe,
-                "=>",
-                score
-            );
-        }
+//         if (score > 0) {
+//             console.log(
+//                 movie.tieuDe,
+//                 "=>",
+//                 score
+//             );
+//         }
 
-        if (
-            score > bestScore
-        ) {
+//         if (
+//             score > bestScore
+//         ) {
 
-            bestScore = score;
-            bestMovie = movie;
+//             bestScore = score;
+//             bestMovie = movie;
 
-        }
+//         }
 
-    });
+//     });
 
-    console.log(
-        "BEST:",
-        bestMovie?.tieuDe,
-        bestScore
-    );
+//     console.log(
+//         "BEST:",
+//         bestMovie?.tieuDe,
+//         bestScore
+//     );
 
-    return bestScore >= 1
-        ? bestMovie
-        : null;
+//     return bestScore >= 1
+//         ? bestMovie
+//         : null;
 
-};
+// };

@@ -1,18 +1,18 @@
-import { normalizeText } from "./chatbotUtils";
+// import { normalizeText } from "./chatbotUtils";
 
-export const detectRatingFilter = text => {
+// export const detectRatingFilter = text => {
 
-    text =
-        normalizeText(text);
+//     text =
+//         normalizeText(text);
 
-    const match =
-        text.match(
-            /(?:tren|tu)\s*(\d+(?:\.\d+)?)/
-        );
+//     const match =
+//         text.match(
+//             /(?:tren|tu)\s*(\d+(?:\.\d+)?)/
+//         );
 
-    if (!match) {
-        return null;
-    }
+//     if (!match) {
+//         return null;
+//     }
 
-    return Number(match[1]);
-};
+//     return Number(match[1]);
+// };

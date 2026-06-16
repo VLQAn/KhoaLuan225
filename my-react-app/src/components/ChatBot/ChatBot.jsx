@@ -153,25 +153,39 @@ const ChatBot = () => {
             const aiReply =
                 await chatBotService.askAI(input);
 
-            if (
-                aiReply.type ===
-                "booking_showtimes"
-            ) {
+            if (aiReply.type === "movie_info") {
+
+                let text = "";
+
+                switch (aiReply.infoType) {
+
+                    case "summary":
+                        text =
+                            aiReply.movie.moTa;
+                        break;
+
+                    case "director":
+                        text =
+                            `🎬 Đạo diễn: ${aiReply.movie.daoDien}`;
+                        break;
+
+                    case "actor":
+                        text =
+                            `🎭 Diễn viên: ${aiReply.movie.dienVien}`;
+                        break;
+                }
 
                 setMessages(prev => [
+
                     ...prev,
+
                     userMessage,
+
                     {
                         sender: "bot",
-                        type: "showtime_list",
-                        text:
-                            `🎟️ Chọn suất chiếu phim ${aiReply.movieTitle}`,
-                        showtimes:
-                            aiReply.showtimes
+                        text
                     }
                 ]);
-
-                setInput("");
 
                 return;
             }
