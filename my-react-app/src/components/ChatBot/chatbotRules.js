@@ -2,13 +2,13 @@ import { normalizeText } from "./chatbotUtils";
 import { detectIntent } from "./chatbotIntents";
 import { detectDate } from "./chatbotDate";
 import { detectCinema, findCinema } from "./chatbotCinema";
-import { findBestMovieMatch } from "./chatbotMovie";
-import { filterShowtimes } from "./chatbotShowtime";
+// import { findBestMovieMatch } from "./chatbotMovie";
+// import { filterShowtimes } from "./chatbotShowtime";
 import { detectTimePeriod } from "./chatbotTime";
-import { detectMovieInfoIntent } from "./chatbotMovieInfo";
-import { detectRatingFilter } from "./chatbotRating";
+// import { detectMovieInfoIntent } from "./chatbotMovieInfo";
+// import { detectRatingFilter } from "./chatbotRating";
 import { isMovieDiscoveryQuery } from "./chatbotMovieDiscovery";
-import { detectMovieComparison } from "./chatbotCompare";
+// import { detectMovieComparison } from "./chatbotCompare";
 
 const chatbotRules = (
     message,
