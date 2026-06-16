@@ -16,7 +16,6 @@ const Seat = () => {
     const { state } = useLocation();
 
     const [selectedSeats, setSelectedSeats] = useState([]);
-    const [soldSeats, setSoldSeats] = useState([]);
     const [seats, setSeats] = useState([]);
     const [xuatChieu, setXuatChieu] = useState(null);
     const [giaVe, setGiaVe] = useState(0);
@@ -111,8 +110,6 @@ const Seat = () => {
             const booked = seatData
                 .filter(seat => seat.daDat)
                 .map(seat => seat.tenGhe);
-
-            setSoldSeats(booked);
 
         } catch (error) {
             console.log(error);

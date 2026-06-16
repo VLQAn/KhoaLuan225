@@ -6,6 +6,7 @@ import movieApi from "../../services/movieApi";
 import khuyenMaiApi from "../../services/khuyenMaiApi";
 import { useNavigate } from "react-router-dom";
 import xuatChieuApi from "../../services/xuatChieuApi";
+import chatBotService from "../../services/chatBotService";
 
 const s = styles;
 
@@ -108,7 +109,7 @@ const ChatBot = () => {
 
     }, [messages]);
 
-    const handleSend = () => {
+    const handleSend = async () => {
 
         if (!input.trim()) return;
 
@@ -123,19 +124,74 @@ const ChatBot = () => {
                 movies,
                 promotions,
                 showtimes,
-                cinemas,
+                cinemas
             );
 
-        const botMessage = {
-            sender: "bot",
-            ...botResponse
-        };
+        if (botResponse) {
 
-        setMessages(prev => [
-            ...prev,
-            userMessage,
-            botMessage
-        ]);
+            const botMessage = {
+                sender: "bot",
+                ...botResponse
+            };
+
+            setMessages(prev => [
+                ...prev,
+                userMessage,
+                botMessage
+            ]);
+
+            setInput("");
+
+            return;
+        }
+
+        // Fallback AI
+        try {
+
+            console.log("CALLING OPENAI...");
+
+            const aiReply =
+                await chatBotService.askAI(input);
+
+            if (aiReply.type === "booking") {
+
+                setMessages(prev => [
+                    ...prev,
+                    userMessage,
+                    {
+                        sender: "bot",
+                        text: aiReply.reply
+                    }
+                ]);
+
+                setInput("");
+                return;
+            }
+
+            setMessages(prev => [
+                ...prev,
+                userMessage,
+                {
+                    sender: "bot",
+                    text: aiReply.reply
+                }
+            ]);
+
+        } catch (error) {
+
+            console.error(error);
+
+            const botMessage = {
+                sender: "bot",
+                text: "Xin lỗi, AI hiện đang bận."
+            };
+
+            setMessages(prev => [
+                ...prev,
+                userMessage,
+                botMessage
+            ]);
+        }
 
         setInput("");
     };

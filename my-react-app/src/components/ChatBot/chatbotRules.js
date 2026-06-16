@@ -1394,18 +1394,7 @@ const chatbotRules = (
        MẶC ĐỊNH
     ===================================== */
 
-    return {
-        type: "text",
-        text:
-            "Xin lỗi, tôi chưa hiểu câu hỏi.\n\n" +
-            "Bạn có thể hỏi:\n\n" +
-            "• Phim đang chiếu\n" +
-            "• Phim sắp chiếu\n" +
-            "• Khuyến mãi\n" +
-            "• Phim kinh dị\n" +
-            "• Phim hành động\n" +
-            "• Tên phim bất kỳ"
-    };
+    return null;
 };
 
 export default chatbotRules;

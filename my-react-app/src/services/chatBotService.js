@@ -1,5 +1,4 @@
-// src/services/chatBotService.js
-const API_URL = "http://127.0.0.1:8000/api/chatbot";
+const API_URL = "http://127.0.0.1:8000/api/chatbot/ask";
 
 const chatBotService = {
     sendMessage: async (messageText) => {
