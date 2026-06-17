@@ -2,13 +2,8 @@ import { normalizeText } from "./chatbotUtils";
 import { detectIntent } from "./chatbotIntents";
 import { detectDate } from "./chatbotDate";
 import { detectCinema, findCinema } from "./chatbotCinema";
-// import { findBestMovieMatch } from "./chatbotMovie";
-// import { filterShowtimes } from "./chatbotShowtime";
 import { detectTimePeriod } from "./chatbotTime";
-// import { detectMovieInfoIntent } from "./chatbotMovieInfo";
-// import { detectRatingFilter } from "./chatbotRating";
 import { isMovieDiscoveryQuery } from "./chatbotMovieDiscovery";
-// import { detectMovieComparison } from "./chatbotCompare";
 
 const chatbotRules = (
     message,
@@ -23,103 +18,17 @@ const chatbotRules = (
 
     const intent = detectIntent(text);
 
-    const isActorSearch =
-        text.includes("dien vien")
-        ||
-        text.includes("tham gia")
-        ||
-        text.includes("cua");
-
-    const isDirectorSearch =
-        text.includes("dao dien")
-        ||
-        text.includes("cua");
-
     /* =====================================
        DANH SÁCH THỂ LOẠI
     ===================================== */
-
-    const allGenres = [];
-
-    movies.forEach(movie => {
-
-        movie.theLoai?.forEach(type => {
-
-            const genre =
-                normalizeText(
-                    type.tenTheLoai
-                );
-
-            if (
-                !allGenres.includes(
-                    genre
-                )
-            ) {
-                allGenres.push(
-                    genre
-                );
-            }
-
-        });
-
-    });
 
     /* =====================================
        TỪ KHÓA THỂ LOẠI THAY THẾ
     ===================================== */
 
-    const genreAlias = {
-
-        "phim ma":
-            "kinh di",
-
-        "ma quy":
-            "kinh di",
-
-        "hai huoc":
-            "hai",
-
-        "tinh yeu":
-            "lang man",
-
-        "yeu duong":
-            "lang man",
-
-        "sieu nhan":
-            "sieu anh hung",
-
-        "xac song":
-            "zombie",
-
-        "vo":
-            "vo thuat"
-    };
-
     /* =====================================
        TỪ KHÓA CÓ THỂ BỎ QUA KHI TÌM KIẾM ĐẠO DIỄN, DIỄN VIÊN
     ===================================== */
-    const searchStopWords = [
-        "toi",
-        "muon",
-        "xem",
-        "co",
-        "nao",
-        "khong",
-        "hom",
-        "nay",
-        "toi",
-        "giup",
-        "minh",
-        "xin",
-        "phim",
-        "cua",
-        "dao",
-        "dien",
-        "dien",
-        "vien",
-        "tham",
-        "gia"
-    ];
 
     /* =====================================
        TỪ KHÓA CÓ THỂ BỎ QUA
@@ -147,15 +56,6 @@ const chatbotRules = (
         "gia"
     ];
 
-    const keywords =
-        text
-            .split(" ")
-            .filter(
-                word =>
-                    word.length > 2 &&
-                    !stopWords.includes(word)
-            );
-
     /* =====================================
        LÀM SẠCH YÊU CẦU
     ===================================== */
@@ -182,14 +82,6 @@ const chatbotRules = (
         "nen xem"
     ];
 
-    const isSuggestion =
-        suggestionKeywords.some(
-            keyword =>
-                processedText.includes(
-                    keyword
-                )
-        );
-
     /* =====================================
         NHẬN DIỆN Ý ĐỊNH ĐẶT VÉ
     ===================================== */
@@ -202,27 +94,9 @@ const chatbotRules = (
         "giu cho"
     ];
 
-    const isBookingIntent =
-        bookingKeywords.some(
-            keyword =>
-                processedText.includes(
-                    keyword
-                )
-        );
-
     /* =====================================
         CÁC BIẾN NHẬN DIỆN
     ===================================== */
-
-    const yearMatch =
-        processedText.match(
-            /\b(19|20)\d{2}\b/
-        );
-
-    const detectedYear =
-        yearMatch
-            ? Number(yearMatch[0])
-            : null;
 
     const originalText = text;
 
@@ -235,11 +109,6 @@ const chatbotRules = (
         findCinema(
             originalText,
             showtimes
-        );
-
-    const detectedRating =
-        detectRatingFilter(
-            originalText
         );
 
     const detectedDate =
@@ -259,12 +128,6 @@ const chatbotRules = (
     const isMovieDiscovery =
         isMovieDiscoveryQuery(
             originalText
-        );
-
-    const comparison =
-        detectMovieComparison(
-            originalText,
-            movies
         );
 
     /* =====================================
@@ -290,128 +153,6 @@ const chatbotRules = (
         }
 
     });
-
-    /* =====================================
-       NHẬN DIỆN THỂ LOẠI
-    ===================================== */
-
-    let detectedGenre =
-        allGenres.find(
-            genre =>
-                processedText.includes(
-                    genre
-                )
-        );
-
-    if (!detectedGenre) {
-
-        Object.entries(
-            genreAlias
-        ).forEach(
-            ([keyword, genre]) => {
-
-                if (
-                    processedText.includes(
-                        keyword
-                    )
-                ) {
-                    detectedGenre =
-                        genre;
-                }
-
-            }
-        );
-    }
-
-    /* =====================================
-       DANH SÁCH PHIM THEO THỂ LOẠI
-    ===================================== */
-
-    const genreMovies =
-        detectedGenre
-            ? movies.filter(movie =>
-
-                movie.trangThai ===
-                "dang_chieu"
-
-                &&
-
-                movie.theLoai?.some(
-                    type =>
-
-                        normalizeText(
-                            type.tenTheLoai
-                        ) === detectedGenre
-                )
-            )
-            : [];
-
-    /* =====================================
-        SO SÁNH PHIM
-    ===================================== */
-    if (comparison) {
-
-        const {
-            movie1,
-            movie2
-        } = comparison;
-
-        let advice = "";
-
-        const genre1 =
-            movie1.theLoai
-                ?.map(
-                    x =>
-                        x.tenTheLoai
-                )
-                .join(", ");
-
-        const genre2 =
-            movie2.theLoai
-                ?.map(
-                    x =>
-                        x.tenTheLoai
-                )
-                .join(", ");
-
-        if (
-            normalizeText(
-                genre2
-            ).includes(
-                "sieu anh hung"
-            )
-        ) {
-
-            advice =
-                `Nếu bạn thích anh hùng và là fan DC thì nên xem ${movie2.tieuDe}. Nhưng nếu bạn muốn phiêu lưu giữa các ngân hà thì ${movie1.tieuDe} là lựa chọn đáng giá.`;
-        }
-
-        else {
-
-            advice =
-                `Cả hai đều đáng xem. ${movie1.tieuDe} được đánh giá ${movie1.danhGia}/10 còn ${movie2.tieuDe} được đánh giá ${movie2.danhGia}/10.`;
-        }
-
-        return {
-
-            type: "text",
-
-            text:
-                `🎬 So sánh phim\n\n` +
-
-                `⭐ ${movie1.tieuDe}: ${movie1.danhGia}/10\n` +
-
-                `⭐ ${movie2.tieuDe}: ${movie2.danhGia}/10\n\n` +
-
-                `🎭 Thể loại:\n` +
-
-                `• ${movie1.tieuDe}: ${genre1}\n` +
-
-                `• ${movie2.tieuDe}: ${genre2}\n\n` +
-
-                `💡 Gợi ý:\n\n${advice}`
-        };
-    }
 
     /* =====================================
        PHIM ĐANG CHIẾU
@@ -488,320 +229,6 @@ const chatbotRules = (
                         .join("\n")
                     : "Hiện chưa có chương trình khuyến mãi."
         };
-    }
-
-    /* =====================================
-       TOP PHIM HAY NHẤT
-    ===================================== */
-    if (intent === "top_movies") {
-
-        const topMovies =
-            movies
-                .filter(
-                    movie =>
-                        movie.trangThai ===
-                        "dang_chieu"
-                )
-                .sort(
-                    (a, b) =>
-                        Number(b.danhGia)
-                        -
-                        Number(a.danhGia)
-                );
-
-        return {
-            type: "movie_list",
-            title:
-                "🏆 Top phim đánh giá cao",
-            movies:
-                topMovies.slice(0, 5)
-        };
-    }
-
-    /* =====================================
-       RATING PHIM
-    ===================================== */
-    if (detectedRating) {
-
-        const ratingMovies =
-            movies
-                .filter(movie => {
-
-                    const rating =
-                        Number(
-                            movie.danhGia || 0
-                        );
-
-                    return (
-                        movie.trangThai ===
-                        "dang_chieu"
-
-                        &&
-
-                        rating >=
-                        detectedRating
-                    );
-                })
-                .sort(
-                    (a, b) =>
-                        Number(b.danhGia)
-                        -
-                        Number(a.danhGia)
-                );
-        if (
-            ratingMovies.length > 0
-        ) {
-
-            return {
-                type: "movie_list",
-                title:
-                    `⭐ Phim đang chiếu từ ${detectedRating} điểm trở lên`,
-                movies:
-                    ratingMovies.slice(
-                        0,
-                        10
-                    )
-            };
-        }
-
-        return {
-            type: "text",
-            text:
-                `Không tìm thấy phim nào từ ${detectedRating} điểm trở lên.`
-        };
-    }
-
-    /* =====================================
-        TÌM PHIM THEO NĂM PHÁT HÀNH
-    ===================================== */
-
-    if (detectedYear) {
-
-        const moviesByYear =
-            movies.filter(movie => {
-
-                if (!movie.ngayCongChieu)
-                    return false;
-
-                const year =
-                    new Date(
-                        movie.ngayCongChieu
-                    ).getFullYear();
-
-                return year === detectedYear;
-            });
-
-        if (moviesByYear.length > 0) {
-
-            return {
-                type: "movie_list",
-                title:
-                    `📅 Phim năm ${detectedYear}`,
-                movies:
-                    moviesByYear.slice(0, 10)
-            };
-        }
-
-        return {
-            type: "text",
-            text:
-                `Không tìm thấy phim phát hành năm ${detectedYear}.`
-        };
-    }
-
-    /* =====================================
-        GỢI Ý PHIM
-    ===================================== */
-
-    if (
-        isSuggestion &&
-        detectedGenre
-    ) {
-
-        const suggestedMovies =
-            movies
-                .filter(movie =>
-
-                    movie.trangThai ===
-                    "dang_chieu"
-
-                    &&
-
-                    movie.theLoai?.some(
-                        type =>
-
-                            normalizeText(
-                                type.tenTheLoai
-                            ) === detectedGenre
-                    )
-                )
-                .sort(
-                    (a, b) =>
-                        Number(b.danhGia || 0)
-                        -
-                        Number(a.danhGia || 0)
-                );
-
-        if (
-            suggestedMovies.length > 0
-        ) {
-
-            return {
-                type: "movie_list",
-
-                title:
-                    `⭐ Gợi ý phim ${detectedGenre}`,
-
-                movies:
-                    suggestedMovies.slice(
-                        0,
-                        5
-                    )
-            };
-        }
-    }
-
-    if (
-        isSuggestion &&
-        !detectedGenre
-    ) {
-
-        const bestMovies =
-            movies
-                .filter(
-                    movie =>
-                        movie.trangThai ===
-                        "dang_chieu"
-                )
-                .sort(
-                    (a, b) =>
-                        Number(b.danhGia || 0)
-                        -
-                        Number(a.danhGia || 0)
-                );
-
-        return {
-            type: "movie_list",
-            title:
-                "⭐ Phim được đề xuất",
-            movies:
-                bestMovies.slice(
-                    0,
-                    5
-                )
-        };
-    }
-
-    /* =====================================
-       TÌM PHIM THEO THỂ LOẠI
-       (ƯU TIÊN CAO)
-    ===================================== */
-
-    if (
-        detectedGenre
-        &&
-        !isMovieDiscovery
-    ) {
-        console.log(
-            "GENRE:",
-            detectedGenre
-        );
-
-        console.log(
-            "DISCOVERY:",
-            isMovieDiscovery
-        );
-
-        if (
-            genreMovies.length === 0
-        ) {
-
-            return {
-                type: "text",
-                text:
-                    `Hiện chưa có phim ${detectedGenre} đang chiếu.`
-            };
-        }
-
-        return {
-
-            type: "movie_list",
-
-            title:
-                `🎬 ${detectedGenre.toUpperCase()} (${genreMovies.length} phim)`,
-
-            movies:
-                genreMovies
-                    .sort(
-                        (a, b) =>
-                            Number(b.danhGia || 0)
-                            -
-                            Number(a.danhGia || 0)
-                    )
-                    .slice(0, 5)
-        };
-    }
-
-    /* =====================
-       TÌM PHIM THEO DIỄN VIÊN
-    ===================== */
-
-    if (isActorSearch) {
-
-        const actorMovies =
-            movies.filter(movie => {
-
-                const actors =
-                    normalizeText(
-                        movie.dienVien || ""
-                    );
-
-                return keywords.every(
-                    keyword =>
-                        actors.includes(keyword)
-                );
-
-            });
-
-        if (actorMovies.length > 0) {
-
-            return {
-                type: "movie_list",
-                title: `🎭 Tìm thấy ${actorMovies.length} phim`,
-                movies: actorMovies.slice(0, 5)
-            };
-        }
-    }
-
-    /* =====================
-        TÌM PHIM THEO ĐẠO DIỄN
-    ===================== */
-
-    if (isDirectorSearch) {
-
-        const directorMovies =
-            movies.filter(movie => {
-
-                const director =
-                    normalizeText(
-                        movie.daoDien || ""
-                    );
-
-                return keywords.every(
-                    keyword =>
-                        director.includes(keyword)
-                );
-
-            });
-
-        if (directorMovies.length > 0) {
-
-            return {
-                type: "movie_list",
-                title: `🎬 Phim của đạo diễn`,
-                movies: directorMovies.slice(0, 5)
-            };
-        }
     }
 
     /* =====================================
@@ -896,11 +323,6 @@ const chatbotRules = (
             };
         }
     }
-
-    const isMovieInfoIntent =
-        originalText.includes("thong tin")
-        ||
-        originalText.includes("chi tiet");
 
     if (intent === "recommendation") {
 
@@ -1053,28 +475,14 @@ const chatbotRules = (
 
         // lọc thể loại
         let matchedMovies =
-            movies.filter(movie => {
+            movies.filter(movie =>
 
-                const exists =
-                    filteredShowtimes.some(
-                        showtime =>
-                            showtime.maPhim ===
-                            movie.maPhim
-                    );
-
-                if (!exists)
-                    return false;
-
-                if (!detectedGenre)
-                    return true;
-
-                return movie.theLoai?.some(
-                    type =>
-                        normalizeText(
-                            type.tenTheLoai
-                        ) === detectedGenre
-                );
-            });
+                filteredShowtimes.some(
+                    showtime =>
+                        showtime.maPhim ===
+                        movie.maPhim
+                )
+            );
 
         // chỉ lấy phim đang chiếu
         matchedMovies =
@@ -1206,90 +614,6 @@ const chatbotRules = (
                 processedText,
                 movies
             );
-    }
-
-    const movieInfoIntent =
-        detectMovieInfoIntent(
-            originalText
-        );
-
-    if (
-        foundMovie
-        &&
-        movieInfoIntent ===
-        "duration"
-    ) {
-
-        return {
-            type: "text",
-
-            text:
-                `⏱️ ${foundMovie.tieuDe} có thời lượng ${foundMovie.thoiLuong} phút.`
-        };
-    }
-
-    if (
-        foundMovie
-        &&
-        movieInfoIntent ===
-        "director"
-    ) {
-
-        return {
-
-            type: "text",
-
-            text:
-                `🎬 Đạo diễn: ${foundMovie.daoDien}`
-        };
-    }
-
-    if (
-        foundMovie
-        &&
-        movieInfoIntent ===
-        "cast"
-    ) {
-
-        return {
-
-            type: "text",
-
-            text:
-                `🎭 Diễn viên:\n${foundMovie.dienVien}`
-        };
-    }
-
-    if (
-        foundMovie
-        &&
-        movieInfoIntent ===
-        "description"
-    ) {
-
-        return {
-
-            type: "text",
-
-            text:
-                `📖 ${foundMovie.moTa}`
-        };
-    }
-
-    if (
-        foundMovie
-        &&
-        movieInfoIntent ===
-        "rating"
-    ) {
-
-        return {
-
-            type: "text",
-
-            text:
-                `⭐ Đánh giá: ${foundMovie.danhGia}/10`
-        };
     }
 
     const shouldShowShowtimes =

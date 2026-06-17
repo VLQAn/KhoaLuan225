@@ -191,6 +191,45 @@ const ChatBot = () => {
             }
 
             if (
+                aiReply.type ===
+                "booking_showtimes"
+            ) {
+
+                let text =
+                    `${aiReply.reply}\n\n`;
+
+                aiReply.showtimes.forEach(
+                    (showtime, index) => {
+
+                        text +=
+                            `${index + 1}. ${new Date(
+                                showtime.thoiGianBatDau
+                            ).toLocaleString("vi-VN")
+                            }\n`;
+                    }
+                );
+
+                text +=
+                    "\n👉 Hãy nhập số thứ tự suất chiếu.";
+
+                setMessages(prev => [
+
+                    ...prev,
+
+                    userMessage,
+
+                    {
+                        sender: "bot",
+                        text
+                    }
+                ]);
+
+                setInput("");
+
+                return;
+            }
+
+            if (
                 aiReply.type === "booking" &&
                 aiReply.action === "select_movie"
             ) {
