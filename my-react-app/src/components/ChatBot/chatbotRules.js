@@ -401,7 +401,6 @@ const chatbotRules = (
                 );
         }
 
-        // lọc thể loại
         let matchedMovies =
             movies.filter(movie =>
 
@@ -423,11 +422,6 @@ const chatbotRules = (
         // trả kết quả
         if (matchedMovies.length > 0) {
             let title = "🎬 Phim phù hợp";
-
-            if (detectedGenre) {
-                title =
-                    `🎬 Phim ${detectedGenre}`;
-            }
 
             if (detectedTimePeriod) {
                 title += " theo khung giờ yêu cầu";

@@ -12,10 +12,6 @@ export const isMovieDiscoveryQuery =
 
             ||
 
-            text.includes("phim gi")
-
-            ||
-
             text.includes("phim nao")
 
             ||
@@ -29,7 +25,5 @@ export const isMovieDiscoveryQuery =
             ||
 
             text.includes("goi y phim")
-
         );
     };
-    

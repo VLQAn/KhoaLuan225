@@ -160,25 +160,28 @@ const ChatBot = () => {
 
             if (aiReply.type === "movie_info") {
 
-                let text = "";
+                const movie = {
 
-                switch (aiReply.infoType) {
+                    maPhim: aiReply.movie.id,
 
-                    case "summary":
-                        text =
-                            aiReply.movie.moTa;
-                        break;
+                    tieuDe: aiReply.movie.title,
 
-                    case "director":
-                        text =
-                            `🎬 Đạo diễn: ${aiReply.movie.daoDien}`;
-                        break;
+                    moTa: aiReply.movie.description,
 
-                    case "actor":
-                        text =
-                            `🎭 Diễn viên: ${aiReply.movie.dienVien}`;
-                        break;
-                }
+                    daoDien: aiReply.movie.director,
+
+                    dienVien: aiReply.movie.actors,
+
+                    danhGia: aiReply.movie.rating,
+
+                    thoiLuong: aiReply.movie.duration,
+
+                    trangThai: aiReply.movie.status,
+
+                    anhPoster: aiReply.movie.poster,
+
+                    theLoai: aiReply.movie.genres || []
+                };
 
                 setMessages(prev => [
 
@@ -188,7 +191,8 @@ const ChatBot = () => {
 
                     {
                         sender: "bot",
-                        text
+                        type: "movie",
+                        movie
                     }
                 ]);
 
