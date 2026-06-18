@@ -215,7 +215,7 @@ const ChatBot = () => {
                 );
 
                 text +=
-                    "\n👉 Bạn muốn mình đặt vé cho xuất chiếu nào.";
+                    "\n👉 Bạn muốn mình đặt vé cho suất chiếu nào.";
 
                 setMessages(prev => [
 
