@@ -153,6 +153,11 @@ const ChatBot = () => {
             const aiReply =
                 await chatBotService.askAI(input);
 
+            console.log(
+                "AI REPLY:",
+                aiReply
+            );
+
             if (aiReply.type === "movie_info") {
 
                 let text = "";
@@ -210,7 +215,7 @@ const ChatBot = () => {
                 );
 
                 text +=
-                    "\n👉 Hãy nhập số thứ tự suất chiếu.";
+                    "\n👉 Bạn muốn mình đặt vé cho xuất chiếu nào.";
 
                 setMessages(prev => [
 
