@@ -4,12 +4,22 @@ const chatBotService = {
 
     askAI: async (messageText) => {
 
+        const token =
+            localStorage.getItem("token");
+
         const response =
             await fetch(API_URL, {
                 method: "POST",
+
                 headers: {
-                    "Content-Type": "application/json",
+
+                    "Content-Type":
+                        "application/json",
+
+                    Authorization:
+                        `Bearer ${token}`
                 },
+
                 body: JSON.stringify({
                     message: messageText
                 }),
