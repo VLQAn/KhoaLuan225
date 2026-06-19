@@ -120,7 +120,7 @@ const ChatBot = () => {
 
         const botResponse =
             chatbotRules(
-                input,
+                messageText,
                 movies,
                 promotions,
                 showtimes,
@@ -151,7 +151,7 @@ const ChatBot = () => {
             console.log("CALLING OPENAI...");
 
             const aiReply =
-                await chatBotService.askAI(input);
+                await chatBotService.askAI(messageText);
 
             console.log(
                 "AI REPLY:",
