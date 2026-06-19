@@ -255,3 +255,35 @@
     box-shadow:
         0 4px 12px rgba(0,0,0,0.15);
 }
+
+.checkoutCard {
+
+    background: #fff;
+
+    border-radius: 12px;
+
+    padding: 12px;
+
+    margin-top: 8px;
+}
+
+.checkoutBtn {
+
+    margin-top: 10px;
+
+    width: 100%;
+
+    padding: 10px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    background: #e50914;
+
+    color: white;
+
+    font-weight: bold;
+}

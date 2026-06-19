@@ -10,6 +10,8 @@ const Checkout = () => {
 
     const { state } = useLocation();
 
+    console.log("CHECKOUT STATE", state);
+
     const foods =
         state?.foods || [];
 
@@ -208,7 +210,10 @@ const Checkout = () => {
                             <div className={s.ticketRow}>
                                 <span>
                                     {selectedSeats
-                                        .map(seat => seat.tenGhe)
+                                        .map(
+                                            seat =>
+                                                `${seat.hangGhe}${seat.soGhe}`
+                                        )
                                         .join(", ")}
                                 </span>
 

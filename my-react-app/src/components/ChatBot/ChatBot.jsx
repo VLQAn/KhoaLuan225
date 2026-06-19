@@ -8,6 +8,7 @@ import khuyenMaiApi from "../../services/khuyenMaiApi";
 import { useNavigate } from "react-router-dom";
 import xuatChieuApi from "../../services/xuatChieuApi";
 import chatBotService from "../../services/chatBotService";
+import chatbotCheckoutApi from "../../services/chatbotCheckoutApi";
 
 const s = styles;
 
@@ -210,7 +211,7 @@ const ChatBot = () => {
                 setMessages(prev => [
 
                     ...prev,
-                    
+
                     userMessage,
 
                     {
@@ -254,6 +255,43 @@ const ChatBot = () => {
                     }
                 ]);
                 setInput("");
+                return;
+            }
+
+            if (
+                aiReply.type ===
+                "booking_checkout"
+            ) {
+
+                setMessages(prev => [
+
+                    ...prev,
+
+                    userMessage,
+
+                    {
+                        sender: "bot",
+
+                        type:
+                            "booking_checkout",
+
+                        showtimeId:
+                            aiReply.showtimeId,
+
+                        selectedSeats:
+                            aiReply.selectedSeats,
+
+                        quantity:
+                            aiReply.quantity,
+
+                        checkoutUrl:
+                            aiReply.checkoutUrl,
+
+                        text:
+                            aiReply.reply
+                    }
+                ]);
+
                 return;
             }
 
@@ -378,12 +416,12 @@ const ChatBot = () => {
                                                                 className={s.showtimeBtn}
                                                                 onClick={() => {
 
-                                                                        navigate(
-                                                                            `/seat/${showtime.maXuatChieu}?qty=${msg.nbTickets || 1}`
-                                                                        );
+                                                                    navigate(
+                                                                        `/seat/${showtime.maXuatChieu}?qty=${msg.nbTickets || 1}`
+                                                                    );
 
-                                                                        setOpen(false);
-                                                                    }}
+                                                                    setOpen(false);
+                                                                }}
                                                             >
                                                                 {
                                                                     new Date(
@@ -484,6 +522,57 @@ const ChatBot = () => {
                                                         </p>
                                                     )
                                                 }
+
+                                            </div>
+
+                                        ) : msg.type === "booking_checkout" ? (
+
+                                            <div className={s.checkoutCard}>
+
+                                                <h4>
+                                                    🎟️ Xác nhận đặt vé
+                                                </h4>
+
+                                                <p>
+                                                    Ghế:
+                                                    {msg.selectedSeats.join(", ")}
+                                                </p>
+
+                                                <button
+
+                                                    className={s.checkoutBtn}
+
+                                                    onClick={async () => {
+
+                                                        try {
+
+                                                            const res =
+                                                                await chatbotCheckoutApi.getInfo();
+
+                                                            navigate(
+                                                                "/checkout",
+                                                                {
+                                                                    state:
+                                                                        res.data
+                                                                }
+                                                            );
+
+                                                            setOpen(false);
+
+                                                        } catch (err) {
+
+                                                            console.error(err);
+
+                                                            alert(
+                                                                "Không lấy được thông tin checkout"
+                                                            );
+                                                        }
+                                                    }}
+                                                >
+
+                                                    Xem thông tin đặt vé
+
+                                                </button>
 
                                             </div>
 
