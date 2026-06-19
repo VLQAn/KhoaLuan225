@@ -164,29 +164,6 @@ const ChatBot = () => {
 
             if (aiReply.type === "movie_info") {
 
-                const movie = {
-
-                    maPhim: aiReply.movie.id,
-
-                    tieuDe: aiReply.movie.title,
-
-                    moTa: aiReply.movie.description,
-
-                    daoDien: aiReply.movie.director,
-
-                    dienVien: aiReply.movie.actors,
-
-                    danhGia: aiReply.movie.rating,
-
-                    thoiLuong: aiReply.movie.duration,
-
-                    trangThai: aiReply.movie.status,
-
-                    anhPoster: aiReply.movie.poster,
-
-                    theLoai: aiReply.movie.genres || []
-                };
-
                 setMessages(prev => [
 
                     ...prev,
@@ -195,13 +172,52 @@ const ChatBot = () => {
 
                     {
                         sender: "bot",
-                        type: "movie",
-                        movie
+                        type: "movie_info",
+                        infoType: aiReply.infoType,
+                        movie: aiReply.movie
                     }
                 ]);
 
                 return;
             }
+
+            const movie = {
+
+                maPhim: aiReply.movie.id,
+
+                tieuDe: aiReply.movie.title,
+
+                moTa: aiReply.movie.description,
+
+                daoDien: aiReply.movie.director,
+
+                dienVien: aiReply.movie.actors,
+
+                danhGia: aiReply.movie.rating,
+
+                thoiLuong: aiReply.movie.duration,
+
+                trangThai: aiReply.movie.status,
+
+                anhPoster: aiReply.movie.poster,
+
+                theLoai: aiReply.movie.genres || []
+            };
+
+            setMessages(prev => [
+
+                ...prev,
+
+                userMessage,
+
+                {
+                    sender: "bot",
+                    type: "movie",
+                    movie
+                }
+            ]);
+
+            return;
 
             if (
                 aiReply.type ===
@@ -428,6 +444,41 @@ const ChatBot = () => {
                                                         </div>
 
                                                     ))
+                                                }
+
+                                            </div>
+
+                                        ) : msg.type === "movie_info" ? (
+
+                                            <div>
+                                                <h4>{msg.movie.title}</h4>
+
+                                                {
+                                                    msg.infoType === "summary" && (
+                                                        <p>
+                                                            📝 {msg.movie.description}
+                                                        </p>
+                                                    )
+                                                }
+
+                                                {
+                                                    msg.infoType === "director" && (
+                                                        <p>
+                                                            🎬 Đạo diễn:
+                                                            {" "}
+                                                            {msg.movie.director}
+                                                        </p>
+                                                    )
+                                                }
+
+                                                {
+                                                    msg.infoType === "actor" && (
+                                                        <p>
+                                                            🎭 Diễn viên:
+                                                            {" "}
+                                                            {msg.movie.actors}
+                                                        </p>
+                                                    )
                                                 }
 
                                             </div>
