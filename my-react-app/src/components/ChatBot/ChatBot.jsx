@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { FaComments, FaPaperPlane } from "react-icons/fa";
 import styles from "./ChatBot.module.css";
 import chatbotRules from "./chatbotRules";
+import { normalizeText } from "./chatbotUtils";
 import movieApi from "../../services/movieApi";
 import khuyenMaiApi from "../../services/khuyenMaiApi";
 import { useNavigate } from "react-router-dom";
@@ -109,6 +110,27 @@ const ChatBot = () => {
 
     }, [messages]);
 
+    const isCancelBookingCommand = (text) => {
+        const normalized = normalizeText(text);
+        const cancelPhrases = [
+            "huy",
+            "huy dat ve",
+            "thoat",
+            "thoat dat ve",
+            "khong dat nua",
+            "bo",
+            "bo dat ve",
+            "huy dat",
+            "bo dat",
+            "dung lai",
+            "dung lai dat ve"
+        ];
+
+        return cancelPhrases.some(phrase =>
+            normalized.includes(phrase)
+        );
+    };
+
     const handleSend = async () => {
 
         if (!input.trim()) return;
@@ -121,6 +143,20 @@ const ChatBot = () => {
             sender: "user",
             text: messageText
         };
+
+        if (isCancelBookingCommand(messageText)) {
+            const botMessage = {
+                sender: "bot",
+                type: "text",
+                text: "🛑 Đã huỷ yêu cầu đặt vé. Bạn có thể gửi yêu cầu mới khi cần."
+            };
+            setMessages(prev => [
+                ...prev,
+                userMessage,
+                botMessage
+            ]);
+            return;
+        }
 
         const botResponse =
             chatbotRules(
@@ -149,13 +185,20 @@ const ChatBot = () => {
             return;
         }
 
+
         // Fallback AI
         try {
 
             console.log("CALLING OPENAI...");
 
+            // If a prior bot message provided a requested ticket quantity, attach it to the outgoing message
+            const lastBotWithQty = [...messages].slice().reverse().find(m => m.sender === "bot" && m.nbTickets);
+            const messageToSend = lastBotWithQty
+                ? `${messageText} (yêu cầu ${lastBotWithQty.nbTickets} vé)`
+                : messageText;
+
             const aiReply =
-                await chatBotService.askAI(messageText);
+                await chatBotService.askAI(messageToSend);
 
             console.log(
                 "AI REPLY:",
@@ -167,7 +210,7 @@ const ChatBot = () => {
                 setMessages(prev => [
 
                     ...prev,
-
+                    
                     userMessage,
 
                     {
@@ -177,92 +220,44 @@ const ChatBot = () => {
                         movie: aiReply.movie
                     }
                 ]);
-
+                setInput("");
                 return;
             }
 
-            const movie = {
-
-                maPhim: aiReply.movie.id,
-
-                tieuDe: aiReply.movie.title,
-
-                moTa: aiReply.movie.description,
-
-                daoDien: aiReply.movie.director,
-
-                dienVien: aiReply.movie.actors,
-
-                danhGia: aiReply.movie.rating,
-
-                thoiLuong: aiReply.movie.duration,
-
-                trangThai: aiReply.movie.status,
-
-                anhPoster: aiReply.movie.poster,
-
-                theLoai: aiReply.movie.genres || []
-            };
-
-            setMessages(prev => [
-
-                ...prev,
-
-                userMessage,
-
-                {
-                    sender: "bot",
-                    type: "movie",
-                    movie
-                }
-            ]);
-
-            return;
-
-            if (
-                aiReply.type ===
-                "booking_showtimes"
-            ) {
-
+            if (aiReply.type === "booking_showtimes") {
                 let text =
                     `${aiReply.reply}\n\n`;
 
                 aiReply.showtimes.forEach(
                     (showtime, index) => {
-
                         text +=
                             `${index + 1}. ${new Date(
                                 showtime.thoiGianBatDau
-                            ).toLocaleString("vi-VN")
-                            }\n`;
+                            ).toLocaleString("vi-VN")}\n`;
                     }
                 );
 
                 text +=
                     "\n👉 Bạn muốn mình đặt vé cho suất chiếu nào.";
 
+                // try to infer requested ticket quantity from the reply or the user's message
+                const qtyMatch = (messageToSend || messageText).match(/(\d+)\s*vé|\(yêu cầu\s*(\d+)\s*vé\)/);
+                const inferredQty = qtyMatch ? Number(qtyMatch[1] || qtyMatch[2]) : null;
+
                 setMessages(prev => [
-
                     ...prev,
-
                     userMessage,
-
                     {
                         sender: "bot",
-                        text
+                        text,
+                        nbTickets: inferredQty
                     }
                 ]);
-
                 setInput("");
-
                 return;
             }
 
-            if (
-                aiReply.type === "booking" &&
-                aiReply.action === "select_movie"
-            ) {
-
+            if (aiReply.type === "booking" && aiReply.action === "select_movie") {
                 setMessages(prev => [
                     ...prev,
                     userMessage,
@@ -273,27 +268,36 @@ const ChatBot = () => {
                 ]);
 
                 setTimeout(() => {
-
-                    navigate(
-                        `/movie/${aiReply.movieId}`
-                    );
-
+                    navigate(`/movie/${aiReply.movieId}`);
                 }, 1500);
 
                 setInput("");
-
                 return;
-            } {
+            }
+
+            if (aiReply.type === "movie" && aiReply.movie) {
+                const movie = {
+                    maPhim: aiReply.movie.id,
+                    tieuDe: aiReply.movie.title,
+                    moTa: aiReply.movie.description,
+                    daoDien: aiReply.movie.director,
+                    dienVien: aiReply.movie.actors,
+                    danhGia: aiReply.movie.rating,
+                    thoiLuong: aiReply.movie.duration,
+                    trangThai: aiReply.movie.status,
+                    anhPoster: aiReply.movie.poster,
+                    theLoai: aiReply.movie.genres || []
+                };
 
                 setMessages(prev => [
                     ...prev,
                     userMessage,
                     {
                         sender: "bot",
-                        text: aiReply.reply
+                        type: "movie",
+                        movie
                     }
                 ]);
-
                 setInput("");
                 return;
             }
@@ -306,7 +310,7 @@ const ChatBot = () => {
                     text: aiReply.reply
                 }
             ]);
-
+            setInput("");
         } catch (error) {
 
             console.error(error);
@@ -374,12 +378,12 @@ const ChatBot = () => {
                                                                 className={s.showtimeBtn}
                                                                 onClick={() => {
 
-                                                                    navigate(
-                                                                        `/seat/${showtime.maXuatChieu}`
-                                                                    );
+                                                                        navigate(
+                                                                            `/seat/${showtime.maXuatChieu}?qty=${msg.nbTickets || 1}`
+                                                                        );
 
-                                                                    setOpen(false);
-                                                                }}
+                                                                        setOpen(false);
+                                                                    }}
                                                             >
                                                                 {
                                                                     new Date(
