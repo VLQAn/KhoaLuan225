@@ -113,9 +113,13 @@ const ChatBot = () => {
 
         if (!input.trim()) return;
 
+        const messageText = input.trim();
+
+        setInput("");
+
         const userMessage = {
             sender: "user",
-            text: input
+            text: messageText
         };
 
         const botResponse =
