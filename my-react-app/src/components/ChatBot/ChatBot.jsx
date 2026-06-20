@@ -168,6 +168,8 @@ const ChatBot = () => {
                 cinemas
             );
 
+        console.log("BOT RESPONSE:", botResponse);
+
         if (botResponse) {
 
             const botMessage = {
@@ -283,6 +285,49 @@ const ChatBot = () => {
 
                         quantity:
                             aiReply.quantity,
+
+                        checkoutUrl:
+                            aiReply.checkoutUrl,
+
+                        text:
+                            aiReply.reply
+                    }
+                ]);
+
+                return;
+            }
+
+            if (
+                aiReply.type ===
+                "smart_booking_checkout"
+            ) {
+
+                setMessages(prev => [
+
+                    ...prev,
+
+                    userMessage,
+
+                    {
+                        sender: "bot",
+
+                        type:
+                            "smart_booking_checkout",
+
+                        movie:
+                            aiReply.movie,
+
+                        cinema:
+                            aiReply.cinema,
+
+                        showtime:
+                            aiReply.showtime,
+
+                        quantity:
+                            aiReply.quantity,
+
+                        seats:
+                            aiReply.seats,
 
                         checkoutUrl:
                             aiReply.checkoutUrl,
@@ -522,6 +567,67 @@ const ChatBot = () => {
                                                         </p>
                                                     )
                                                 }
+
+                                            </div>
+
+                                        ) : msg.type === "smart_booking_checkout" ? (
+
+                                            <div className={s.checkoutCard}>
+
+                                                <h4>
+                                                    🎟️ Đã tìm thấy vé phù hợp
+                                                </h4>
+
+                                                <p>
+                                                    🎬 {msg.cinema.tenRap}
+                                                </p>
+
+                                                <p>
+                                                    🎞️ {msg.movie.tieuDe}
+                                                </p>
+
+                                                <p>
+                                                    💺 {
+                                                        msg.seats
+                                                            .map(
+                                                                seat =>
+                                                                    `${seat.hangGhe}${seat.soGhe}`
+                                                            )
+                                                            .join(", ")
+                                                    }
+                                                </p>
+
+                                                <button
+                                                    className={s.checkoutBtn}
+                                                    onClick={async () => {
+
+                                                        try {
+
+                                                            const res =
+                                                                await chatbotCheckoutApi.getInfo();
+
+                                                            navigate(
+                                                                "/checkout",
+                                                                {
+                                                                    state: res.data
+                                                                }
+                                                            );
+
+                                                            setOpen(false);
+
+                                                        } catch (err) {
+
+                                                            console.error(err);
+
+                                                            alert(
+                                                                "Không lấy được thông tin checkout"
+                                                            );
+                                                        }
+
+                                                    }}
+                                                >
+                                                    Xem thông tin đặt vé
+                                                </button>
 
                                             </div>
 

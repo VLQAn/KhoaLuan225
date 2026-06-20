@@ -1,6 +1,6 @@
 import styles from "./Checkout.module.css";
 import { useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import datVeApi from "../../services/datVeApi";
 import paymentApi from "../../services/paymentApi";
 
@@ -9,6 +9,9 @@ const s = styles;
 const Checkout = () => {
 
     const { state } = useLocation();
+
+    const chatbotBooking =
+        state?.chatbotBooking;
 
     console.log("CHECKOUT STATE", state);
 
@@ -128,6 +131,19 @@ const Checkout = () => {
             );
         }
     };
+
+    useEffect(() => {
+
+        if (!chatbotBooking) {
+            return;
+        }
+
+        console.log(
+            "BOOKING FROM CHATBOT",
+            state
+        );
+
+    }, []);
 
     return (
         <div className={s.container}>
