@@ -41,9 +41,7 @@ const Checkout = () => {
         Number(value).toLocaleString("vi-VN") + " VNĐ";
 
     const showDate = xuatChieu?.thoiGianBatDau
-        ? new Date(
-            xuatChieu.thoiGianBatDau.replace("Z", "")
-        )
+        ? new Date(xuatChieu.thoiGianBatDau)
         : null;
 
     console.log(selectedSeats);

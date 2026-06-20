@@ -13,6 +13,10 @@ import {
     MdMenu,
     MdLightMode,
     MdDarkMode,
+    MdLocationOn,
+    MdChair,
+    MdAccessTime,
+    MdKeyboardArrowDown,
 } from "react-icons/md";
 
 import { useEffect, useState } from "react";

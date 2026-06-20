@@ -58,11 +58,7 @@ const Food = () => {
                 // 1. Lấy xuất chiếu
                 const xuatChieuRes = await xuatChieuApi.getById(maXuatChieu);
 
-                const xuatChieuData = {
-                    ...xuatChieuRes,
-                    thoiGianBatDau: xuatChieuRes?.thoiGianBatDau?.replace("Z", ""),
-                    thoiGianKetThuc: xuatChieuRes?.thoiGianKetThuc?.replace("Z", "")
-                };
+                const xuatChieuData = xuatChieuRes;
 
                 setXuatChieu(xuatChieuData);
 

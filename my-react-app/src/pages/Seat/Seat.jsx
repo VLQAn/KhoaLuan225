@@ -46,16 +46,6 @@ const Seat = () => {
         try {
             const data = await xuatChieuApi.getById(maXuatChieu);
 
-            if (data?.thoiGianBatDau) {
-                data.thoiGianBatDau =
-                    data.thoiGianBatDau.replace("Z", "");
-            }
-
-            if (data?.thoiGianKetThuc) {
-                data.thoiGianKetThuc =
-                    data.thoiGianKetThuc.replace("Z", "");
-            }
-
             setXuatChieu(data);
 
         } catch (err) {
