@@ -381,6 +381,16 @@ td {
 
 .info_item {
     margin-top: 1.4rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.info_item:hover {
+    transform: translateY(-2px);
+}
+
+.activeFilter {
+    border: 2px solid var(--color-primary);
 }
 
 /* ASIDE */

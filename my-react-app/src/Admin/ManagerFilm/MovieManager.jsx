@@ -196,6 +196,11 @@ const MovieManager = () => {
         });
 
         setEditingId(movie.maPhim);
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+        });
     };
 
     const handleDelete = async (id) => {
@@ -305,6 +310,16 @@ const MovieManager = () => {
     const phimNgungChieu = movies.filter(
         (movie) => movie.trangThai === "ngung_chieu"
     ).length;
+
+    const [filterStatus, setFilterStatus] = useState("all");
+
+    const filteredMovies =
+        filterStatus === "all"
+            ? movies
+            : movies.filter(
+                movie =>
+                    movie.trangThai === filterStatus
+            );
 
     const userData = localStorage.getItem("user");
 
@@ -625,7 +640,7 @@ const MovieManager = () => {
                         </thead>
 
                         <tbody>
-                            {movies.map((movie) => (
+                            {filteredMovies.map((movie) => (
                                 <tr key={movie.maPhim}>
                                     <td>
                                         <img
@@ -735,22 +750,31 @@ const MovieManager = () => {
                 <div className={s.right_card}>
                     <h2>Thông tin</h2>
 
-                    <div className={s.info_item}>
+                    <div
+                        className={s.info_item}
+                        onClick={() => setFilterStatus("all")}
+                    >
                         <p>Tổng số phim</p>
                         <h3>{movies.length}</h3>
                     </div>
 
-                    <div className={s.info_item}>
+                    <div className={s.info_item}
+                        onClick={() => setFilterStatus("dang_chieu")}
+                    >
                         <p>Phim đang chiếu</p>
                         <h3>{phimDangChieu}</h3>
                     </div>
 
-                    <div className={s.info_item}>
+                    <div className={s.info_item}
+                        onClick={() => setFilterStatus("sap_chieu")}
+                    >
                         <p>Phim sắp chiếu</p>
                         <h3>{phimSapChieu}</h3>
                     </div>
 
-                    <div className={s.info_item}>
+                    <div className={s.info_item}
+                        onClick={() => setFilterStatus("ngung_chieu")}
+                    >
                         <p>Phim ngừng chiếu</p>
                         <h3>{phimNgungChieu}</h3>
                     </div>
