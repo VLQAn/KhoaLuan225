@@ -487,16 +487,20 @@ const ShowtimeManager = () => {
                                     Chọn phim
                                 </option>
 
-                                {movies.map((movie) => (
+                                {movies
+                                    .filter(
+                                        movie => movie.trangThai === "dang_chieu"
+                                    )
+                                    .map((movie) => (
 
-                                    <option
-                                        key={movie.maPhim}
-                                        value={movie.maPhim}
-                                    >
-                                        {movie.tieuDe}
-                                    </option>
+                                        <option
+                                            key={movie.maPhim}
+                                            value={movie.maPhim}
+                                        >
+                                            {movie.tieuDe}
+                                        </option>
 
-                                ))}
+                                    ))}
 
                             </select>
                         </div>
