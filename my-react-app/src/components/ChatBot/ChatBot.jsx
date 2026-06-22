@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { FaComments, FaPaperPlane } from "react-icons/fa";
 import styles from "./ChatBot.module.css";
 import chatbotRules from "./chatbotRules";
-import { normalizeText } from "./chatbotUtils";
+import { normalizeText, getDateLabel } from "./chatbotUtils";
 import movieApi from "../../services/movieApi";
 import khuyenMaiApi from "../../services/khuyenMaiApi";
 import { useNavigate } from "react-router-dom";
@@ -360,17 +360,13 @@ const ChatBot = () => {
 
             if (aiReply.type === "showtime_query") {
 
-                const dateTextMap = {
-                    today: "hôm nay",
-                    tomorrow: "ngày mai",
-                    tonight: "tối nay"
-                };
-
-                const dateText =
-                    dateTextMap[aiReply.date] || "";
+                const dateLabel =
+                    getDateLabel(aiReply.date);
 
                 let text =
-                    `🎬 Phim "${aiReply.movie.tieuDe}" ${dateText} có các suất chiếu sau:\n\n`;
+                    dateLabel
+                        ? `🎬 ${aiReply.movie.tieuDe} có các suất chiếu vào ${dateLabel} như sau:\n\n`
+                        : `🎬 ${aiReply.movie.tieuDe} có các suất chiếu như sau:\n\n`;
 
                 aiReply.showtimes.forEach((showtime, index) => {
 
