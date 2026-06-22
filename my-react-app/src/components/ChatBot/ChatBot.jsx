@@ -358,6 +358,50 @@ const ChatBot = () => {
                 return;
             }
 
+            if (aiReply.type === "showtime_query") {
+
+                const dateTextMap = {
+                    today: "hôm nay",
+                    tomorrow: "ngày mai",
+                    tonight: "tối nay"
+                };
+
+                const dateText =
+                    dateTextMap[aiReply.date] || "";
+
+                let text =
+                    `🎬 Phim "${aiReply.movie.tieuDe}" ${dateText} có các suất chiếu sau:\n\n`;
+
+                aiReply.showtimes.forEach((showtime, index) => {
+
+                    const rap =
+                        showtime.phong_chieu?.rap_chieu?.tenRap
+                        || "Không rõ rạp";
+
+                    const gio =
+                        new Date(
+                            showtime.thoiGianBatDau
+                        ).toLocaleString("vi-VN");
+
+                    text +=
+                        `${index + 1}. ${gio} - ${rap}\n`;
+                });
+
+                setMessages(prev => [
+                    ...prev,
+                    userMessage,
+                    {
+                        sender: "bot",
+                        type: "showtime_query",
+                        movie: aiReply.movie,
+                        showtimes: aiReply.showtimes,
+                        text
+                    }
+                ]);
+
+                return;
+            }
+
             if (aiReply.type === "movie" && aiReply.movie) {
                 const movie = {
                     maPhim: aiReply.movie.id,
