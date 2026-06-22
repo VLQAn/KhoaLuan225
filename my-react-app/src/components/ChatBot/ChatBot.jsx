@@ -415,6 +415,21 @@ const ChatBot = () => {
                 return;
             }
 
+            if (aiReply.type === "top_movies" && Array.isArray(aiReply.movies)) {
+                setMessages(prev => [
+                    ...prev,
+                    userMessage,
+                    {
+                        sender: "bot",
+                        type: "movie_list",
+                        title: `🔥 Top ${aiReply.limit || aiReply.movies.length} phim đánh giá cao nhất`,
+                        movies: aiReply.movies
+                    }
+                ]);
+                setInput("");
+                return;
+            }
+
             setMessages(prev => [
                 ...prev,
                 userMessage,
@@ -505,19 +520,15 @@ const ChatBot = () => {
                                                                 {movie.tieuDe}
                                                             </h4>
 
-                                                            <p>
-                                                                🎭 {
-                                                                    movie.theLoai
-                                                                        ?.map(
-                                                                            t => t.tenTheLoai
-                                                                        )
-                                                                        .join(", ")
-                                                                }
-                                                            </p>
+                                                            {movie.theLoai?.length > 0 && (
+                                                                <p>🎭 {movie.theLoai.map(t => t.tenTheLoai).join(", ")}</p>
+                                                            )}
 
-                                                            <p>
-                                                                ⏱ {movie.thoiLuong} phút
-                                                            </p>
+                                                            <p>⏱ {movie.thoiLuong} phút</p>
+
+                                                            {movie.danhGia && (
+                                                                <p>⭐ {movie.danhGia}</p>
+                                                            )}
 
                                                         </div>
 
