@@ -219,41 +219,103 @@
 }
 
 .showtimeTitle {
-    font-weight: 600;
+    font-size: 16px;
+    font-weight: 700;
     margin-bottom: 12px;
 }
 
-.showtimeList {
+.showtimeCards {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    margin-top: 12px;
+    margin-top: 10px;
 }
-.showtimeBtn {
+
+.showtimeCard {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    background: #fff;
+    border-radius: 12px;
+    padding: 12px;
+
+    border: 1px solid #e5e5e5;
+
+    transition: all .2s;
+}
+
+.showtimeCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
+}
+
+.showtimeIndex {
+    font-weight: 700;
+    color: #666;
+    min-width: 30px;
+}
+
+.showtimeInfo {
+    display: flex;
+    justify-content: space-between;
+    margin-left: 10px;
+    gap: 10px;
+}
+
+.showtimeTime {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(prive);
+}
+
+.showtimeDate {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(prive);
+    color: var(prive);
+}
+
+.showtimeCinema {
+    font-size: 14px;
+}
+
+.bookShowtimeBtn {
+    background: #e50914;
+    color: white;
+    border: none;
+    border-radius: 8px;
+
+    padding: 8px 12px;
+    cursor: pointer;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.bookShowtimeBtn:hover {
+    opacity: .9;
+}
+
+.showMoreBtn {
+    margin-top: 12px;
+
     width: 100%;
-    padding: 12px 16px;
 
     border: none;
     border-radius: 10px;
 
-    background: #fff;
-    color: #333;
+    padding: 10px;
 
-    text-align: left;
+    background: #e50914;
+    color: white;
 
     cursor: pointer;
-
-    box-shadow:
-        0 2px 8px rgba(0,0,0,0.08);
-
-    transition: all 0.2s ease;
+    font-weight: 600;
 }
 
-.showtimeBtn:hover {
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 4px 12px rgba(0,0,0,0.15);
+.showMoreBtn:hover {
+    opacity: .9;
 }
 
 .checkoutCard {

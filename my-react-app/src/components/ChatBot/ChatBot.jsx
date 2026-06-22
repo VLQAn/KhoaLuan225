@@ -365,23 +365,12 @@ const ChatBot = () => {
 
                 let text =
                     dateLabel
-                        ? `🎬 ${aiReply.movie.tieuDe} có các suất chiếu vào ${dateLabel} như sau:\n\n`
-                        : `🎬 ${aiReply.movie.tieuDe} có các suất chiếu như sau:\n\n`;
+                        ? `🎬 ${aiReply.movie.tieuDe} có các suất chiếu vào ${dateLabel} như sau:`
+                        : `🎬 ${aiReply.movie.tieuDe} có các suất chiếu như sau:`;
 
-                aiReply.showtimes.forEach((showtime, index) => {
+                const MAX_SHOWTIME = 5;
 
-                    const rap =
-                        showtime.phong_chieu?.rap_chieu?.tenRap
-                        || "Không rõ rạp";
-
-                    const gio =
-                        new Date(
-                            showtime.thoiGianBatDau
-                        ).toLocaleString("vi-VN");
-
-                    text +=
-                        `${index + 1}. ${gio} - ${rap}\n`;
-                });
+                const firstFive = aiReply.showtimes.slice(0, MAX_SHOWTIME);
 
                 setMessages(prev => [
                     ...prev,
@@ -389,12 +378,13 @@ const ChatBot = () => {
                     {
                         sender: "bot",
                         type: "showtime_query",
+                        text: text,
                         movie: aiReply.movie,
-                        showtimes: aiReply.showtimes,
-                        text
+                        showtimes: firstFive,
+                        allShowtimes: aiReply.showtimes,
+                        expanded: false
                     }
                 ]);
-
                 return;
             }
 
@@ -483,46 +473,7 @@ const ChatBot = () => {
                                     }
                                 >
                                     {
-                                        msg.type === "showtime_list" ? (
-
-                                            <div>
-
-                                                <h4>
-                                                    {msg.text}
-                                                </h4>
-
-                                                <div className={s.showtimeList}>
-
-                                                    {
-                                                        msg.showtimes.map(showtime => (
-
-                                                            <button
-                                                                key={showtime.maXuatChieu}
-                                                                className={s.showtimeBtn}
-                                                                onClick={() => {
-
-                                                                    navigate(
-                                                                        `/seat/${showtime.maXuatChieu}?qty=${msg.nbTickets || 1}`
-                                                                    );
-
-                                                                    setOpen(false);
-                                                                }}
-                                                            >
-                                                                {
-                                                                    new Date(
-                                                                        showtime.thoiGianBatDau
-                                                                    ).toLocaleString("vi-VN")
-                                                                }
-                                                            </button>
-
-                                                        ))
-                                                    }
-
-                                                </div>
-
-                                            </div>
-
-                                        ) : msg.type === "movie_list" ? (
+                                        msg.type === "movie_list" ? (
 
                                             <div>
 
@@ -719,6 +670,140 @@ const ChatBot = () => {
                                                     Xem thông tin đặt vé
 
                                                 </button>
+
+                                            </div>
+
+                                        ) : msg.type === "showtime_query" ? (
+
+                                            <div>
+
+                                                <p className={s.showtimeTitle}>{msg.text}</p>
+
+                                                <div className={s.showtimeCards}>
+
+                                                    {
+                                                        msg.showtimes.map((showtime, index) => {
+
+                                                            const rap =
+                                                                showtime.phong_chieu?.rap_chieu?.tenRap
+                                                                || "Không rõ rạp";
+
+                                                            const ngay =
+                                                                new Date(showtime.thoiGianBatDau)
+                                                                    .toLocaleDateString("vi-VN");
+
+                                                            const gio =
+                                                                new Date(showtime.thoiGianBatDau)
+                                                                    .toLocaleTimeString(
+                                                                        "vi-VN",
+                                                                        {
+                                                                            hour: "2-digit",
+                                                                            minute: "2-digit"
+                                                                        }
+                                                                    );
+
+                                                            return (
+
+                                                                <div
+                                                                    key={showtime.maXuatChieu}
+                                                                    className={s.showtimeCard}
+                                                                >
+
+                                                                    <div className={s.showtimeIndex}>
+                                                                        #{index + 1}
+                                                                    </div>
+
+                                                                    <div className={s.showtimeInfo}>
+
+                                                                        <div className={s.showtimeTime}>
+                                                                            🕒 {gio}
+                                                                        </div>
+
+                                                                        <div className={s.showtimeDate}>
+                                                                            📅 {ngay}
+                                                                        </div>
+
+                                                                        <div className={s.showtimeCinema}>
+                                                                            🎬 {rap}
+                                                                        </div>
+
+                                                                    </div>
+
+                                                                    <button
+                                                                        className={s.bookShowtimeBtn}
+                                                                        onClick={() => {
+
+                                                                            navigate(
+                                                                                `/seat/${showtime.maXuatChieu}`
+                                                                            );
+
+                                                                            setOpen(false);
+
+                                                                        }}
+                                                                    >
+                                                                        Đặt vé
+                                                                    </button>
+
+                                                                </div>
+
+                                                            );
+                                                        })
+                                                    }
+
+                                                </div>
+
+                                                {/* NÚT XEM THÊM / THU GỌN */}
+                                                {msg.allShowtimes?.length > 5 && (
+                                                    <button
+                                                        className={s.showMoreBtn}
+                                                        onClick={() => {
+                                                            setMessages(prev =>
+                                                                prev.map(m => {
+                                                                    if (m !== msg) return m;
+
+                                                                    const isExpanded = m.expanded;
+
+                                                                    return {
+                                                                        ...m,
+                                                                        expanded: !isExpanded,
+                                                                        showtimes: isExpanded
+                                                                            ? m.allShowtimes.slice(0, 5)
+                                                                            : m.allShowtimes
+                                                                    };
+                                                                })
+                                                            );
+                                                        }}
+                                                    >
+                                                        {msg.expanded ? "Thu gọn" : "Xem thêm"}
+                                                    </button>
+                                                )}
+
+                                                {
+                                                    msg.hasMore && (
+                                                        <button
+                                                            className={s.showMoreBtn}
+                                                            onClick={() => {
+
+                                                                setMessages(prev =>
+                                                                    prev.map(m => {
+
+                                                                        if (m !== msg)
+                                                                            return m;
+
+                                                                        return {
+                                                                            ...m,
+                                                                            showtimes: m.allShowtimes,
+                                                                            hasMore: false
+                                                                        };
+                                                                    })
+                                                                );
+
+                                                            }}
+                                                        >
+                                                            Xem thêm
+                                                        </button>
+                                                    )
+                                                }
 
                                             </div>
 
