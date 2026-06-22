@@ -235,6 +235,11 @@ const ShowtimeManager = () => {
             ngayChieu: date,
             gioChieu: time,
         });
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+        });
     };
 
     const handleDelete = async (id) => {

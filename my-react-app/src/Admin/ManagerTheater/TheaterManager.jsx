@@ -25,7 +25,7 @@ import {
 
 } from "react-icons/md";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { NavLink } from "react-router-dom";
 import rapChieuApi from "../../services/rapChieuApi";
 import { useNavigate } from "react-router-dom";
@@ -124,6 +124,13 @@ const TheaterManager = () => {
                 },
             ],
         });
+
+        setTimeout(() => {
+            lastRoomRef.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+            });
+        }, 100);
     };
 
     const removeRoom = (index) => {
@@ -263,6 +270,8 @@ const TheaterManager = () => {
             phongChieus: [],
         });
     };
+
+    const lastRoomRef = useRef(null);
 
     const userData = localStorage.getItem("user");
 
@@ -457,6 +466,11 @@ const TheaterManager = () => {
 
                                 <div
                                     key={room.maPhong || index}
+                                    ref={
+                                        index === formData.phongChieus.length - 1
+                                            ? lastRoomRef
+                                            : null
+                                    }
                                     className={s.room_card}
                                 >
 
