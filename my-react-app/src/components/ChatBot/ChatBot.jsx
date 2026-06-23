@@ -540,7 +540,7 @@ const ChatBot = () => {
                         type: "comparison",
                         movie1: aiReply.movie1,
                         movie2: aiReply.movie2,
-                        suggestion: aiReply.suggestion
+                        verdict: aiReply.verdict
                     }
                 ]);
                 setInput("");
@@ -726,9 +726,9 @@ const ChatBot = () => {
                                                     ))}
                                                 </div>
 
-                                                {msg.suggestion && (
+                                                {msg.verdict && (
                                                     <p className={s.comparisonVerdict}>
-                                                        👉 Dựa vào đánh giá, <b>{msg.suggestion}</b> đang được đánh giá cao hơn.
+                                                        👉 {msg.verdict}
                                                     </p>
                                                 )}
 
