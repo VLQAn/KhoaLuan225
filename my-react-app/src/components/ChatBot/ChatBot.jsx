@@ -463,6 +463,40 @@ const ChatBot = () => {
                 return;
             }
 
+            if (aiReply.type === "genre_filter") {
+
+                if (!Array.isArray(aiReply.movies) || aiReply.movies.length === 0) {
+                    setMessages(prev => [
+                        ...prev,
+                        userMessage,
+                        {
+                            sender: "bot",
+                            text: aiReply.reply
+                                || `😢 Hiện chưa có phim ${aiReply.genre} đang chiếu.`
+                        }
+                    ]);
+                    setInput("");
+                    return;
+                }
+
+                const title = aiReply.audience
+                    ? `Hiện đang có các phim dành cho ${aiReply.audience} như`
+                    : `Hiện đang có các phim ${aiReply.genre.toLowerCase()} như`;
+
+                setMessages(prev => [
+                    ...prev,
+                    userMessage,
+                    {
+                        sender: "bot",
+                        type: "movie_list",
+                        title,
+                        movies: aiReply.movies
+                    }
+                ]);
+                setInput("");
+                return;
+            }
+
             if (
                 aiReply.type === "rating_filter" &&
                 Array.isArray(aiReply.movies)
@@ -481,6 +515,35 @@ const ChatBot = () => {
 
                 setInput("");
 
+                return;
+            }
+
+            if (aiReply.type === "movie_not_found") {
+                setMessages(prev => [
+                    ...prev,
+                    userMessage,
+                    {
+                        sender: "bot",
+                        text: "Xin lỗi, tôi không tìm thấy một hoặc cả hai phim bạn nhắc đến. Bạn kiểm tra lại tên phim giúp tôi nhé."
+                    }
+                ]);
+                setInput("");
+                return;
+            }
+
+            if (aiReply.type === "comparison") {
+                setMessages(prev => [
+                    ...prev,
+                    userMessage,
+                    {
+                        sender: "bot",
+                        type: "comparison",
+                        movie1: aiReply.movie1,
+                        movie2: aiReply.movie2,
+                        suggestion: aiReply.suggestion
+                    }
+                ]);
+                setInput("");
                 return;
             }
 
@@ -635,6 +698,39 @@ const ChatBot = () => {
                                                     ))}
 
                                                 </div>
+
+                                            </div>
+
+                                        ) : msg.type === "comparison" ? (
+
+                                            <div className={s.comparisonCard}>
+
+                                                <div className={s.comparisonRow}>
+                                                    {[msg.movie1, msg.movie2].map(movie => (
+                                                        <div
+                                                            key={movie.maPhim}
+                                                            className={s.movieCard}
+                                                            onClick={() => {
+                                                                setOpen(false);
+                                                                navigate(`/movie/${movie.maPhim}`);
+                                                            }}
+                                                        >
+                                                            <img src={movie.anhPoster} alt={movie.tieuDe} />
+                                                            <h4>{movie.tieuDe}</h4>
+                                                            <p>⭐ {movie.danhGia}</p>
+                                                            <p>⏱ {movie.thoiLuong} phút</p>
+                                                            <p>
+                                                                🎭 {movie.theLoai?.map(t => t.tenTheLoai).join(", ")}
+                                                            </p>
+                                                        </div>
+                                                    ))}
+                                                </div>
+
+                                                {msg.suggestion && (
+                                                    <p className={s.comparisonVerdict}>
+                                                        👉 Dựa vào đánh giá, <b>{msg.suggestion}</b> đang được đánh giá cao hơn.
+                                                    </p>
+                                                )}
 
                                             </div>
 

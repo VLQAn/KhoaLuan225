@@ -266,14 +266,13 @@
 .showtimeTime {
     font-size: 14px;
     font-weight: 700;
-    color: var(prive);
+    color: #e53935;
 }
 
 .showtimeDate {
     font-size: 14px;
     font-weight: 700;
-    color: var(prive);
-    color: var(prive);
+    color: #e53935;
 }
 
 .showtimeCinema {
@@ -348,4 +347,41 @@
     color: white;
 
     font-weight: bold;
+}
+
+.comparisonCard {
+    background: #fff;
+    border-radius: 12px;
+    padding: 12px;
+    margin-top: 8px;
+}
+
+.comparisonRow {
+    display: flex;
+    gap: 12px;
+}
+
+.comparisonRow .movieCard {
+    flex: 1;
+    min-width: 0;
+    border: 1px solid #e5e5e5;
+}
+
+.comparisonRow .movieCard img {
+    height: 160px;
+}
+
+.comparisonVerdict {
+    margin-top: 14px;
+    padding: 10px 12px;
+    text-align: center;
+    font-size: 14px;
+    background: #fff5f4;
+    border: 1px solid #ffd6d3;
+    border-radius: 10px;
+    color: #333;
+}
+
+.comparisonVerdict b {
+    color: #e53935;
 }
