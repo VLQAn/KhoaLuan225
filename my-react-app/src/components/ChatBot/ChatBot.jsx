@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { FaComments, FaPaperPlane } from "react-icons/fa";
+import { FaComments, FaPaperPlane, FaTimes } from "react-icons/fa";
 import styles from "./ChatBot.module.css";
 import chatbotRules from "./chatbotRules";
 import { normalizeText, getDateLabel } from "./chatbotUtils";
@@ -577,19 +577,27 @@ const ChatBot = () => {
 
     return (
         <>
-            <button
-                className={s.floatingBtn}
-                onClick={() => setOpen(!open)}
-            >
-                <FaComments />
-            </button>
+            {!open && (
+                <button
+                    className={s.floatingBtn}
+                    onClick={() => setOpen(true)}
+                >
+                    <FaComments />
+                </button>
+            )}
 
             {
                 open && (
                     <div className={s.chatBox}>
 
                         <div className={s.header}>
-                            🎬 RACSO BOT
+                            <span>🎬 RACSO BOT</span>
+                            <button
+                                className={s.closeBtn}
+                                onClick={() => setOpen(false)}
+                            >
+                                <FaTimes />
+                            </button>
                         </div>
 
                         <div className={s.messages}>

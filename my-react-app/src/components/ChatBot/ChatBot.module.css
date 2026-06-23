@@ -6,7 +6,7 @@
     width: 65px;
     height: 65px;
 
-    border: none;
+    border: solid 1.5px #f5f2f3;
     border-radius: 50%;
 
     cursor: pointer;
@@ -25,24 +25,31 @@
 .chatBox {
     position: fixed;
 
-    right: 30px;
-    bottom: 110px;
+    top: 0;
+    right: 0;
+    bottom: 0;
 
-    width: 620px;
-    height: 500px;
+    width: 33vw;
 
     background: white;
 
-    border-radius: 15px;
+    border-radius: 16px 0 0 16px;
 
     overflow: hidden;
 
     display: flex;
     flex-direction: column;
 
-    box-shadow: 0 0 20px rgba(0, 0, 0, .2);
+    box-shadow: -4px 0 24px rgba(0, 0, 0, .18);
 
     z-index: 9999;
+}
+
+@media (max-width: 768px) {
+    .chatBox {
+        width: 100vw;
+        border-radius: 0;
+    }
 }
 
 .header {
@@ -50,9 +57,30 @@
 
     color: white;
 
-    padding: 15px;
+    padding: 15px 20px;
 
     font-weight: bold;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    flex-shrink: 0;
+}
+
+.closeBtn {
+    background: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 20px;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+}
+
+.closeBtn:hover {
+    opacity: .8;
 }
 
 .messages {
