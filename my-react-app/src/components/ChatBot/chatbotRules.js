@@ -420,7 +420,7 @@ const chatbotRules = (
         };
 
         for (const [k, v] of Object.entries(wordsMap)) {
-            if (normalized.includes(k + " ve") || normalized.includes(k + " vé") || normalized.includes(k + " ve") ) {
+            if (normalized.includes(k + " ve") || normalized.includes(k + " vé") || normalized.includes(k + " ve")) {
                 return v;
             }
         }
@@ -466,27 +466,35 @@ const chatbotRules = (
 
     if (intent === "recommendation") {
 
-        const bestMovies =
-            movies
-                .filter(
-                    movie =>
-                        movie.trangThai ===
-                        "dang_chieu"
-                )
-                .sort(
-                    (a, b) =>
-                        Number(b.danhGia || 0)
-                        -
-                        Number(a.danhGia || 0)
-                );
+        const genreKeywords = [
+            "hanh dong", "phieu luu", "khoa hoc vien tuong", "vien tuong",
+            "kinh di", "tam ly", "tinh cam", "hai", "hoat hinh", "gia dinh",
+            "bi an", "trinh tham", "tai lieu", "chien tranh", "lich su",
+            "am nhac", "the thao", "vien tay", "than thoai", "sieu anh hung",
+            "anime", "hoc duong", "chinh kich", "toi pham", "sinh ton",
+            "gia tuong", "lang man", "teen", "zombie", "tham hoa", "vo thuat"
+        ];
 
-        return {
-            type: "movie_list",
-            title:
-                "⭐ Phim đáng xem hôm nay",
-            movies:
-                bestMovies.slice(0, 5)
-        };
+        const hasNumber = /\d/.test(originalText);
+        const hasGenre = genreKeywords.some(g => originalText.includes(g));
+
+        // Có số lượng cụ thể hoặc nhắc thể loại => để AI backend xử lý
+        // (AI mới hiểu được kết hợp limit + genre)
+        if (!hasNumber && !hasGenre) {
+
+            const bestMovies =
+                movies
+                    .filter(movie => movie.trangThai === "dang_chieu")
+                    .sort((a, b) => Number(b.danhGia || 0) - Number(a.danhGia || 0));
+
+            return {
+                type: "movie_list",
+                title: "⭐ Phim đáng xem hôm nay",
+                movies: bestMovies.slice(0, 5)
+            };
+        }
+
+        // ngược lại: rơi xuống cuối hàm, return null, nhường cho AI
     }
 
     /* =====================================

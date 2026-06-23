@@ -416,17 +416,50 @@ const ChatBot = () => {
             }
 
             if (aiReply.type === "top_movies" && Array.isArray(aiReply.movies)) {
+
+                const genreLabel = aiReply.genre ? ` ${aiReply.genre}` : "";
+
+                if (aiReply.movies.length === 1) {
+                    setMessages(prev => [
+                        ...prev,
+                        userMessage,
+                        { sender: "bot", type: "movie", movie: aiReply.movies[0] }
+                    ]);
+                } else {
+                    setMessages(prev => [
+                        ...prev,
+                        userMessage,
+                        {
+                            sender: "bot",
+                            type: "movie_list",
+                            title: `🔥 Top ${aiReply.limit || aiReply.movies.length} phim${genreLabel} đánh giá cao nhất`,
+                            movies: aiReply.movies
+                        }
+                    ]);
+                }
+
+                setInput("");
+                return;
+            }
+
+            if (
+                aiReply.type === "rating_filter" &&
+                Array.isArray(aiReply.movies)
+            ) {
+
                 setMessages(prev => [
                     ...prev,
                     userMessage,
                     {
                         sender: "bot",
-                        type: "movie_list",
-                        title: `🔥 Top ${aiReply.limit || aiReply.movies.length} phim đánh giá cao nhất`,
+                        type: "rating_filter",
+                        min_rating: aiReply.min_rating,
                         movies: aiReply.movies
                     }
                 ]);
+
                 setInput("");
+
                 return;
             }
 
@@ -816,6 +849,34 @@ const ChatBot = () => {
                                                     )
                                                 }
 
+                                            </div>
+
+                                        ) : msg.type === "rating_filter" ? (
+
+                                            <div>
+                                                <p>
+                                                    ⭐ Các phim có điểm đánh giá từ {msg.min_rating} trở lên
+                                                </p>
+
+                                                <div className={s.movieCards}>
+                                                    {msg.movies.map((movie) => (
+                                                        <div
+                                                            key={movie.maPhim}
+                                                            className={s.movieCard}
+                                                        >
+                                                            <img
+                                                                src={movie.anhPoster}
+                                                                alt={movie.tieuDe}
+                                                            />
+
+                                                            <h4>{movie.tieuDe}</h4>
+
+                                                            <p>⭐ {movie.danhGia}/10</p>
+
+                                                            <p>{movie.thoiLuong} phút</p>
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             </div>
 
                                         ) : msg.type === "movie" ? (
