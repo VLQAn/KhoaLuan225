@@ -121,11 +121,6 @@ const chatbotRules = (
         );
 
     console.log(
-        "USE AI:",
-        shouldUseAI
-    );
-
-    console.log(
         "GENRE:",
         detectedGenre
     );
@@ -151,6 +146,11 @@ const chatbotRules = (
         shouldUseAIRecommendation(
             originalText
         );
+
+    console.log(
+        "USE AI:",
+        shouldUseAI
+    );
 
     console.log(
         "USE AI:",
