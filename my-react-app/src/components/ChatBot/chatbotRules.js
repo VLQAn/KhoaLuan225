@@ -4,6 +4,8 @@ import { detectDate } from "./chatbotDate";
 import { detectCinema, findCinema } from "./chatbotCinema";
 import { detectTimePeriod } from "./chatbotTime";
 import { isMovieDiscoveryQuery } from "./chatbotMovieDiscovery";
+import { detectGenre } from "./chatbotGenre";
+import { shouldUseAIRecommendation } from "./chatbotRecommendationAI";
 
 const chatbotRules = (
     message,
@@ -113,10 +115,47 @@ const chatbotRules = (
             showtimes
         );
 
+    const detectedGenre =
+        detectGenre(
+            originalText
+        );
+
+    console.log(
+        "USE AI:",
+        shouldUseAI
+    );
+
+    console.log(
+        "GENRE:",
+        detectedGenre
+    );
+
     const isMovieDiscovery =
         isMovieDiscoveryQuery(
             originalText
         );
+
+    console.log(
+        "DISCOVERY:",
+        isMovieDiscovery
+    );
+
+    const shouldFilterMovies =
+        isMovieDiscovery
+        || detectedGenre
+        || detectedCinema
+        || detectedDate
+        || detectedTimePeriod;
+
+    const shouldUseAI =
+        shouldUseAIRecommendation(
+            originalText
+        );
+
+    console.log(
+        "USE AI:",
+        shouldUseAI
+    );
 
     /* =====================================
         NHẬN DIỆN RẠP CHIẾU
@@ -141,6 +180,10 @@ const chatbotRules = (
         }
 
     });
+
+    if (shouldUseAI) {
+        return null;
+    }
 
     /* =====================================
        PHIM ĐANG CHIẾU
@@ -500,7 +543,10 @@ const chatbotRules = (
     /* =====================================
        NHẬN DIỆN TÊN PHIM
     ===================================== */
-    if (isMovieDiscovery) {
+    if (
+        shouldFilterMovies &&
+        !shouldUseAI
+    ) {
 
         let filteredShowtimes =
             [...showtimes];
@@ -631,6 +677,23 @@ const chatbotRules = (
                 )
             );
 
+        if (detectedGenre) {
+
+            matchedMovies =
+                matchedMovies.filter(movie =>
+
+                    movie.theLoai?.some(
+                        genre =>
+                            normalizeText(
+                                genre.tenTheLoai
+                            ) ===
+                            normalizeText(
+                                detectedGenre
+                            )
+                    )
+                );
+        }
+
         // chỉ lấy phim đang chiếu
         matchedMovies =
             matchedMovies.filter(
@@ -643,8 +706,20 @@ const chatbotRules = (
         if (matchedMovies.length > 0) {
             let title = "🎬 Phim phù hợp";
 
+            if (detectedGenre) {
+                title =
+                    `🎬 Phim ${detectedGenre}`;
+            }
+
             if (detectedTimePeriod) {
-                title += " theo khung giờ yêu cầu";
+
+                const labels = {
+                    morning: "buổi sáng",
+                    afternoon: "buổi chiều",
+                    evening: "buổi tối"
+                };
+
+                title += ` ${labels[detectedTimePeriod]}`;
             }
 
             if (detectedCinema) {

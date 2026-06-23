@@ -9,6 +9,23 @@ export const detectDate = (message) => {
         new Date();
 
     if (
+        text.includes("ngay mai") ||
+        text.includes("mai")
+    ) {
+
+        const tomorrow = new Date();
+
+        tomorrow.setDate(
+            tomorrow.getDate() + 1
+        );
+
+        return {
+            type: "specific",
+            date: tomorrow
+        };
+    }
+
+    if (
         text.includes("hom nay")
         ||
         text.includes("toi nay")

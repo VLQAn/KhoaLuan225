@@ -443,6 +443,27 @@ const ChatBot = () => {
             }
 
             if (
+                aiReply.type === "recommendation" &&
+                Array.isArray(aiReply.movies)
+            ) {
+
+                setMessages(prev => [
+                    ...prev,
+                    userMessage,
+                    {
+                        sender: "bot",
+                        type: "recommendation",
+                        title: aiReply.title,
+                        movies: aiReply.movies
+                    }
+                ]);
+
+                setInput("");
+
+                return;
+            }
+
+            if (
                 aiReply.type === "rating_filter" &&
                 Array.isArray(aiReply.movies)
             ) {
@@ -567,6 +588,53 @@ const ChatBot = () => {
 
                                                     ))
                                                 }
+
+                                            </div>
+
+                                        ) : msg.type === "recommendation" ? (
+
+                                            <div>
+
+                                                <h4>{msg.title}</h4>
+
+                                                <div className={s.movieCards}>
+
+                                                    {msg.movies.map(movie => (
+
+                                                        <div
+                                                            key={movie.maPhim}
+                                                            className={s.movieCard}
+                                                            onClick={() => {
+
+                                                                navigate(
+                                                                    `/movie/${movie.maPhim}`
+                                                                );
+
+                                                                setOpen(false);
+
+                                                            }}
+                                                        >
+
+                                                            <img
+                                                                src={movie.anhPoster}
+                                                                alt={movie.tieuDe}
+                                                            />
+
+                                                            <h4>{movie.tieuDe}</h4>
+
+                                                            <p>
+                                                                ⭐ {movie.danhGia}
+                                                            </p>
+
+                                                            <p>
+                                                                ⏱ {movie.thoiLuong} phút
+                                                            </p>
+
+                                                        </div>
+
+                                                    ))}
+
+                                                </div>
 
                                             </div>
 
