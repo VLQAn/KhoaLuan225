@@ -176,15 +176,6 @@ const ChatBot = () => {
                 );
         }
 
-        console.log(
-            "BOT RESPONSE:",
-            JSON.stringify(
-                botResponse,
-                null,
-                2
-            )
-        );
-
         if (botResponse) {
 
             const botMessage = {
