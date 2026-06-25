@@ -108,6 +108,24 @@ export const detectDate = (message) => {
 
     }
 
+    const longDateMatch =
+        text.match(
+            /ngay\s*(\d{1,2})\s*thang\s*(\d{1,2})/
+        );
+
+    if (longDateMatch) {
+
+        return {
+            type: "single",
+            date: new Date(
+                today.getFullYear(),
+                Number(longDateMatch[2]) - 1,
+                Number(longDateMatch[1])
+            )
+        };
+
+    }
+
     return null;
 
 };
