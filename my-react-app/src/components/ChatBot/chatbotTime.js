@@ -1,36 +1,33 @@
-import { normalizeText }
-from "./chatbotUtils";
+// import { normalizeText }
+//     from "./chatbotUtils";
 
-export const detectTimePeriod = (
-    text
-) => {
+// export const detectTimePeriod = (
+//     text
+// ) => {
+//     console.log("RAW TIME TEXT:", text);
 
-    text =
-        normalizeText(text);
+//     text =
+//         normalizeText(text)
+//             .replace(/suat chieu/g, "");
 
-    if (
-        text.includes("sang")
-    ) {
-        return "morning";
-    }
+//     console.log("NORMALIZED TIME TEXT:", text);
 
-    if (
-        text.includes("trua")
-    ) {
-        return "noon";
-    }
 
-    if (
-        text.includes("chieu")
-    ) {
-        return "afternoon";
-    }
+//     if (/\bsang\b/.test(text)) {
+//         return "morning";
+//     }
 
-    if (
-        text.includes("toi")
-    ) {
-        return "evening";
-    }
+//     if (/\btrua\b/.test(text)) {
+//         return "noon";
+//     }
 
-    return null;
-};
+//     if (/\bchieu\b/.test(text)) {
+//         return "afternoon";
+//     }
+
+//     if (/\btoi\b/.test(text)) {
+//         return "evening";
+//     }
+
+//     // return null;
+// };

@@ -50,7 +50,7 @@ const chatbotRules = (
             originalText,
             showtimes
         );
-
+        
     const detectedGenre =
         detectGenre(originalText);
 

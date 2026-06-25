@@ -4,31 +4,28 @@ import { normalizeText }
 export const detectTimePeriod = (
     text
 ) => {
+    console.log("RAW TIME TEXT:", text);
 
     text =
-        normalizeText(text);
+        normalizeText(text)
+            .replace(/suat chieu/g, "");
 
-    if (
-        text.includes("sang")
-    ) {
+    console.log("NORMALIZED TIME TEXT:", text);
+
+
+    if (/\bsang\b/.test(text)) {
         return "morning";
     }
 
-    if (
-        text.includes("trua")
-    ) {
+    if (/\btrua\b/.test(text)) {
         return "noon";
     }
 
-    if (
-        text.includes("chieu")
-    ) {
+    if (/\bchieu\b/.test(text)) {
         return "afternoon";
     }
 
-    if (
-        text.includes("toi")
-    ) {
+    if (/\btoi\b/.test(text)) {
         return "evening";
     }
 

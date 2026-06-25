@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { FaComments, FaPaperPlane, FaTimes } from "react-icons/fa";
 import styles from "./ChatBot.module.css";
 import chatbotRules from "./chatbotRules";
-import { normalizeText, getDateLabel } from "./chatbotUtils";
+import { normalizeText } from "./helpers/chatbotUtils";
 import movieApi from "../../services/movieApi";
 import khuyenMaiApi from "../../services/khuyenMaiApi";
 import { useNavigate } from "react-router-dom";
