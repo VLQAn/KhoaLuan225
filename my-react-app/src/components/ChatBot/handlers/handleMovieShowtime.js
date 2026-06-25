@@ -40,11 +40,45 @@ export const handleMovieShowtime = (
 
     if (!matchedShowtimes.length) {
 
+        let message =
+            `😢 Hiện không có suất chiếu cho phim "${movie.tieuDe}"`;
+
+        if (detectedDate) {
+
+            if (detectedDate.type === "weekend") {
+
+                message += " vào cuối tuần";
+
+            } else {
+
+                message +=
+                    ` vào ngày ${detectedDate.date.toLocaleDateString("vi-VN")}`;
+            }
+        }
+
+        if (detectedTimePeriod) {
+
+            const labels = {
+                morning: " buổi sáng",
+                afternoon: " buổi chiều",
+                evening: " buổi tối"
+            };
+
+            message += labels[detectedTimePeriod] || "";
+        }
+
+        if (detectedCinema) {
+
+            message +=
+                ` tại ${detectedCinema.value}`;
+        }
+
+        message += ".";
+
         return {
             type: "text",
-            text: `😢 Không tìm thấy suất chiếu phù hợp cho phim ${movie.tieuDe}.`
+            text: message
         };
-
     }
 
     let title =
