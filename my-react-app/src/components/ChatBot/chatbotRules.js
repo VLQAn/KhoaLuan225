@@ -330,6 +330,10 @@ const chatbotRules = (
             return null;
         }
 
+        // if (/^\d+$/.test(normalizedText)) {
+        //     return null;
+        // }
+
         const moviePhrase =
             normalizedText
                 .replace(/\s+/g, " ");

@@ -2,10 +2,10 @@ import api from "./axiosClient";
 
 const chatbotCheckoutApi = {
 
-    getInfo() {
+    getInfo(maHoaDon) {
 
         return api.get(
-            "/chatbot/checkout-info"
+            `/chatbot/checkout-info/${maHoaDon}`
         );
     }
 };

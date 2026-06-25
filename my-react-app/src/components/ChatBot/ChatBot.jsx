@@ -37,6 +37,9 @@ const ChatBot = () => {
     const [cinemas, setCinemas] =
         useState([]);
 
+    const [bookingFlow, setBookingFlow] =
+        useState(false);
+
     useEffect(() => {
 
         const saved =
@@ -159,16 +162,28 @@ const ChatBot = () => {
             return;
         }
 
-        const botResponse =
-            chatbotRules(
-                messageText,
-                movies,
-                promotions,
-                showtimes,
-                cinemas
-            );
+        let botResponse = null;
 
-        console.log("BOT RESPONSE:", botResponse);
+        if (!bookingFlow) {
+
+            botResponse =
+                chatbotRules(
+                    messageText,
+                    movies,
+                    promotions,
+                    showtimes,
+                    cinemas
+                );
+        }
+
+        console.log(
+            "BOT RESPONSE:",
+            JSON.stringify(
+                botResponse,
+                null,
+                2
+            )
+        );
 
         if (botResponse) {
 
@@ -228,6 +243,7 @@ const ChatBot = () => {
             }
 
             if (aiReply.type === "booking_showtimes") {
+                setBookingFlow(true);
                 let text =
                     `${aiReply.reply}\n\n`;
 
@@ -262,9 +278,8 @@ const ChatBot = () => {
 
             if (
                 aiReply.type ===
-                "booking_checkout"
+                "booking_invoice"
             ) {
-
                 setMessages(prev => [
 
                     ...prev,
@@ -274,20 +289,10 @@ const ChatBot = () => {
                     {
                         sender: "bot",
 
-                        type:
-                            "booking_checkout",
+                        type: "booking_invoice",
 
-                        showtimeId:
-                            aiReply.showtimeId,
-
-                        selectedSeats:
-                            aiReply.selectedSeats,
-
-                        quantity:
-                            aiReply.quantity,
-
-                        checkoutUrl:
-                            aiReply.checkoutUrl,
+                        invoiceId:
+                            aiReply.invoiceId,
 
                         text:
                             aiReply.reply
@@ -811,12 +816,21 @@ const ChatBot = () => {
                                                         try {
 
                                                             const res =
-                                                                await chatbotCheckoutApi.getInfo();
+                                                                await chatbotCheckoutApi
+                                                                    .getInfo(
+                                                                        msg.invoiceId
+                                                                    );
 
                                                             navigate(
                                                                 "/checkout",
                                                                 {
-                                                                    state: res.data
+                                                                    state: {
+                                                                        ...res.data,
+                                                                        invoiceId:
+                                                                            msg.invoiceId,
+                                                                        chatbotBooking:
+                                                                            true
+                                                                    }
                                                                 }
                                                             );
 
@@ -827,7 +841,7 @@ const ChatBot = () => {
                                                             console.error(err);
 
                                                             alert(
-                                                                "Không lấy được thông tin checkout"
+                                                                "Không lấy được hóa đơn"
                                                             );
                                                         }
 
@@ -838,7 +852,7 @@ const ChatBot = () => {
 
                                             </div>
 
-                                        ) : msg.type === "booking_checkout" ? (
+                                        ) : msg.type === "booking_invoice" ? (
 
                                             <div className={s.checkoutCard}>
 
@@ -847,8 +861,7 @@ const ChatBot = () => {
                                                 </h4>
 
                                                 <p>
-                                                    Ghế:
-                                                    {msg.selectedSeats.join(", ")}
+                                                    {msg.text}
                                                 </p>
 
                                                 <button
@@ -860,13 +873,17 @@ const ChatBot = () => {
                                                         try {
 
                                                             const res =
-                                                                await chatbotCheckoutApi.getInfo();
+                                                                await chatbotCheckoutApi.getInfo(
+                                                                    msg.invoiceId
+                                                                );
 
                                                             navigate(
                                                                 "/checkout",
                                                                 {
-                                                                    state:
-                                                                        res.data
+                                                                    state: {
+                                                                        ...res.data,
+                                                                        chatbotBooking: true
+                                                                    }
                                                                 }
                                                             );
 
@@ -876,10 +893,9 @@ const ChatBot = () => {
 
                                                             console.error(err);
 
-                                                            alert(
-                                                                "Không lấy được thông tin checkout"
-                                                            );
+                                                            alert("Không lấy được thông tin checkout");
                                                         }
+
                                                     }}
                                                 >
 
@@ -1131,7 +1147,7 @@ const ChatBot = () => {
                                                                 e.stopPropagation();
 
                                                                 navigate(
-                                                                    `/showtime/${msg.movie.maPhim}`
+                                                                    `/seat/${msg.movie.maPhim}`
                                                                 );
 
                                                             }}

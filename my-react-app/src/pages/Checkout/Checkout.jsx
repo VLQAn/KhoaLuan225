@@ -13,6 +13,9 @@ const Checkout = () => {
     const chatbotBooking =
         state?.chatbotBooking;
 
+    const invoiceId =
+        state?.invoiceId;
+
     console.log("CHECKOUT STATE", state);
 
     const foods =
@@ -52,6 +55,18 @@ const Checkout = () => {
     const handlePayment = async () => {
 
         try {
+            if (chatbotBooking) {
+                const payRes =
+                    await paymentApi
+                        .createVNPay(
+                            invoiceId
+                        );
+
+                window.location.href =
+                    payRes.data.payment_url;
+
+                return;
+            }
 
             // Tạo hóa đơn + giữ ghế
             const bookingRes =
