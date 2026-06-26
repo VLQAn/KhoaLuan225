@@ -213,6 +213,8 @@ const ChatBot = () => {
             }
 
             if (aiReply.type === "booking_invoice") {
+                setBookingFlow(false);
+
                 setMessages(prev => [
                     ...prev,
                     userMessage,
@@ -259,6 +261,8 @@ const ChatBot = () => {
             }
 
             if (aiReply.type === "smart_booking_checkout") {
+                setBookingFlow(true);
+
                 setMessages(prev => [
                     ...prev,
                     userMessage,
@@ -270,6 +274,7 @@ const ChatBot = () => {
                         showtime: aiReply.showtime,
                         quantity: aiReply.quantity,
                         seats: aiReply.seats,
+                        foods: aiReply.foods || [],
                         checkoutUrl: aiReply.checkoutUrl,
                         text: aiReply.reply
                     }
@@ -324,6 +329,8 @@ const ChatBot = () => {
                     thoiLuong: aiReply.movie.duration,
                     trangThai: aiReply.movie.status,
                     anhPoster: aiReply.movie.poster,
+                    anhBanner: aiReply.movie.banner,
+                    ngayCongChieu: aiReply.movie.releaseDate,
                     theLoai: aiReply.movie.genres || []
                 };
                 setMessages(prev => [...prev, userMessage, { sender: "bot", type: "movie", movie }]);
@@ -535,7 +542,7 @@ const ChatBot = () => {
                                                                 setOpen(false);
 
                                                                 navigate(
-                                                                    `/movie/${movie.maPhim}`
+                                                                    `/movie/${movie.maPhim}`, { state: movie }
                                                                 );
 
                                                             }}
@@ -583,7 +590,7 @@ const ChatBot = () => {
                                                             onClick={() => {
 
                                                                 navigate(
-                                                                    `/movie/${movie.maPhim}`
+                                                                    `/movie/${movie.maPhim}`, { state: movie }
                                                                 );
 
                                                                 setOpen(false);
@@ -625,7 +632,7 @@ const ChatBot = () => {
                                                             className={s.movieCard}
                                                             onClick={() => {
                                                                 setOpen(false);
-                                                                navigate(`/movie/${movie.maPhim}`);
+                                                                navigate(`/movie/${movie.maPhim}`, { state: movie });
                                                             }}
                                                         >
                                                             <img src={movie.anhPoster} alt={movie.tieuDe} />
@@ -832,68 +839,32 @@ const ChatBot = () => {
 
                                             <div className={s.checkoutCard}>
 
-                                                <h4>
-                                                    🎟️ Đã tìm thấy vé phù hợp
-                                                </h4>
+                                                <h4>🎟️ Đã tìm thấy vé phù hợp</h4>
+
+                                                <p>🎬 {msg.cinema.tenRap}</p>
+
+                                                <p>🎞️ {msg.movie.tieuDe}</p>
 
                                                 <p>
-                                                    🎬 {msg.cinema.tenRap}
+                                                    💺 {msg.seats.map(seat => `${seat.hangGhe}${seat.soGhe}`).join(", ")}
                                                 </p>
 
-                                                <p>
-                                                    🎞️ {msg.movie.tieuDe}
-                                                </p>
-
-                                                <p>
-                                                    💺 {
-                                                        msg.seats
-                                                            .map(
-                                                                seat =>
-                                                                    `${seat.hangGhe}${seat.soGhe}`
-                                                            )
-                                                            .join(", ")
-                                                    }
-                                                </p>
+                                                {msg.foods?.length > 0 && (
+                                                    <p>
+                                                        🍿 {msg.foods.map(f => `${f.name} x${f.quantity}`).join(", ")}
+                                                    </p>
+                                                )}
 
                                                 <button
                                                     className={s.checkoutBtn}
-                                                    onClick={async () => {
-
-                                                        try {
-
-                                                            const res =
-                                                                await chatbotCheckoutApi
-                                                                    .getInfo(
-                                                                        msg.invoiceId
-                                                                    );
-
-                                                            navigate(
-                                                                "/checkout",
-                                                                {
-                                                                    state: {
-                                                                        ...res.data,
-                                                                        invoiceId:
-                                                                            msg.invoiceId,
-                                                                        chatbotBooking:
-                                                                            true
-                                                                    }
-                                                                }
-                                                            );
-
-                                                            setOpen(false);
-
-                                                        } catch (err) {
-
-                                                            console.error(err);
-
-                                                            alert(
-                                                                "Không lấy được hóa đơn"
-                                                            );
-                                                        }
-
+                                                    onClick={() => {
+                                                        sendToBot(
+                                                            { sender: "user", text: "Xác nhận đặt vé" },
+                                                            "xác nhận"
+                                                        );
                                                     }}
                                                 >
-                                                    Xem thông tin đặt vé
+                                                    Xác nhận đặt vé
                                                 </button>
 
                                             </div>
@@ -1122,7 +1093,7 @@ const ChatBot = () => {
                                                     setOpen(false);
 
                                                     navigate(
-                                                        `/movie/${msg.movie.maPhim}`
+                                                        `/movie/${msg.movie.maPhim}`, { state: msg.movie }
                                                     );
 
                                                 }}
