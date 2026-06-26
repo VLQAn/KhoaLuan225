@@ -771,6 +771,20 @@ const ChatBot = () => {
                                                     )
                                                 }
 
+                                                {
+                                                    msg.infoType === "duration" && (
+                                                        <p>
+                                                            ⏱ Thời lượng: {msg.movie.duration} phút
+                                                        </p>
+                                                    )
+                                                }
+
+                                                {msg.infoType === "rating" && (
+                                                    <p>
+                                                        ⭐ Đánh giá: {msg.movie.rating}/10
+                                                    </p>
+                                                )}
+
                                             </div>
 
                                         ) : msg.type === "smart_booking_checkout" ? (

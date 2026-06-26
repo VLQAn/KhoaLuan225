@@ -8,6 +8,9 @@ export const handleBooking = (
     movie,
     showtimes
 ) => {
+    if (!movie) return null;
+    if (!showtimes) return null;
+    if (!isBookingRequest(message)) return null;
 
     const qty =
         parseTicketQuantity(text);

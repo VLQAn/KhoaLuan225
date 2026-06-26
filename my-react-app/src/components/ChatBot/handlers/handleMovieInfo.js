@@ -1,77 +1,77 @@
-import {
+import { detectMovieDetailQuery, isMovieTitleQuery } from "../helpers/chatbotMovieHelper";
 
-    detectMovieInfoType,
-
-    detectMovieDetailQuery,
-
-    isMovieTitleQuery
-
-}
-from "../helpers/chatbotMovieHelper";
-
-export const handleMovieInfo =
-(
+export const handleMovieInfo = (
     context
 ) => {
 
     const {
+
         movie,
-        message
+
+        message,
+
+        infoType
+
     } = context;
 
     if (!movie)
         return null;
 
-    const infoType =
-        detectMovieInfoType(
-            message
-        );
-
     if (infoType) {
 
         return {
 
-            type:
-                "movie_info",
+            type: "movie_info",
 
             infoType,
 
             movie: {
 
-                title:
-                    movie.tieuDe,
+                title: movie.tieuDe,
 
-                description:
-                    movie.moTa,
+                description: movie.moTa,
 
-                director:
-                    movie.daoDien,
+                director: movie.daoDien,
 
-                actors:
-                    movie.dienVien
+                actors: movie.dienVien,
+
+                duration: movie.thoiLuong,
+
+                releaseDate: movie.ngayCongChieu,
+
+                genre: movie.theLoai,
+
+                rating: movie.danhGia
+
             }
+
         };
+
     }
 
     if (
-        detectMovieDetailQuery(
-            message
-        )
+
+        detectMovieDetailQuery(message)
+
         ||
+
         isMovieTitleQuery(
             message,
             movie
         )
+
     ) {
 
         return {
 
-            type:
-                "movie",
+            type: "movie",
 
             movie
+
         };
+
     }
 
     return null;
+
 };

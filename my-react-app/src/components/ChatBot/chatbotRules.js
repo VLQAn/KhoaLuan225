@@ -7,6 +7,7 @@ import { detectTimePeriod } from "./detectors/chatbotTime";
 import { detectGenre } from "./detectors/chatbotGenre";
 import { isMovieDiscoveryQuery } from "./detectors/chatbotMovieDiscovery";
 import { shouldUseAIRecommendation } from "./detectors/chatbotRecommendationAI";
+import { detectMovieInfo } from "./detectors/chatbotMovieInfo";
 
 import { findMovieByKeyword } from "./helpers/chatbotMovieHelper";
 
@@ -50,9 +51,12 @@ const chatbotRules = (
             originalText,
             showtimes
         );
-        
+
     const detectedGenre =
         detectGenre(originalText);
+
+    const detectedMovieInfo =
+        detectMovieInfo(originalText);
 
     const foundCinema =
         findCinema(
@@ -159,10 +163,11 @@ const chatbotRules = (
     ===================================== */
 
     const movieInfoResult =
-        handleMovieInfo(
-            originalText,
-            movie
-        );
+        handleMovieInfo({
+            movie,
+            infoType: detectedMovieInfo,
+            message: originalText
+        });
 
     if (movieInfoResult) {
 
@@ -170,26 +175,7 @@ const chatbotRules = (
     }
 
     /* =====================================
-       9. BOOKING
-       Ví dụ:
-       - Đặt 2 vé Doraemon
-       - Mua 4 vé Conan
-    ===================================== */
-
-    const bookingResult =
-        handleBooking(
-            originalText,
-            movie,
-            showtimes
-        );
-
-    if (bookingResult) {
-
-        return bookingResult;
-    }
-
-    /* =====================================
-       10. MOVIE FILTER
+       9. MOVIE FILTER
        Ví dụ:
        - Phim hoạt hình
        - Phim tối nay
@@ -216,7 +202,7 @@ const chatbotRules = (
     }
 
     /* =====================================
-       11. CINEMA INFO
+       10. CINEMA INFO
        Ví dụ:
        - CGV ở đâu
        - Số điện thoại Galaxy
@@ -234,7 +220,7 @@ const chatbotRules = (
     }
 
     /* =====================================
-       12. BOOKING GUIDE
+       11. BOOKING GUIDE
        Ví dụ:
        - Đặt vé
        - Hướng dẫn đặt vé
@@ -250,6 +236,25 @@ const chatbotRules = (
     if (guideResult) {
 
         return guideResult;
+    }
+
+    /* =====================================
+       12. BOOKING
+       Ví dụ:
+       - Đặt 2 vé Doraemon
+       - Mua 4 vé Conan
+    ===================================== */
+
+    const bookingResult =
+        handleBooking(
+            originalText,
+            movie,
+            showtimes
+        );
+
+    if (bookingResult) {
+
+        return bookingResult;
     }
 
     /* =====================================

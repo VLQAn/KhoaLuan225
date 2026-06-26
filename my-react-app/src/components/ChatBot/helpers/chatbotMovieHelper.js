@@ -38,37 +38,6 @@ export const extractMovieQuery = (text) => {
 
 };
 
-export const detectMovieInfoType = (text) => {
-
-    const normalized =
-        normalizeText(text);
-
-    if (
-        normalized.includes("noi dung")
-        ||
-        normalized.includes("tom tat")
-        ||
-        normalized.includes("mo ta")
-    ) {
-        return "summary";
-    }
-
-    if (
-        normalized.includes("dao dien")
-    ) {
-        return "director";
-    }
-
-    if (
-        normalized.includes("dien vien")
-    ) {
-        return "actor";
-    }
-
-    return null;
-
-};
-
 export const calculateSimilarity = (
     query,
     movieTitle

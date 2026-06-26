@@ -38,6 +38,16 @@ export const handleIntent = (
                 promotions
             };
 
+        case "top_movies":
+
+            return {
+                type: "movie_list",
+                title: "🔥 Top phim được yêu thích",
+                movies: movies
+                    .sort((a, b) => b.danhGia - a.danhGia)
+                    .slice(0, 5)
+            };
+
         default:
             return null;
     }
