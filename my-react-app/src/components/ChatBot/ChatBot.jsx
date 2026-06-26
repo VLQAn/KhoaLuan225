@@ -135,7 +135,12 @@ const ChatBot = () => {
         );
     };
 
-    const handleSend = async () => {
+    const handleSend = async (overrideText) => {
+        const raw = overrideText ?? input;
+
+        if (!raw.trim()) return;
+
+        setInput("");
 
         if (!input.trim()) return;
 
@@ -290,6 +295,46 @@ const ChatBot = () => {
                     }
                 ]);
 
+                return;
+            }
+
+            if (aiReply.type === "booking_select_seat") {
+                setMessages(prev => [
+                    ...prev,
+                    userMessage,
+                    {
+                        sender: "bot",
+                        type: "booking_select_seat",
+                        text: aiReply.reply,
+                        availableSeats: aiReply.availableSeats || []
+                    }
+                ]);
+                setInput("");
+                return;
+            }
+
+            if (aiReply.type === "ask_food") {
+                setMessages(prev => [
+                    ...prev,
+                    userMessage,
+                    { sender: "bot", type: "ask_food", text: aiReply.reply }
+                ]);
+                setInput("");
+                return;
+            }
+
+            if (aiReply.type === "food_list") {
+                setMessages(prev => [
+                    ...prev,
+                    userMessage,
+                    {
+                        sender: "bot",
+                        type: "food_list",
+                        text: aiReply.reply,
+                        foods: aiReply.foods || []
+                    }
+                ]);
+                setInput("");
                 return;
             }
 
@@ -1165,6 +1210,50 @@ const ChatBot = () => {
 
                                             </div>
 
+                                        ) : msg.type === "booking_select_seat" ? (
+
+                                            <div>
+                                                <p>{msg.text}</p>
+
+                                                {msg.availableSeats?.length > 0 && (
+                                                    <p>
+                                                        🟢 Ghế trống:{" "}
+                                                        {msg.availableSeats
+                                                            .map(seat => `${seat.hangGhe}${seat.soGhe}`)
+                                                            .join(", ")}
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                        ) : msg.type === "food_list" ? (
+
+                                            <div>
+                                                <p>{msg.text}</p>
+
+                                                <div className={s.movieCards}>
+                                                    {msg.foods?.map(food => (
+                                                        <div key={food.maMon} className={s.movieCard}>
+                                                            <h4>{food.tenMon}</h4>
+                                                            <p>{Number(food.gia).toLocaleString("vi-VN")} VNĐ</p>
+                                                            {food.moTa && <p>{food.moTa}</p>}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                        ) : msg.type === "ask_food" ? (
+
+                                            <div>
+                                                <p>{msg.text}</p>
+                                                <div>
+                                                    <button className={s.checkoutBtn} onClick={() => handleSend("không")}>
+                                                        Không, cảm ơn
+                                                    </button>
+                                                    <button className={s.checkoutBtn} onClick={() => handleSend("có")}>
+                                                        Có, đặt thêm
+                                                    </button>
+                                                </div>
+                                            </div>
                                         ) : (
 
                                             msg.text

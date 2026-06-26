@@ -15,9 +15,7 @@ import { handleIntent } from "./handlers/handleIntent";
 import { handleMovieInfo } from "./handlers/handleMovieInfo";
 import { handleMovieShowtime } from "./handlers/handleMovieShowtime";
 import { handleMovieFilter } from "./handlers/handleMovieFilter";
-import { handleBooking } from "./handlers/handleBooking";
 import { handleCinemaInfo } from "./handlers/handleCinemaInfo";
-import { handleBookingGuide } from "./handlers/handleBookingGuide";
 
 const chatbotRules = (
     message,
@@ -220,45 +218,7 @@ const chatbotRules = (
     }
 
     /* =====================================
-       11. BOOKING GUIDE
-       Ví dụ:
-       - Đặt vé
-       - Hướng dẫn đặt vé
-    ===================================== */
-
-    const guideResult =
-        handleBookingGuide({
-            processedText: originalText,
-            originalText,
-            movies
-        });
-
-    if (guideResult) {
-
-        return guideResult;
-    }
-
-    /* =====================================
-       12. BOOKING
-       Ví dụ:
-       - Đặt 2 vé Doraemon
-       - Mua 4 vé Conan
-    ===================================== */
-
-    const bookingResult =
-        handleBooking(
-            originalText,
-            movie,
-            showtimes
-        );
-
-    if (bookingResult) {
-
-        return bookingResult;
-    }
-
-    /* =====================================
-       13. FALLBACK AI
+       11. FALLBACK AI
     ===================================== */
 
     return null;
