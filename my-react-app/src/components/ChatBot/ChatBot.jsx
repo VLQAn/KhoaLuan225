@@ -40,6 +40,36 @@ const ChatBot = () => {
     const [bookingFlow, setBookingFlow] =
         useState(false);
 
+    const [selectedSeats, setSelectedSeats] = useState([]);
+
+    const toggleSeat = (seatCode, maxQuantity) => {
+        setSelectedSeats(prev => {
+            if (prev.includes(seatCode)) {
+                return prev.filter(s => s !== seatCode);
+            }
+            if (prev.length >= maxQuantity) {
+                return prev;
+            }
+            return [...prev, seatCode];
+        });
+    };
+
+    const confirmSeatSelection = async (quantity) => {
+
+        if (selectedSeats.length !== quantity) return;
+
+        const seatText = selectedSeats.join(" ");
+
+        const userMessage = {
+            sender: "user",
+            text: `Đã chọn ghế: ${selectedSeats.join(", ")}`
+        };
+
+        setSelectedSeats([]);
+
+        await sendToBot(userMessage, seatText);
+    };
+
     useEffect(() => {
 
         const saved =
@@ -135,104 +165,21 @@ const ChatBot = () => {
         );
     };
 
-    const handleSend = async (overrideText) => {
-        const raw = overrideText ?? input;
+    const sendToBot = async (userMessage, textToSend) => {
 
-        if (!raw.trim()) return;
-
-        setInput("");
-
-        if (!input.trim()) return;
-
-        const messageText = input.trim();
-
-        setInput("");
-
-        const userMessage = {
-            sender: "user",
-            text: messageText
-        };
-
-        if (isCancelBookingCommand(messageText)) {
-            const botMessage = {
-                sender: "bot",
-                type: "text",
-                text: "🛑 Đã huỷ yêu cầu đặt vé. Bạn có thể gửi yêu cầu mới khi cần."
-            };
-            setMessages(prev => [
-                ...prev,
-                userMessage,
-                botMessage
-            ]);
-            return;
-        }
-
-        let botResponse = null;
-
-        if (!bookingFlow) {
-
-            botResponse =
-                chatbotRules(
-                    messageText,
-                    movies,
-                    promotions,
-                    showtimes,
-                    cinemas
-                );
-        }
-
-        if (botResponse) {
-
-            const botMessage = {
-                sender: "bot",
-                ...botResponse
-            };
-
-            setMessages(prev => [
-                ...prev,
-                userMessage,
-                botMessage
-            ]);
-
-            setInput("");
-
-            return;
-        }
-
-
-        // Fallback AI
         try {
 
             console.log("CALLING OPENAI...");
 
-            // If a prior bot message provided a requested ticket quantity, attach it to the outgoing message
-            const lastBotWithQty = [...messages].slice().reverse().find(m => m.sender === "bot" && m.nbTickets);
-            const messageToSend = lastBotWithQty
-                ? `${messageText} (yêu cầu ${lastBotWithQty.nbTickets} vé)`
-                : messageText;
+            const aiReply = await chatBotService.askAI(textToSend);
 
-            const aiReply =
-                await chatBotService.askAI(messageToSend);
-
-            console.log(
-                "AI REPLY:",
-                aiReply
-            );
+            console.log("AI REPLY:", aiReply);
 
             if (aiReply.type === "movie_info") {
-
                 setMessages(prev => [
-
                     ...prev,
-
                     userMessage,
-
-                    {
-                        sender: "bot",
-                        type: "movie_info",
-                        infoType: aiReply.infoType,
-                        movie: aiReply.movie
-                    }
+                    { sender: "bot", type: "movie_info", infoType: aiReply.infoType, movie: aiReply.movie }
                 ]);
                 setInput("");
                 return;
@@ -240,31 +187,24 @@ const ChatBot = () => {
 
             if (aiReply.type === "booking_showtimes") {
                 setBookingFlow(true);
-                let text =
-                    `${aiReply.reply}\n\n`;
 
-                aiReply.showtimes.forEach(
-                    (showtime, index) => {
-                        text +=
-                            `${index + 1}. ${new Date(
-                                showtime.thoiGianBatDau
-                            ).toLocaleString("vi-VN")}\n`;
-                    }
-                );
-
-                text +=
-                    "\n👉 Bạn muốn mình đặt vé cho suất chiếu nào.";
-
-                // try to infer requested ticket quantity from the reply or the user's message
-                const qtyMatch = (messageToSend || messageText).match(/(\d+)\s*vé|\(yêu cầu\s*(\d+)\s*vé\)/);
+                const qtyMatch = textToSend.match(/(\d+)\s*vé|\(yêu cầu\s*(\d+)\s*vé\)/);
                 const inferredQty = qtyMatch ? Number(qtyMatch[1] || qtyMatch[2]) : null;
+
+                const MAX_SHOWTIME = 5;
+                const allShowtimes = aiReply.showtimes || [];
+                const firstFive = allShowtimes.slice(0, MAX_SHOWTIME);
 
                 setMessages(prev => [
                     ...prev,
                     userMessage,
                     {
                         sender: "bot",
-                        text,
+                        type: "booking_showtimes",
+                        text: aiReply.reply,
+                        showtimes: firstFive,
+                        allShowtimes: allShowtimes,
+                        expanded: false,
                         nbTickets: inferredQty
                     }
                 ]);
@@ -272,33 +212,17 @@ const ChatBot = () => {
                 return;
             }
 
-            if (
-                aiReply.type ===
-                "booking_invoice"
-            ) {
+            if (aiReply.type === "booking_invoice") {
                 setMessages(prev => [
-
                     ...prev,
-
                     userMessage,
-
-                    {
-                        sender: "bot",
-
-                        type: "booking_invoice",
-
-                        invoiceId:
-                            aiReply.invoiceId,
-
-                        text:
-                            aiReply.reply
-                    }
+                    { sender: "bot", type: "booking_invoice", invoiceId: aiReply.invoiceId, text: aiReply.reply }
                 ]);
-
                 return;
             }
 
             if (aiReply.type === "booking_select_seat") {
+                setSelectedSeats([]);
                 setMessages(prev => [
                     ...prev,
                     userMessage,
@@ -306,7 +230,8 @@ const ChatBot = () => {
                         sender: "bot",
                         type: "booking_select_seat",
                         text: aiReply.reply,
-                        availableSeats: aiReply.availableSeats || []
+                        availableSeats: aiReply.availableSeats || [],
+                        quantity: aiReply.quantity || 1
                     }
                 ]);
                 setInput("");
@@ -327,57 +252,28 @@ const ChatBot = () => {
                 setMessages(prev => [
                     ...prev,
                     userMessage,
-                    {
-                        sender: "bot",
-                        type: "food_list",
-                        text: aiReply.reply,
-                        foods: aiReply.foods || []
-                    }
+                    { sender: "bot", type: "food_list", text: aiReply.reply }
                 ]);
                 setInput("");
                 return;
             }
 
-            if (
-                aiReply.type ===
-                "smart_booking_checkout"
-            ) {
-
+            if (aiReply.type === "smart_booking_checkout") {
                 setMessages(prev => [
-
                     ...prev,
-
                     userMessage,
-
                     {
                         sender: "bot",
-
-                        type:
-                            "smart_booking_checkout",
-
-                        movie:
-                            aiReply.movie,
-
-                        cinema:
-                            aiReply.cinema,
-
-                        showtime:
-                            aiReply.showtime,
-
-                        quantity:
-                            aiReply.quantity,
-
-                        seats:
-                            aiReply.seats,
-
-                        checkoutUrl:
-                            aiReply.checkoutUrl,
-
-                        text:
-                            aiReply.reply
+                        type: "smart_booking_checkout",
+                        movie: aiReply.movie,
+                        cinema: aiReply.cinema,
+                        showtime: aiReply.showtime,
+                        quantity: aiReply.quantity,
+                        seats: aiReply.seats,
+                        checkoutUrl: aiReply.checkoutUrl,
+                        text: aiReply.reply
                     }
                 ]);
-
                 return;
             }
 
@@ -385,32 +281,20 @@ const ChatBot = () => {
                 setMessages(prev => [
                     ...prev,
                     userMessage,
-                    {
-                        sender: "bot",
-                        text: aiReply.reply
-                    }
+                    { sender: "bot", text: aiReply.reply }
                 ]);
-
-                setTimeout(() => {
-                    navigate(`/movie/${aiReply.movieId}`);
-                }, 1500);
-
+                setTimeout(() => navigate(`/movie/${aiReply.movieId}`), 1500);
                 setInput("");
                 return;
             }
 
             if (aiReply.type === "showtime_query") {
-
-                const dateLabel =
-                    getDateLabel(aiReply.date);
-
-                let text =
-                    dateLabel
-                        ? `🎬 ${aiReply.movie.tieuDe} có các suất chiếu vào ${dateLabel} như sau:`
-                        : `🎬 ${aiReply.movie.tieuDe} có các suất chiếu như sau:`;
+                const dateLabel = getDateLabel(aiReply.date);
+                let text = dateLabel
+                    ? `🎬 ${aiReply.movie.tieuDe} có các suất chiếu vào ${dateLabel} như sau:`
+                    : `🎬 ${aiReply.movie.tieuDe} có các suất chiếu như sau:`;
 
                 const MAX_SHOWTIME = 5;
-
                 const firstFive = aiReply.showtimes.slice(0, MAX_SHOWTIME);
 
                 setMessages(prev => [
@@ -442,22 +326,12 @@ const ChatBot = () => {
                     anhPoster: aiReply.movie.poster,
                     theLoai: aiReply.movie.genres || []
                 };
-
-                setMessages(prev => [
-                    ...prev,
-                    userMessage,
-                    {
-                        sender: "bot",
-                        type: "movie",
-                        movie
-                    }
-                ]);
+                setMessages(prev => [...prev, userMessage, { sender: "bot", type: "movie", movie }]);
                 setInput("");
                 return;
             }
 
             if (aiReply.type === "top_movies" && Array.isArray(aiReply.movies)) {
-
                 const genreLabel = aiReply.genre ? ` ${aiReply.genre}` : "";
 
                 if (aiReply.movies.length === 1) {
@@ -478,43 +352,26 @@ const ChatBot = () => {
                         }
                     ]);
                 }
-
                 setInput("");
                 return;
             }
 
-            if (
-                aiReply.type === "recommendation" &&
-                Array.isArray(aiReply.movies)
-            ) {
-
+            if (aiReply.type === "recommendation" && Array.isArray(aiReply.movies)) {
                 setMessages(prev => [
                     ...prev,
                     userMessage,
-                    {
-                        sender: "bot",
-                        type: "recommendation",
-                        title: aiReply.title,
-                        movies: aiReply.movies
-                    }
+                    { sender: "bot", type: "recommendation", title: aiReply.title, movies: aiReply.movies }
                 ]);
-
                 setInput("");
-
                 return;
             }
 
             if (aiReply.type === "genre_filter") {
-
                 if (!Array.isArray(aiReply.movies) || aiReply.movies.length === 0) {
                     setMessages(prev => [
                         ...prev,
                         userMessage,
-                        {
-                            sender: "bot",
-                            text: aiReply.reply
-                                || `😢 Hiện chưa có phim ${aiReply.genre} đang chiếu.`
-                        }
+                        { sender: "bot", text: aiReply.reply || `😢 Hiện chưa có phim ${aiReply.genre} đang chiếu.` }
                     ]);
                     setInput("");
                     return;
@@ -527,35 +384,19 @@ const ChatBot = () => {
                 setMessages(prev => [
                     ...prev,
                     userMessage,
-                    {
-                        sender: "bot",
-                        type: "movie_list",
-                        title,
-                        movies: aiReply.movies
-                    }
+                    { sender: "bot", type: "movie_list", title, movies: aiReply.movies }
                 ]);
                 setInput("");
                 return;
             }
 
-            if (
-                aiReply.type === "rating_filter" &&
-                Array.isArray(aiReply.movies)
-            ) {
-
+            if (aiReply.type === "rating_filter" && Array.isArray(aiReply.movies)) {
                 setMessages(prev => [
                     ...prev,
                     userMessage,
-                    {
-                        sender: "bot",
-                        type: "rating_filter",
-                        min_rating: aiReply.min_rating,
-                        movies: aiReply.movies
-                    }
+                    { sender: "bot", type: "rating_filter", min_rating: aiReply.min_rating, movies: aiReply.movies }
                 ]);
-
                 setInput("");
-
                 return;
             }
 
@@ -563,10 +404,7 @@ const ChatBot = () => {
                 setMessages(prev => [
                     ...prev,
                     userMessage,
-                    {
-                        sender: "bot",
-                        text: "Xin lỗi, tôi không tìm thấy một hoặc cả hai phim bạn nhắc đến. Bạn kiểm tra lại tên phim giúp tôi nhé."
-                    }
+                    { sender: "bot", text: "Xin lỗi, tôi không tìm thấy một hoặc cả hai phim bạn nhắc đến. Bạn kiểm tra lại tên phim giúp tôi nhé." }
                 ]);
                 setInput("");
                 return;
@@ -576,44 +414,70 @@ const ChatBot = () => {
                 setMessages(prev => [
                     ...prev,
                     userMessage,
-                    {
-                        sender: "bot",
-                        type: "comparison",
-                        movie1: aiReply.movie1,
-                        movie2: aiReply.movie2,
-                        verdict: aiReply.verdict
-                    }
+                    { sender: "bot", type: "comparison", movie1: aiReply.movie1, movie2: aiReply.movie2, verdict: aiReply.verdict }
                 ]);
                 setInput("");
                 return;
             }
 
-            setMessages(prev => [
-                ...prev,
-                userMessage,
-                {
-                    sender: "bot",
-                    text: aiReply.reply
-                }
-            ]);
+            setMessages(prev => [...prev, userMessage, { sender: "bot", text: aiReply.reply }]);
             setInput("");
+
         } catch (error) {
 
             console.error(error);
 
-            const botMessage = {
-                sender: "bot",
-                text: "Xin lỗi, AI hiện đang bận."
-            };
-
             setMessages(prev => [
                 ...prev,
                 userMessage,
-                botMessage
+                { sender: "bot", text: "Xin lỗi, AI hiện đang bận." }
             ]);
         }
+    };
+
+    const handleSend = async (overrideText) => {
+
+        const raw = overrideText ?? input;
+
+        if (!raw.trim()) return;
+
+        const messageText = raw.trim();
 
         setInput("");
+
+        const userMessage = {
+            sender: "user",
+            text: messageText
+        };
+
+        if (isCancelBookingCommand(messageText)) {
+            const botMessage = {
+                sender: "bot",
+                type: "text",
+                text: "🛑 Đã huỷ yêu cầu đặt vé. Bạn có thể gửi yêu cầu mới khi cần."
+            };
+            setMessages(prev => [...prev, userMessage, botMessage]);
+            return;
+        }
+
+        let botResponse = null;
+
+        if (!bookingFlow) {
+            botResponse = chatbotRules(messageText, movies, promotions, showtimes, cinemas);
+        }
+
+        if (botResponse) {
+            const botMessage = { sender: "bot", ...botResponse };
+            setMessages(prev => [...prev, userMessage, botMessage]);
+            return;
+        }
+
+        const lastBotWithQty = [...messages].slice().reverse().find(m => m.sender === "bot" && m.nbTickets);
+        const messageToSend = lastBotWithQty
+            ? `${messageText} (yêu cầu ${lastBotWithQty.nbTickets} vé)`
+            : messageText;
+
+        await sendToBot(userMessage, messageToSend);
     };
 
     return (
@@ -781,6 +645,138 @@ const ChatBot = () => {
                                                     </p>
                                                 )}
 
+                                            </div>
+
+                                        ) : msg.type === "booking_showtimes" ? (
+
+                                            <div>
+                                                <p className={s.showtimeTitle}>{msg.text}</p>
+
+                                                <div className={s.showtimeCards}>
+                                                    {msg.showtimes.map((showtime, index) => {
+
+                                                        const rap =
+                                                            showtime.phongChieu?.rapChieu?.tenRap
+                                                            || showtime.phong_chieu?.rap_chieu?.tenRap
+                                                            || "Không rõ rạp";
+
+                                                        const ngay = new Date(showtime.thoiGianBatDau).toLocaleDateString("vi-VN");
+                                                        const gio = new Date(showtime.thoiGianBatDau).toLocaleTimeString("vi-VN", {
+                                                            hour: "2-digit",
+                                                            minute: "2-digit"
+                                                        });
+
+                                                        return (
+                                                            <div key={showtime.maXuatChieu} className={s.showtimeCard}>
+                                                                <div className={s.showtimeIndex}>#{index + 1}</div>
+                                                                <div className={s.showtimeInfo}>
+                                                                    <div className={s.showtimeTime}>🕒 {gio}</div>
+                                                                    <div className={s.showtimeDate}>📅 {ngay}</div>
+                                                                    <div className={s.showtimeCinema}>🎬 {rap}</div>
+                                                                </div>
+                                                                <button
+                                                                    className={s.bookShowtimeBtn}
+                                                                    onClick={() => handleSend(String(index + 1))}
+                                                                >
+                                                                    Chọn suất này
+                                                                </button>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+
+                                                {msg.allShowtimes?.length > 5 && (
+                                                    <button
+                                                        className={s.showMoreBtn}
+                                                        onClick={() => {
+                                                            setMessages(prev =>
+                                                                prev.map(m => {
+                                                                    if (m !== msg) return m;
+                                                                    const isExpanded = m.expanded;
+                                                                    return {
+                                                                        ...m,
+                                                                        expanded: !isExpanded,
+                                                                        showtimes: isExpanded
+                                                                            ? m.allShowtimes.slice(0, 5)
+                                                                            : m.allShowtimes
+                                                                    };
+                                                                })
+                                                            );
+                                                        }}
+                                                    >
+                                                        {msg.expanded ? "Thu gọn" : "Xem thêm"}
+                                                    </button>
+                                                )}
+
+                                                <p className={s.showtimeHint}>👉 Bạn muốn mình đặt vé cho suất chiếu nào?</p>
+                                            </div>
+
+                                        ) : msg.type === "booking_select_seat" ? (
+
+                                            <div>
+                                                <p>{msg.text}</p>
+
+                                                <div className={s.seatLegend}>
+                                                    <span className={s.legendItem}>
+                                                        <span className={s.legendBox}></span> Còn trống
+                                                    </span>
+                                                    <span className={s.legendItem}>
+                                                        <span className={`${s.legendBox} ${s.legendBoxSelected}`}></span> Đã chọn
+                                                    </span>
+                                                </div>
+
+                                                {msg.availableSeats?.length > 0 && (() => {
+
+                                                    const rows = {};
+                                                    msg.availableSeats.forEach(seat => {
+                                                        if (!rows[seat.hangGhe]) rows[seat.hangGhe] = [];
+                                                        rows[seat.hangGhe].push(seat);
+                                                    });
+
+                                                    const rowKeys = Object.keys(rows).sort();
+
+                                                    return (
+                                                        <div className={s.seatGrid}>
+                                                            {rowKeys.map(row => (
+                                                                <div key={row} className={s.seatRow}>
+                                                                    <span className={s.seatRowLabel}>{row}</span>
+
+                                                                    {rows[row]
+                                                                        .sort((a, b) => a.soGhe - b.soGhe)
+                                                                        .map(seat => {
+                                                                            const code = `${seat.hangGhe}${seat.soGhe}`;
+                                                                            const isSelected = selectedSeats.includes(code);
+                                                                            const isMaxed = !isSelected && selectedSeats.length >= msg.quantity;
+
+                                                                            return (
+                                                                                <button
+                                                                                    key={seat.maGhe}
+                                                                                    className={`${s.seatBox} ${isSelected ? s.seatBoxSelected : ""} ${isMaxed ? s.seatBoxDisabled : ""}`}
+                                                                                    disabled={isMaxed}
+                                                                                    onClick={() => toggleSeat(code, msg.quantity)}
+                                                                                >
+                                                                                    {seat.soGhe}
+                                                                                </button>
+                                                                            );
+                                                                        })}
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    );
+                                                })()}
+
+                                                <p className={s.seatSelectedText}>
+                                                    Đã chọn: {selectedSeats.length > 0 ? selectedSeats.join(", ") : "chưa chọn ghế"}
+                                                    {" "}({selectedSeats.length}/{msg.quantity})
+                                                </p>
+
+                                                <button
+                                                    className={s.checkoutBtn}
+                                                    disabled={selectedSeats.length !== msg.quantity}
+                                                    onClick={() => confirmSeatSelection(msg.quantity)}
+                                                >
+                                                    Xác nhận chọn ghế
+                                                </button>
                                             </div>
 
                                         ) : msg.type === "movie_info" ? (
@@ -1229,30 +1225,12 @@ const ChatBot = () => {
 
                                             <div>
                                                 <p>{msg.text}</p>
-
-                                                <div className={s.movieCards}>
-                                                    {msg.foods?.map(food => (
-                                                        <div key={food.maMon} className={s.movieCard}>
-                                                            <h4>{food.tenMon}</h4>
-                                                            <p>{Number(food.gia).toLocaleString("vi-VN")} VNĐ</p>
-                                                            {food.moTa && <p>{food.moTa}</p>}
-                                                        </div>
-                                                    ))}
-                                                </div>
                                             </div>
 
                                         ) : msg.type === "ask_food" ? (
 
                                             <div>
                                                 <p>{msg.text}</p>
-                                                <div>
-                                                    <button className={s.checkoutBtn} onClick={() => handleSend("không")}>
-                                                        Không, cảm ơn
-                                                    </button>
-                                                    <button className={s.checkoutBtn} onClick={() => handleSend("có")}>
-                                                        Có, đặt thêm
-                                                    </button>
-                                                </div>
                                             </div>
                                         ) : (
 

@@ -413,3 +413,96 @@
 .comparisonVerdict b {
     color: #e53935;
 }
+
+.seatLegend {
+    display: flex;
+    gap: 16px;
+    margin: 8px 0;
+    font-size: 13px;
+}
+
+.legendItem {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legendBox {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+}
+
+.legendBoxSelected {
+    background: #e53935;
+    border-color: #e50914;
+}
+
+.seatGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 10px 0;
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.seatRow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.seatRowLabel {
+    width: 22px;
+    font-weight: 600;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.seatBox {
+    width: 36px;
+    height: 36px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+}
+
+.seatBox:hover:not(:disabled) {
+    border-color: #e50914;
+}
+
+.seatBoxSelected {
+    background: #e53935;
+    color: #fff;
+    border-color: #e50914;
+}
+
+.seatBoxDisabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.seatSelectedText {
+    font-size: 13px;
+    margin: 6px 0;
+    color: #555;
+}
+
+.foodListText {
+    white-space: pre-line;
+    line-height: 1.5;
+}
+
+.showtimeHint {
+    margin-top: 10px;
+    font-weight: 500;
+}
