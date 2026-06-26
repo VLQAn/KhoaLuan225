@@ -1,29 +1,29 @@
-import { normalizeText } from "./chatbotUtils";
+// import { normalizeText } from "./chatbotUtils";
 
-export const isMovieDiscoveryQuery =
-    text => {
+// export const isMovieDiscoveryQuery =
+//     text => {
 
-        text =
-            normalizeText(text);
+//         text =
+//             normalizeText(text);
 
-        return (
+//         return (
 
-            text.includes("co phim")
+//             text.includes("co phim")
 
-            ||
+//             ||
 
-            text.includes("phim nao")
+//             text.includes("phim nao")
 
-            ||
+//             ||
 
-            text.includes("co gi xem")
+//             text.includes("co gi xem")
 
-            ||
+//             ||
 
-            text.includes("xem gi")
+//             text.includes("xem gi")
 
-            ||
+//             ||
 
-            text.includes("goi y phim")
-        );
-    };
+//             text.includes("goi y phim")
+//         );
+//     };

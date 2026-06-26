@@ -11,8 +11,6 @@ export const parseTicketQuantity =
                 /(\d+)\s*(ve|vé)*/
             );
 
-        const safeArray = Array.isArray(xxx) ? xxx : [];
-
         if (digitMatch) {
             return Number(
                 digitMatch[1]

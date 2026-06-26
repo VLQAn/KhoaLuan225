@@ -1,4 +1,5 @@
 import { normalizeText } from "../helpers/chatbotUtils";
+import { stopWords } from "../constants/stopWords";
 
 export const normalizeMovieText = (text = "") => {
 
@@ -82,90 +83,54 @@ export const extractMovieAliases = (
 
 };
 
-export const findMovieByKeyword = (
-    text,
-    movies
-) => {
+export const findMovieByKeyword = (text, movies) => {
 
-    const normalizedText =
-        normalizeText(text);
+    const normalizedText = normalizeText(text);
 
     let bestMovie = null;
     let bestScore = 0;
 
     movies.forEach(movie => {
 
-        const aliases =
-            extractMovieAliases(
-                movie.tieuDe
-            );
+        const aliases = extractMovieAliases(movie.tieuDe);
 
         let score = 0;
 
         aliases.forEach(alias => {
 
-            const words =
-                alias
-                    .split(" ")
-                    .filter(
-                        word =>
-                            word.length >= 2
-                    );
-
-            const queryWords =
-                normalizedText.split(" ");
-
-            const matched =
-                words.filter(
-                    word =>
-                        queryWords.includes(word)
-                ).length;
-
-            score =
-                Math.max(
-                    score,
-                    matched
+            const words = alias
+                .split(" ")
+                .filter(word =>
+                    word.length >= 2 &&
+                    !stopWords.includes(word)   // <-- loại stop word
                 );
 
-            if (
-                normalizedText.includes(alias)
-            ) {
+            const queryWords = normalizedText
+                .split(" ")
+                .filter(word => !stopWords.includes(word));  // <-- loại stop word
+
+            const matched = words.filter(
+                word => queryWords.includes(word)
+            ).length;
+
+            score = Math.max(score, matched);
+
+            if (normalizedText.includes(alias)) {
                 score += 100;
             }
 
         });
 
-        if (score > 0) {
-            console.log(
-                movie.tieuDe,
-                score
-            );
-        }
-
-        if (
-            score > bestScore &&
-            score > 0
-        ) {
-
+        if (score > bestScore && score > 0) {
             bestScore = score;
             bestMovie = movie;
-
         }
 
     });
 
-    console.log(
-        "BEST MOVIE:",
-        bestMovie?.tieuDe,
-        "SCORE:",
-        bestScore
-    );
-
-    return bestScore > 0
-        ? bestMovie
-        : null;
-
+    return bestScore > 0 ? bestMovie : null;
 };
+
 
 export const detectMovieDetailQuery = (
     text

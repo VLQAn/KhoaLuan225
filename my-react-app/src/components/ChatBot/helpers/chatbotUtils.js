@@ -60,6 +60,21 @@ export const getDateLabel = (date) => {
         case "tet":
             return "Tết";
 
+        case "next_weekend":
+            return "cuối tuần sau";
+
+        case "start_of_month":
+            return "đầu tháng";
+
+        case "end_of_month":
+            return "cuối tháng";
+
+        case "christmas":
+            return "Giáng Sinh";
+
+        case "new_year":
+            return "năm mới";
+
         default:
             return date;
     }
