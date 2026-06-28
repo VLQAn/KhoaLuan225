@@ -17,6 +17,11 @@ import {
     MdChair,
     MdAccessTime,
     MdKeyboardArrowDown,
+    MdKeyboardArrowUp,
+    MdLocalMovies,
+    MdRestaurantMenu,
+    MdPayments,
+    MdDiscount
 } from "react-icons/md";
 
 import { useEffect, useState } from "react";
@@ -363,7 +368,7 @@ const BookingManager = () => {
                                             </div>
 
                                             <div className={s.detail_item}>
-                                                <MdCombo />
+                                                <MdRestaurantMenu />
                                                 <div>
                                                     <h4>Bắp nước</h4>
                                                     <p>{booking.food}</p>
